@@ -14,11 +14,13 @@ class MainWindow(QMainWindow):
 
         #layouts
         osc_labels = QVBoxLayout()
-        osc_layout = QVBoxLayout()
+        osc_sliders = QVBoxLayout()
         osc_buttons = QHBoxLayout()
         filt_labels = QVBoxLayout()
-        filt_layout = QVBoxLayout()
+        filt_sliders = QVBoxLayout()
         filt_buttons = QHBoxLayout()
+        adsr_labels = QVBoxLayout()
+        adsr_sliders = QVBoxLayout()
         self.window_layout = QHBoxLayout()
 
         #labels
@@ -31,6 +33,11 @@ class MainWindow(QMainWindow):
         self.osc_amp_label = QLabel("level:")
         self.osc_width_label = QLabel("width:")
         self.osc_alg_label = QLabel("shape:")
+
+        self.adsr_att_label = QLabel("attack:")
+        self.adsr_dec_label = QLabel("decay:")
+        self.adsr_sus_label = QLabel("sustain:")
+        self.adsr_rel_label = QLabel("release:")
 
         #sliders
         self.filt_freq_slider = QSlider(Qt.Horizontal)
@@ -62,6 +69,26 @@ class MainWindow(QMainWindow):
         self.osc_width_slider.setSingleStep(1)
         self.osc_width_slider.setRange(0, 500)
         self.osc_width_slider.setValue(250)
+
+        self.adsr_att_slider = QSlider(Qt.Horizontal)
+        self.adsr_att_slider.setSingleStep(1)
+        self.adsr_att_slider.setRange(1, 1000)
+        self.adsr_att_slider.setValue(10)
+
+        self.adsr_dec_slider = QSlider(Qt.Horizontal)
+        self.adsr_dec_slider.setSingleStep(1)
+        self.adsr_dec_slider.setRange(1, 1000)
+        self.adsr_dec_slider.setValue(500)
+
+        self.adsr_sus_slider = QSlider(Qt.Horizontal)
+        self.adsr_sus_slider.setSingleStep(1)
+        self.adsr_sus_slider.setRange(1, 1000)
+        self.adsr_sus_slider.setValue(500)
+
+        self.adsr_rel_slider = QSlider(Qt.Horizontal)
+        self.adsr_rel_slider.setSingleStep(1)
+        self.adsr_rel_slider.setRange(1, 1000)
+        self.adsr_rel_slider.setValue(500)
 
         #radio buttons
         self.osc_alg_sin = QRadioButton("sine")
@@ -98,33 +125,48 @@ class MainWindow(QMainWindow):
         osc_labels.addWidget(self.osc_width_label)
         osc_labels.addWidget(self.osc_alg_label)
 
-        #add sliders
-        filt_layout.addWidget(self.filt_freq_slider)
-        filt_layout.addWidget(self.filt_res_slider)
-        filt_layout.addWidget(self.filt_drive_slider)
+        adsr_labels.addWidget(self.adsr_att_label)
+        adsr_labels.addWidget(self.adsr_dec_label)
+        adsr_labels.addWidget(self.adsr_sus_label)
+        adsr_labels.addWidget(self.adsr_rel_label)
 
-        osc_layout.addWidget(self.osc_freq_slider)
-        osc_layout.addWidget(self.osc_amp_slider)
-        osc_layout.addWidget(self.osc_width_slider)
+        #add sliders
+        filt_sliders.addWidget(self.filt_freq_slider)
+        filt_sliders.addWidget(self.filt_res_slider)
+        filt_sliders.addWidget(self.filt_drive_slider)
+
+        osc_sliders.addWidget(self.osc_freq_slider)
+        osc_sliders.addWidget(self.osc_amp_slider)
+        osc_sliders.addWidget(self.osc_width_slider)
+
+        adsr_sliders.addWidget(self.adsr_att_slider)
+        adsr_sliders.addWidget(self.adsr_dec_slider)
+        adsr_sliders.addWidget(self.adsr_sus_slider)
+        adsr_sliders.addWidget(self.adsr_rel_slider)
+
 
         #add radio buttons
         filt_buttons.addWidget(self.filt_alg_low)
         filt_buttons.addWidget(self.filt_alg_high)
         filt_buttons.addWidget(self.filt_alg_band)
         filt_buttons.addWidget(self.filt_alg_notch)
-        filt_layout.addLayout(filt_buttons)
+        filt_sliders.addLayout(filt_buttons)
 
         osc_buttons.addWidget(self.osc_alg_sin)
         osc_buttons.addWidget(self.osc_alg_saw)
         osc_buttons.addWidget(self.osc_alg_pulse)
-        osc_layout.addLayout(osc_buttons)
+        osc_sliders.addLayout(osc_buttons)
 
         #add layouts
         self.window_layout.addLayout(filt_labels)
-        self.window_layout.addLayout(filt_layout)
+        self.window_layout.addLayout(filt_sliders)
 
         self.window_layout.addLayout(osc_labels)
-        self.window_layout.addLayout(osc_layout)
+        self.window_layout.addLayout(osc_sliders)
+
+        self.window_layout.addLayout(adsr_labels)
+        self.window_layout.addLayout(adsr_sliders)
+
         self.env_test = QPushButton("gate")
         self.env_test.setCheckable(True)
         self.window_layout.addWidget(self.env_test)
@@ -146,6 +188,11 @@ class MainWindow(QMainWindow):
         self.osc_amp_slider.valueChanged.connect(self.update_osc_amp)
         self.osc_width_slider.valueChanged.connect(self.update_osc_width)
         self.osc_alg_group.buttonClicked.connect(self.update_osc_alg)
+
+        self.adsr_att_slider.valueChanged.connect(self.update_env_attack)
+        self.adsr_dec_slider.valueChanged.connect(self.update_env_decay)
+        self.adsr_sus_slider.valueChanged.connect(self.update_env_sustain)
+        self.adsr_rel_slider.valueChanged.connect(self.update_env_release)
 
         self.env_test.clicked.connect(self.update_gate)
 
@@ -198,6 +245,22 @@ class MainWindow(QMainWindow):
         elif (text == "pulse"):
             newAlg = 2.0
         self.engine.osc.update_algorithm(newAlg)
+
+    def update_env_attack(self, value):
+        att = float(value)/1000.0
+        self.engine.env.update_attack(att)
+
+    def update_env_decay(self, value):
+        dec = float(value)/100.0
+        self.engine.env.update_decay(dec)
+
+    def update_env_sustain(self, value):
+        sus = float(value)/1000.0
+        self.engine.env.update_sustain(sus)
+
+    def update_env_release(self, value):
+        rel = float(value)/1000.0
+        self.engine.env.update_release(rel)
     
     def update_gate(self, checked):
         self.engine.env.update_gate(checked)
