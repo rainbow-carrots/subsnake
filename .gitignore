@@ -1,0 +1,12 @@
+#dependencies
+Include
+Lib
+Scripts
+bin
+include
+lib
+lib64
+.vscode
+__pycache__/
+pyvenv.cfg
+*:Zone.Identifier
