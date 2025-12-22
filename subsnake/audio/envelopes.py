@@ -9,7 +9,7 @@ twopi = 2*np.pi
 oneoverpi = 1/np.pi
 
 class ADSR():
-    def __init__(self, attack=0.001, decay=0.5, sustain=0.5, release=0.5):
+    def __init__(self, attack=0.01, decay=0.5, sustain=0.5, release=0.5):
         #envelope state array
         #   level, stage, attack c, decay c, sustain, release c
         self.state = np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
@@ -19,13 +19,28 @@ class ADSR():
         self.state[2] = 1.0 - math.exp(-1/(fs*attack))
         self.state[3] = 1.0 - math.exp(-1/(fs*decay))
         self.state[4] = sustain
-        self.state[5] = 1 - math.exp(-1/(fs*release))
+        self.state[5] = 1.0 - math.exp(-1/(fs*release))
 
     def process_block(self, input, output):
         self.envelope_block(self.state, self.gate, input, output)
     
     def update_gate(self, newGate):
         self.gate = newGate
+
+    def update_attack(self, newAttack):
+        N = fs*newAttack
+        self.state[2] = 1.0 - math.exp(-1/N)
+
+    def update_decay(self, newDecay):
+        N = fs*newDecay
+        self.state[3] = 1.0 - math.exp(-1/N)
+    
+    def update_sustain(self, newSustain):
+        self.state[4] = newSustain
+    
+    def update_release(self, newRelease):
+        N = fs*newRelease
+        self.state[5] = 1.0 - math.exp(-1/N)
     
     #ADSR envelope (recursive 1-pole LPF)
     @staticmethod
