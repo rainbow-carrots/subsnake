@@ -51,7 +51,7 @@ class HalSVF():
                 prev_band = state[c, 1]
                 freq_c = state[c, 2]
                 res_c = state[c, 3]
-                substate = state[c, 4]
+                substate = int(state[c, 4])
                 drive = state[c, 5]
                 oneoverdrive = 1.0/drive
                 for m in range(4):
@@ -60,13 +60,13 @@ class HalSVF():
                     high = input[n, c] - state[c, 0] - feedback
                     state[c, 1] = freq_c*high + prev_band
                     notch = high + state[c, 0]
-                    if (substate == 0.0):   #lowpass
+                    if (substate == 0):   #lowpass
                         subsample += state[c, 0]
-                    elif (substate == 1.0): #highpass
+                    elif (substate == 1): #highpass
                         subsample += high
-                    elif (substate == 2.0): #bandpass
+                    elif (substate == 2): #bandpass
                         subsample += state[c, 1]
-                    elif (substate == 3.0): #notch
+                    elif (substate == 3): #notch
                         subsample += notch
                 sample = subsample*0.25
                 output[n, c] = sample
