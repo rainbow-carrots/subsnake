@@ -1,7 +1,7 @@
 from subsnake.audio.engine import AudioEngine
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
-    QMainWindow,
+    QMainWindow, QGridLayout,
     QSlider, QRadioButton,
     QLabel, QVBoxLayout,
     QHBoxLayout, QWidget,
@@ -13,15 +13,9 @@ class MainWindow(QMainWindow):
         super().__init__()
 
         #layouts
-        osc_labels = QVBoxLayout()
-        osc_sliders = QVBoxLayout()
         osc_buttons = QHBoxLayout()
-        filt_labels = QVBoxLayout()
-        filt_sliders = QVBoxLayout()
         filt_buttons = QHBoxLayout()
-        adsr_labels = QVBoxLayout()
-        adsr_sliders = QVBoxLayout()
-        self.window_layout = QHBoxLayout()
+        self.window_grid = QGridLayout()
 
         #labels
         self.filt_freq_label = QLabel("cutoff:")
@@ -115,65 +109,59 @@ class MainWindow(QMainWindow):
         self.filt_alg_group.addButton(self.filt_alg_notch)
 
         #add labels
-        filt_labels.addWidget(self.filt_freq_label)
-        filt_labels.addWidget(self.filt_res_label)
-        filt_labels.addWidget(self.filt_drive_label)
-        filt_labels.addWidget(self.filt_alg_label)
+        self.window_grid.addWidget(self.filt_freq_label, 0, 0)
+        self.window_grid.addWidget(self.filt_res_label, 1, 0)
+        self.window_grid.addWidget(self.filt_drive_label, 2, 0)
+        self.window_grid.addWidget(self.filt_alg_label, 3, 0)
 
-        osc_labels.addWidget(self.osc_freq_label)
-        osc_labels.addWidget(self.osc_amp_label)
-        osc_labels.addWidget(self.osc_width_label)
-        osc_labels.addWidget(self.osc_alg_label)
+        self.window_grid.addWidget(self.osc_freq_label, 0, 3)
+        self.window_grid.addWidget(self.osc_amp_label, 1, 3)
+        self.window_grid.addWidget(self.osc_width_label, 2, 3)
+        self.window_grid.addWidget(self.osc_alg_label, 3, 3)
 
-        adsr_labels.addWidget(self.adsr_att_label)
-        adsr_labels.addWidget(self.adsr_dec_label)
-        adsr_labels.addWidget(self.adsr_sus_label)
-        adsr_labels.addWidget(self.adsr_rel_label)
+        self.window_grid.addWidget(self.adsr_att_label, 0, 6)
+        self.window_grid.addWidget(self.adsr_dec_label, 1, 6)
+        self.window_grid.addWidget(self.adsr_sus_label, 2, 6)
+        self.window_grid.addWidget(self.adsr_rel_label, 3, 6)
 
         #add sliders
-        filt_sliders.addWidget(self.filt_freq_slider)
-        filt_sliders.addWidget(self.filt_res_slider)
-        filt_sliders.addWidget(self.filt_drive_slider)
+        self.window_grid.addWidget(self.filt_freq_slider, 0, 1)
+        self.window_grid.addWidget(self.filt_res_slider, 1, 1)
+        self.window_grid.addWidget(self.filt_drive_slider, 2, 1)
 
-        osc_sliders.addWidget(self.osc_freq_slider)
-        osc_sliders.addWidget(self.osc_amp_slider)
-        osc_sliders.addWidget(self.osc_width_slider)
+        self.window_grid.addWidget(self.osc_freq_slider, 0, 4)
+        self.window_grid.addWidget(self.osc_amp_slider, 1, 4)
+        self.window_grid.addWidget(self.osc_width_slider, 2, 4)
 
-        adsr_sliders.addWidget(self.adsr_att_slider)
-        adsr_sliders.addWidget(self.adsr_dec_slider)
-        adsr_sliders.addWidget(self.adsr_sus_slider)
-        adsr_sliders.addWidget(self.adsr_rel_slider)
-
+        self.window_grid.addWidget(self.adsr_att_slider, 0, 7)
+        self.window_grid.addWidget(self.adsr_dec_slider, 1, 7)
+        self.window_grid.addWidget(self.adsr_sus_slider, 2, 7)
+        self.window_grid.addWidget(self.adsr_rel_slider, 3, 7)
 
         #add radio buttons
         filt_buttons.addWidget(self.filt_alg_low)
         filt_buttons.addWidget(self.filt_alg_high)
         filt_buttons.addWidget(self.filt_alg_band)
         filt_buttons.addWidget(self.filt_alg_notch)
-        filt_sliders.addLayout(filt_buttons)
+        self.window_grid.addLayout(filt_buttons, 3, 1)
 
         osc_buttons.addWidget(self.osc_alg_sin)
         osc_buttons.addWidget(self.osc_alg_saw)
         osc_buttons.addWidget(self.osc_alg_pulse)
-        osc_sliders.addLayout(osc_buttons)
+        self.window_grid.addLayout(osc_buttons, 3, 4)
 
-        #add layouts
-        self.window_layout.addLayout(filt_labels)
-        self.window_layout.addLayout(filt_sliders)
+        #column spacing
+        self.window_grid.setColumnMinimumWidth(2, 30)
+        self.window_grid.setColumnMinimumWidth(5, 30)
 
-        self.window_layout.addLayout(osc_labels)
-        self.window_layout.addLayout(osc_sliders)
-
-        self.window_layout.addLayout(adsr_labels)
-        self.window_layout.addLayout(adsr_sliders)
-
+        #gate
         self.env_test = QPushButton("gate")
         self.env_test.setCheckable(True)
-        self.window_layout.addWidget(self.env_test)
+        self.window_grid.addWidget(self.env_test, 4, 7)
 
         #set layout of window
         window_widget = QWidget()
-        window_widget.setLayout(self.window_layout)
+        window_widget.setLayout(self.window_grid)
 
         #start audio engine
         self.engine = AudioEngine()
