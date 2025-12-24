@@ -19,9 +19,11 @@ WrappedOsc.polyblep_saw(osc_test, np.zeros((16, 2), dtype=np.float32))
 HalSVF.filter_block(filt_test, np.zeros((16, 2), dtype=np.float32), np.zeros((16, 2), dtype=np.float32))
 ADSR.envelope_block(env_test, False, np.zeros((16, 2), dtype=np.float32), np.zeros((16, 2), dtype=np.float32))
 
-#start stream
+#instance app
 app = QApplication(sys.argv)
 window = MainWindow()
 window.show()
+
+#start stream
 with sd.OutputStream(channels=2, samplerate=fs, blocksize=1024, latency='high', callback=window.engine.callback, dtype=np.float32):
      app.exec()
