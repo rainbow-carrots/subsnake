@@ -12,7 +12,7 @@ oneoverpi = 1/np.pi
 
 #init compile
 osc_test = np.array([0.0, 0.0, 0.0], dtype=np.float32)
-filt_test = np.array([0.0, 0.0, 1.0, 2.0, 0.0, 1.0], dtype=np.float32)
+filt_test = np.array([[0.0, 0.0, 1.0, 2.0, 0.0, 1.0], [0.0, 0.0, 1.0, 2.0, 0.0, 1.0]], dtype=np.float32)
 env_test = np.array([0.0, 0.0, 1.0, 1.0, 0.5, 1.0], dtype=np.float32)
 WrappedOsc.generate_sine(osc_test, np.zeros((16, 2), dtype=np.float32))
 WrappedOsc.polyblep_saw(osc_test, np.zeros((16, 2), dtype=np.float32))
