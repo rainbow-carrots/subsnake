@@ -75,6 +75,8 @@ class ADSR():
                         state[0] = 0.0
                         state[1] = 0.0  #stop envelope
 
-            new_sample = input[n, 0] * state[0]
-            output[n, 0] = new_sample
-            output[n, 1] = new_sample
+            #apply envelope (stereo)
+            sample_L = input[n, 0] * state[0]
+            sample_R = input[n, 1] * state[0]
+            output[n, 0] = sample_L
+            output[n, 1] = sample_R
