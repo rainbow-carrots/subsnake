@@ -47,12 +47,18 @@ class HalSVF():
         for c in range (2):
             for n in range(len(output)):
                 subsample = 0.0
+                prev_low = state[c, 0]
+                prev_band = state[c, 1]
+                freq_c = state[c, 2]
+                res_c = state[c, 3]
                 substate = state[c, 4]
+                drive = state[c, 5]
+                oneoverdrive = 1.0/drive
                 for m in range(4):
-                    state[c, 0] = state[c, 0] + state[c, 2]*state[c, 1]
-                    feedback = state[c, 3]*(np.tanh(state[c, 1]*state[c, 5])/state[c, 5])
-                    high = input[n, 0] - state[c, 0] - feedback
-                    state[c, 1] = state[c, 2]*high + state[c, 1]
+                    state[c, 0] = prev_low + freq_c*prev_band
+                    feedback = res_c*(np.tanh(prev_band*drive)*oneoverdrive)
+                    high = input[n, c] - state[c, 0] - feedback
+                    state[c, 1] = freq_c*high + prev_band
                     notch = high + state[c, 0]
                     if (substate == 0.0):   #lowpass
                         subsample += state[c, 0]
