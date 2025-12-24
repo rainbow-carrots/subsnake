@@ -23,7 +23,7 @@ class HalSVF():
         self.state = np.array([[0.0, 0.0, f, q, type, drive], [0.0, 0.0, f, q, type, drive]], dtype=np.float32)
     
     def process_block(self, state, input, output):
-        self.filter_block(state, input, output)
+        self.filter_block(state, input, output, HalSVF.clip_sample)
 
     def update_cutoff(self, freq):
         f = 2*math.sin(np.pi*(freq/(4*fs)))
@@ -36,6 +36,7 @@ class HalSVF():
 
     def update_drive(self, drive):
         self.state[0, 5] = drive
+        self.state[1, 5] = drive
     
     def update_type(self, type):
         self.state[0, 4] = type
@@ -43,7 +44,7 @@ class HalSVF():
         
     @staticmethod
     @njit(nogil=True, fastmath=True)
-    def filter_block(state, input, output):
+    def filter_block(state, input, output, clip_sample):
         for c in range (2):
             for n in range(len(output)):
                 subsample = 0.0
@@ -59,20 +60,10 @@ class HalSVF():
                     high = input[n, c] - prev_low - feedback
                     #clip band
                     newband = freq_c*high + prev_band
-                    if (newband > 4.0):
-                        state[c, 1] = 4.0
-                    elif (newband < -4.0):
-                        state[c, 1] = -4.0
-                    else:
-                        state[c, 1] = newband
+                    state[c, 1] = clip_sample(newband, 8.0)
                     #clip low
                     newlow = prev_low + freq_c*state[c, 1]
-                    if (newlow > 4.0):
-                        state[c, 0] = 4.0
-                    elif (newlow < -4.0):
-                        state[c, 0] = -4.0
-                    else:
-                        state[c, 0] = newlow
+                    state[c, 0] = clip_sample(newlow, 8.0)
                     notch = high + state[c, 0]
                     if (substate == 0):   #lowpass
                         subsample += state[c, 0]
@@ -84,3 +75,16 @@ class HalSVF():
                         subsample += notch
                 sample = subsample*0.25
                 output[n, c] = sample
+
+    @staticmethod
+    @njit(nogil=True, fastmath=True)
+    def clip_sample(sample, threshold):
+        if (sample > threshold):
+            output = threshold * 0.66667
+        elif (sample < -threshold):
+            output = -threshold * 0.66667
+        else:
+            norm_sample = sample/threshold
+            clip_sample = norm_sample - (norm_sample**3) * 0.33333
+            output = clip_sample * threshold
+        return output
