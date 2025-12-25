@@ -15,6 +15,7 @@ class AudioEngine():
         self.osc = WrappedOsc(2, 0.5, 55, fs, .5)
         self.filt = HalSVF(0.0, 3520, 10, 1.0)
         self.env = ADSR(.01, 1.0, 0.5, 1.0)
+        self.octave = 0
     
     def callback(self, outdata, frames, time, status):
         self.osc.process_block(self.osc_out, frames)
