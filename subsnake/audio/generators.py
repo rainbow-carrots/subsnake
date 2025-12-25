@@ -68,22 +68,23 @@ class WrappedOsc():
     def polyblep_saw(state, outdata):
         frames = len(outdata)
         for n in range(frames):
+            #generate naive saw
             sample = (state[0] * oneoverpi) - 1.0
-            sample *= state[1]
+            
+            #apply polyblep corrections
+            if (state[0] < state[2]):           #phase just wrapped
+                t = state[0]/state[2]
+                sample += (t - 1.0)**2
+            elif (state[0] + state[2] > twopi):   #phase about to wrap
+                t = (twopi - state[0])/state[2]
+                sample -= (t - 1.0)**2
+
+            #increment phase & wrap
             state[0] += state[2]
             if (state[0] > twopi):
                 state[0] -= twopi
-                if (state[0] < state[2]):   #phase just wrapped - correct sample
-                    t = state[0]/state[2]
-                    sample += (t - 1)**2 * state[1]
-                    if (n>0):               #correct previous sample when possible
-                        prev_sample = outdata[n-1, 0] - (t**2 * state[1])
-                        outdata[n-1, 0] = prev_sample
-                        outdata[n-1, 1] = prev_sample
-            if (n == (frames-1)):
-                if (state[0] + state[2] > twopi):
-                    t = (twopi - state[0])/state[2]
-                    sample -= (t - 1)**2 * state[1]
-                    
+
+            #output
+            sample *= state[1]
             outdata[n, 0] = sample
             outdata[n, 1] = sample
