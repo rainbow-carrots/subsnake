@@ -274,15 +274,36 @@ class MainWindow(QMainWindow):
             return
         else:
             offset = key_conv.key_offset(event.key())
-            key_text = event.text()
-            print(f"pressed key: {key_text}, offset: {offset}")
-            return super().keyPressEvent(event)
+            if (offset is not None):
+                if (offset < 18):
+                    key_text = event.text()
+                    print(f"pressed key: {key_text}, offset: {offset}")
+                    #set pitch
+                    note = 3 + 12.0*self.engine.octave + offset
+                    new_pitch = 440.0 * 2**(float(note)/12.0)
+                    self.engine.osc.update_pitch(new_pitch)
+                    #trigger gate
+                    self.engine.env.update_gate(True)
+                    return super().keyPressEvent(event)
+                else:
+                    if (offset == 18):
+                        if (self.engine.octave < 5):
+                            self.engine.octave += 1
+                    elif (offset == 19):
+                        if (self.engine.octave > -5):
+                            self.engine.octave -= 1
+            else:
+                print(f"DEBUG: key: {event.text()}, value: {event.key()}")
     
     def keyReleaseEvent(self, event):
         if (event.isAutoRepeat()):
             return
         else:
             offset = key_conv.key_offset(event.key())
-            key_text = event.text()
-            print(f"released key: {key_text}, value: {offset}")
-            return super().keyReleaseEvent(event)
+            if (offset is not None):
+                if (offset < 18):
+                    key_text = event.text()
+                    print(f"released key: {key_text}, offset: {offset}")
+                    #release gate
+                    self.engine.env.update_gate(False)
+                    return super().keyReleaseEvent(event)
