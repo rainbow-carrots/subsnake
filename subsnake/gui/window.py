@@ -1,4 +1,5 @@
 from subsnake.audio.engine import AudioEngine
+from subsnake.gui.keys import Keys
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
     QMainWindow, QGridLayout,
@@ -6,6 +7,8 @@ from PySide6.QtWidgets import (
     QLabel, QVBoxLayout,
     QHBoxLayout, QWidget,
     QButtonGroup, QPushButton)
+
+key_conv = Keys()
 
 class MainWindow(QMainWindow):
 
@@ -265,3 +268,21 @@ class MainWindow(QMainWindow):
     
     def update_gate(self, checked):
         self.engine.env.update_gate(checked)
+
+    def keyPressEvent(self, event):
+        if (event.isAutoRepeat()):
+            return
+        else:
+            offset = key_conv.key_offset(event.key())
+            key_text = event.text()
+            print(f"pressed key: {key_text}, offset: {offset}")
+            return super().keyPressEvent(event)
+    
+    def keyReleaseEvent(self, event):
+        if (event.isAutoRepeat()):
+            return
+        else:
+            offset = key_conv.key_offset(event.key())
+            key_text = event.text()
+            print(f"released key: {key_text}, value: {offset}")
+            return super().keyReleaseEvent(event)
