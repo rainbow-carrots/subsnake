@@ -12,15 +12,15 @@ oneoverpi = 1/np.pi
 # Hal Chamberlin's digital SV Filter w/ nonlinear feedback | 4x oversampled
 # type = 1.0: lowpass, 2.0: highpass, 3.0: bandpass, 4.0: notch
 class HalSVF():
-    def __init__(self, type, cutoff, resonance, drive=1.0):
+    def __init__(self, type, cutoff, resonance, drive=1.0, saturate=8.0):
         self.cutoff = cutoff
         self.resonance = resonance
 
         q = resonance
         f = 2*math.sin(np.pi*(cutoff/(4*fs)))
 
-        #init parameter buffer | lowpass, bandpass, tuning, dampening, type, drive
-        self.state = np.array([[0.0, 0.0, f, q, type, drive], [0.0, 0.0, f, q, type, drive]], dtype=np.float32)
+        #init parameter buffer | lowpass, bandpass, tuning, dampening, type, drive, saturation
+        self.state = np.array([[0.0, 0.0, f, q, type, drive, saturate], [0.0, 0.0, f, q, type, drive, saturate]], dtype=np.float32)
     
     def process_block(self, state, input, output):
         self.filter_block(state, input, output, HalSVF.clip_sample)
@@ -41,6 +41,10 @@ class HalSVF():
     def update_type(self, type):
         self.state[0, 4] = type
         self.state[1, 4] = type
+
+    def update_saturate(self, saturate):
+        self.state[0, 6] = saturate
+        self.state[1, 6] = saturate
         
     @staticmethod
     @njit(nogil=True, fastmath=True)
@@ -54,16 +58,17 @@ class HalSVF():
                 res_c = state[c, 3]
                 substate = int(state[c, 4])
                 drive = state[c, 5]
+                saturate = state[c, 6]
                 oneoverdrive = 1.0/drive
                 for m in range(4):
                     feedback = res_c*(np.tanh(prev_band*drive)*oneoverdrive)
                     high = input[n, c] - prev_low - feedback
                     #clip band
                     newband = freq_c*high + prev_band
-                    state[c, 1] = clip_sample(newband, 8.0)
+                    state[c, 1] = clip_sample(newband, saturate)
                     #clip low
                     newlow = prev_low + freq_c*state[c, 1]
-                    state[c, 0] = clip_sample(newlow, 8.0)
+                    state[c, 0] = clip_sample(newlow, saturate)
                     notch = high + state[c, 0]
                     if (substate == 0):   #lowpass
                         subsample += state[c, 0]
