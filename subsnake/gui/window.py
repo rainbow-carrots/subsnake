@@ -21,6 +21,7 @@ class MainWindow(QMainWindow):
         self.filt_freq_label = QLabel("cutoff:")
         self.filt_res_label = QLabel("feedback:")
         self.filt_drive_label = QLabel("drive:")
+        self.filt_sat_label = QLabel("saturate:")
         self.filt_alg_label = QLabel("type:")
 
         self.osc_freq_label = QLabel("pitch:")
@@ -48,6 +49,11 @@ class MainWindow(QMainWindow):
         self.filt_drive_slider.setSingleStep(1)
         self.filt_drive_slider.setRange(1, 360)
         self.filt_drive_slider.setValue(40)
+
+        self.filt_sat_slider = QSlider(Qt.Horizontal)
+        self.filt_sat_slider.setSingleStep(1)
+        self.filt_sat_slider.setRange(100, 1200)
+        self.filt_sat_slider.setValue(800)
 
         self.osc_freq_slider = QSlider(Qt.Horizontal)
         self.osc_freq_slider.setSingleStep(1)
@@ -112,7 +118,8 @@ class MainWindow(QMainWindow):
         self.window_grid.addWidget(self.filt_freq_label, 0, 0)
         self.window_grid.addWidget(self.filt_res_label, 1, 0)
         self.window_grid.addWidget(self.filt_drive_label, 2, 0)
-        self.window_grid.addWidget(self.filt_alg_label, 3, 0)
+        self.window_grid.addWidget(self.filt_sat_label, 3, 0)
+        self.window_grid.addWidget(self.filt_alg_label, 4, 0)
 
         self.window_grid.addWidget(self.osc_freq_label, 0, 3)
         self.window_grid.addWidget(self.osc_amp_label, 1, 3)
@@ -128,6 +135,7 @@ class MainWindow(QMainWindow):
         self.window_grid.addWidget(self.filt_freq_slider, 0, 1)
         self.window_grid.addWidget(self.filt_res_slider, 1, 1)
         self.window_grid.addWidget(self.filt_drive_slider, 2, 1)
+        self.window_grid.addWidget(self.filt_sat_slider, 3, 1)
 
         self.window_grid.addWidget(self.osc_freq_slider, 0, 4)
         self.window_grid.addWidget(self.osc_amp_slider, 1, 4)
@@ -143,7 +151,7 @@ class MainWindow(QMainWindow):
         filt_buttons.addWidget(self.filt_alg_high)
         filt_buttons.addWidget(self.filt_alg_band)
         filt_buttons.addWidget(self.filt_alg_notch)
-        self.window_grid.addLayout(filt_buttons, 3, 1)
+        self.window_grid.addLayout(filt_buttons, 4, 1)
 
         osc_buttons.addWidget(self.osc_alg_sin)
         osc_buttons.addWidget(self.osc_alg_saw)
@@ -170,6 +178,7 @@ class MainWindow(QMainWindow):
         self.filt_freq_slider.valueChanged.connect(self.update_filt_freq)
         self.filt_res_slider.valueChanged.connect(self.update_filt_res)
         self.filt_drive_slider.valueChanged.connect(self.update_filt_drive)
+        self.filt_sat_slider.valueChanged.connect(self.update_filt_sat)
         self.filt_alg_group.buttonClicked.connect(self.update_filt_alg)
 
         self.osc_freq_slider.valueChanged.connect(self.update_osc_freq)
@@ -198,6 +207,10 @@ class MainWindow(QMainWindow):
     def update_filt_drive(self, value):
         newDrive = value/40.0
         self.engine.filt.update_drive(newDrive)
+
+    def update_filt_sat(self, value):
+        newSat = float(value)/100.0
+        self.engine.filt.update_saturate(newSat)
 
     def update_filt_alg(self, button):
         text = button.text()
