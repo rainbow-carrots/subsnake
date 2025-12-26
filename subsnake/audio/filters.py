@@ -22,8 +22,8 @@ class HalSVF():
         #init parameter buffer | lowpass, bandpass, tuning, dampening, type, drive, saturation
         self.state = np.array([[0.0, 0.0, f, q, type, drive, saturate], [0.0, 0.0, f, q, type, drive, saturate]], dtype=np.float32)
     
-    def process_block(self, state, input, output):
-        self.filter_block(state, input, output, HalSVF.clip_sample)
+    def process_block(self, input, output):
+        self.filter_block(self.state, input, output, HalSVF.clip_sample)
 
     def update_cutoff(self, freq):
         f = 2*math.sin(np.pi*(freq/(4*fs)))
