@@ -201,19 +201,19 @@ class MainWindow(QMainWindow):
     #slots
     def update_filt_freq(self, value):
         newFreq = 27.5 * 2**(float(value)/100.0)
-        self.engine.filt.update_cutoff(newFreq)
+        self.engine.update_cutoff(newFreq)
 
     def update_filt_res(self, value):
         newRes = 10.0 / (10.0**(value/100.0))
-        self.engine.filt.update_resonance(newRes)
+        self.engine.update_resonance(newRes)
 
     def update_filt_drive(self, value):
         newDrive = value/40.0
-        self.engine.filt.update_drive(newDrive)
+        self.engine.update_drive(newDrive)
 
     def update_filt_sat(self, value):
         newSat = float(value)/100.0
-        self.engine.filt.update_saturate(newSat)
+        self.engine.update_saturate(newSat)
 
     def update_filt_alg(self, button):
         text = button.text()
@@ -225,20 +225,20 @@ class MainWindow(QMainWindow):
             newAlg = 2.0
         elif (text == "notch"):
             newAlg = 3.0
-        self.engine.filt.update_type(newAlg)
+        self.engine.update_type(newAlg)
         
 
     def update_osc_freq(self, value):
         newFreq = 440.0 * 2**(float(value)/100.0)
-        self.engine.osc.update_pitch(newFreq)
+        self.engine.update_pitch(newFreq)
 
     def update_osc_amp(self, value):
         newAmp = float(value)/500.0
-        self.engine.osc.update_amplitude(newAmp)
+        self.engine.update_amplitude(newAmp)
 
     def update_osc_width(self, value):
         newWidth = float(value)/500.0
-        self.engine.osc.update_width(newWidth)
+        self.engine.update_width(newWidth)
 
     def update_osc_alg(self, button):
         text = button.text()
@@ -248,26 +248,26 @@ class MainWindow(QMainWindow):
             newAlg = 1.0
         elif (text == "pulse"):
             newAlg = 2.0
-        self.engine.osc.update_algorithm(newAlg)
+        self.engine.update_algorithm(newAlg)
 
     def update_env_attack(self, value):
         att = float(value)/1000.0
-        self.engine.env.update_attack(att)
+        self.engine.update_attack(att)
 
     def update_env_decay(self, value):
         dec = float(value)/100.0
-        self.engine.env.update_decay(dec)
+        self.engine.update_decay(dec)
 
     def update_env_sustain(self, value):
         sus = float(value)/1000.0
-        self.engine.env.update_sustain(sus)
+        self.engine.update_sustain(sus)
 
     def update_env_release(self, value):
         rel = float(value)/1000.0
-        self.engine.env.update_release(rel)
+        self.engine.update_release(rel)
     
     def update_gate(self, checked):
-        self.engine.env.update_gate(checked)
+        self.engine.update_gate(checked)
 
     def keyPressEvent(self, event):
         if (event.isAutoRepeat()):
@@ -281,9 +281,9 @@ class MainWindow(QMainWindow):
                     #set pitch
                     note = 3 + 12.0*self.engine.octave + offset
                     new_pitch = 440.0 * 2**(float(note)/12.0)
-                    self.engine.osc.update_pitch(new_pitch)
+                    self.engine.update_pitch(new_pitch)
                     #trigger gate
-                    self.engine.env.update_gate(True)
+                    self.engine.update_gate(True)
                     return super().keyPressEvent(event)
                 else:
                     if (offset == 18):
@@ -305,5 +305,5 @@ class MainWindow(QMainWindow):
                     key_text = event.text()
                     print(f"released key: {key_text}, offset: {offset}")
                     #release gate
-                    self.engine.env.update_gate(False)
+                    self.engine.update_gate(False)
                     return super().keyReleaseEvent(event)
