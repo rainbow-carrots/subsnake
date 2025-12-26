@@ -18,6 +18,6 @@ class AudioEngine():
         self.octave = 0
     
     def callback(self, outdata, frames, time, status):
-        self.osc.process_block(self.osc_out, frames)
-        self.filt.process_block(self.filt.state, self.osc_out, self.filt_out)
+        self.osc.process_block(self.osc_out)
+        self.filt.process_block(self.osc_out, self.filt_out)
         self.env.process_block(self.filt_out, outdata)
