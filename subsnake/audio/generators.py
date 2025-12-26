@@ -19,7 +19,7 @@ class WrappedOsc():
         self.alg = alg
         self.pulsewidth = width
     
-    def process_block(self, buffer, frames):
+    def process_block(self, buffer):
         #print(f"DEBUG: buffer shape is {buffer.shape}")
         if (self.alg == 0):
             self.generate_sine(self.state, buffer)
@@ -27,6 +27,7 @@ class WrappedOsc():
             self.polyblep_saw(self.state, buffer)
         elif (self.alg == 2.0):
             #anti-aliased square wave
+            frames = len(buffer)
             self.state2[0] = self.state[0] + self.pulsewidth*twopi
             if (self.state2[0] > twopi):
                 self.state2[0] -= twopi
