@@ -40,7 +40,7 @@ class MainWindow(QMainWindow):
         #sliders
         self.filt_freq_slider = QSlider(Qt.Horizontal)
         self.filt_freq_slider.setSingleStep(1)
-        self.filt_freq_slider.setRange(0, 890)
+        self.filt_freq_slider.setRange(0, 885)
         self.filt_freq_slider.setValue(700)
 
         self.filt_res_slider = QSlider(Qt.Horizontal)
@@ -280,10 +280,7 @@ class MainWindow(QMainWindow):
                     print(f"pressed key: {key_text}, offset: {offset}")
                     #set pitch
                     note = 3 + 12.0*self.engine.octave + offset
-                    new_pitch = 440.0 * 2**(float(note)/12.0)
-                    self.engine.update_pitch(new_pitch)
-                    #trigger gate
-                    self.engine.update_gate(True)
+                    self.engine.key_pressed(note)
                     return super().keyPressEvent(event)
                 else:
                     if (offset == 18):
@@ -305,5 +302,5 @@ class MainWindow(QMainWindow):
                     key_text = event.text()
                     print(f"released key: {key_text}, offset: {offset}")
                     #release gate
-                    self.engine.update_gate(False)
-                    return super().keyReleaseEvent(event)
+                    note = 3 + 12.0*self.engine.octave + offset
+                    self.engine.key_released(note)
