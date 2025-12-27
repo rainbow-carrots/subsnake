@@ -10,7 +10,7 @@ oneoverpi = 1/np.pi
 
 class AudioEngine():
     def __init__(self):
-        self.voices = [Voice(), Voice(), Voice(), Voice()]
+        self.voices = [Voice(), Voice(), Voice(), Voice(), Voice(), Voice(), Voice(), Voice()]
         self.voice_output = np.zeros((1024, 2), dtype=np.float32)
         self.voices_playing = []
         self.note_to_voice = {}
@@ -23,7 +23,7 @@ class AudioEngine():
         for voice in self.voices:
             voice.callback(self.voice_output)
             outdata += self.voice_output
-        outdata *= 0.5
+        outdata *= 0.353553391
 
     #voice assignment
     def assign_voice(self, note):
