@@ -2,14 +2,6 @@ QLabel {
     color: #000000
 }
 
-QHBoxLayout#osc_buttons {
-    color: #6b1212
-}
-
-QHBoxLayout#filt_buttons {
-    color: #6b1212
-}
-
 QGroupBox {
     margin-top: 1.5em;
 }
