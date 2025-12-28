@@ -1,0 +1,33 @@
+QLabel {
+    color: #000000
+}
+
+QHBoxLayout#osc_buttons {
+    color: #6b1212
+}
+
+QHBoxLayout#filt_buttons {
+    color: #6b1212
+}
+
+QGroupBox {
+    margin-top: 1.5em;
+}
+
+QGroupBox::title {
+    subcontrol-origin: margin;
+    subcontrol-position: top center;
+    padding: 1px;
+}
+
+QGroupBox#filt_group {
+    background-color: #95c2a1
+}
+
+QGroupBox#osc_group {
+    background-color: #91a7bd
+}
+
+QGroupBox#env_group {
+    background-color: #bd91a4
+}

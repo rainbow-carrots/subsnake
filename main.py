@@ -3,7 +3,9 @@ import sounddevice as sd
 import numpy as np
 from PySide6.QtWidgets import QApplication
 from subsnake.gui import MainWindow
+import subsnake.gui as gui
 from subsnake.audio import WrappedOsc, HalSVF, ADSR
+from importlib import resources
 
 fs = 44100
 blocksize = 1024
@@ -22,8 +24,15 @@ ADSR.envelope_block(env_test, False, np.zeros((16, 2), dtype=np.float32), np.zer
 #instance app
 app = QApplication(sys.argv)
 window = MainWindow()
+
+#load stylesheet
+style_file = resources.files(gui) / 'window.qss'
+style = style_file.read_text(encoding='utf-8')
+app.setStyleSheet(style)
+
+#show window
 window.show()
 
-#start stream
+#start stream & main loop
 with sd.OutputStream(channels=2, samplerate=fs, blocksize=1024, latency='high', callback=window.engine.callback, dtype=np.float32):
      app.exec()
