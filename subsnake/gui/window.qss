@@ -4,6 +4,30 @@ QLabel {
 
 QGroupBox {
     margin-top: 1.5em;
+    border: 1px solid white;
+    border-radius: 6px;
+}
+
+QRadioButton {
+    color: #000000;
+    font-size: 12px;
+    spacing: 6px;
+}
+
+QRadioButton::indicator {
+    width: 12px;
+    height: 12px;
+    border-radius: 6.5px;
+    border: 1px solid black;
+    background-color: gray;
+}
+
+QGroupBox#filt_group QRadioButton::indicator:checked {
+    background-color: #82c694;
+}
+
+QGroupBox#osc_group QRadioButton::indicator:checked {
+    background-color: #7496b8;
 }
 
 QGroupBox::title {
@@ -13,13 +37,13 @@ QGroupBox::title {
 }
 
 QGroupBox#filt_group {
-    background-color: #95c2a1
+    background-color: #95c2a1;
 }
 
 QGroupBox#osc_group {
-    background-color: #91a7bd
+    background-color: #91a7bd;
 }
 
 QGroupBox#env_group {
-    background-color: #bd91a4
+    background-color: #bd91a4;
 }
