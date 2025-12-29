@@ -10,9 +10,11 @@ oneoverpi = 1/np.pi
 
 class AudioEngine():
     def __init__(self):
-        self.voices = [Voice(), Voice(), Voice(), Voice(), Voice(), Voice(), Voice(), Voice()]
+        self.voices = [Voice(), Voice(), Voice(), Voice(),
+                       Voice(), Voice(), Voice(), Voice(),
+                       Voice(), Voice(), Voice(), Voice()]
         self.voice_output = np.zeros((1024, 2), dtype=np.float32)
-        self.voices_playing = []
+        self.key_to_note = {}
         self.note_to_voice = {}
         self.octave = 0
 
