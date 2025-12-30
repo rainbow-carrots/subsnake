@@ -17,6 +17,7 @@ class AudioEngine():
         self.key_to_note = {}
         self.note_to_voice = {}
         self.octave = 0
+        self.pitch_offset = 0.0
 
     
     #audio callback
@@ -57,11 +58,12 @@ class AudioEngine():
     
     #key input handlers
     def key_pressed(self, note):
-        new_pitch = 440.0 * 2**(float(note)/12.0)
+        new_pitch = 440.0 * 2**((float(note))/12.0 + self.pitch_offset)
         new_voice = self.assign_voice(note)
         new_voice.osc.update_pitch(new_pitch)
         new_voice.env.update_gate(True)
         new_voice.status = 2
+        new_voice.base_note = note
 
     def key_released(self, note):
         if note in self.note_to_voice:
@@ -71,9 +73,11 @@ class AudioEngine():
         
 
     #voice helper functions
-    def update_pitch(self, newPitch):
-        voice = self.voices[0]
-        voice.osc.update_pitch(newPitch)
+    def update_pitch(self, offset):
+        for voice in self.voices:
+            new_pitch = 440.0 * 2**(float(voice.base_note)/12.0 + offset)
+            voice.osc.update_pitch(new_pitch)
+        self.pitch_offset = offset
 
     def update_amplitude(self, newAmp):
         for voice in self.voices:
@@ -136,6 +140,7 @@ class Voice():
         self.osc = WrappedOsc(2, 0.5, 55, fs, .5)
         self.filt = HalSVF(0.0, 3520, 10, 1.0)
         self.env = ADSR(.01, 1.0, 0.5, 1.0)
+        self.base_note = 0
         self.status = 0
 
     def callback(self, output):
