@@ -70,7 +70,7 @@ class MainWindow(QMainWindow):
         self.osc_freq_slider = QSlider(Qt.Horizontal)
         self.osc_freq_slider.setSingleStep(1)
         self.osc_freq_slider.setRange(-500, 500)
-        self.osc_freq_slider.setValue(-300)
+        self.osc_freq_slider.setValue(0)
 
         self.osc_amp_slider = QSlider(Qt.Horizontal)
         self.osc_amp_slider.setSingleStep(1)
@@ -252,8 +252,8 @@ class MainWindow(QMainWindow):
         
 
     def update_osc_freq(self, value):
-        newFreq = 440.0 * 2**(float(value)/100.0)
-        self.engine.update_pitch(newFreq)
+        offset = float(value)/100.0
+        self.engine.update_pitch(offset)
 
     def update_osc_amp(self, value):
         newAmp = float(value)/500.0
