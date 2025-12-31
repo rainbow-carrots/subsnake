@@ -1,6 +1,7 @@
 import numpy as np
 import mido
 import queue
+import sounddevice as sd
 from .generators import WrappedOsc
 from .filters import HalSVF
 from .envelopes import ADSR
@@ -22,8 +23,30 @@ class AudioEngine():
         self.octave = 0
         self.pitch_offset = 0.0
         self.midi_in_queue = queue.SimpleQueue()
+        self.stream = None
+        self.midi_input = None
 
-    
+    #initialize stream
+    def start_audio(self):
+        self.stream = sd.OutputStream(channels=2, samplerate=fs, blocksize=1024, latency='high', callback=self.callback, dtype=np.float32)
+        self.stream.start()
+
+    #initialize midi
+    def set_midi_input(self, port_name):
+        if self.midi_input:
+            self.midi_input.close()
+        
+        if port_name:
+            self.midi_input = mido.open_input(port_name, callback=self.midi_callback)
+
+    def close(self):
+        if self.stream:
+            self.stream.stop()
+            self.stream.close()
+        
+        if self.midi_input:
+            self.midi_input.close()
+
     #audio callback
     def callback(self, outdata, frames, time, status):
         #outdata[:] = 0.0
