@@ -303,7 +303,7 @@ class MainWindow(QMainWindow):
                     print(f"pressed key: {key_text}, offset: {offset}")
                     #set pitch
                     note = 3 + 12.0*self.engine.octave + offset
-                    self.engine.key_pressed(note)
+                    self.engine.key_pressed(note, 127)
                     return super().keyPressEvent(event)
                 else:
                     if (offset == 18):
