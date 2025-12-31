@@ -1,6 +1,7 @@
 import sys
 import sounddevice as sd
 import numpy as np
+import mido
 from PySide6.QtWidgets import QApplication
 from subsnake.gui import MainWindow
 import subsnake.gui as gui
@@ -33,6 +34,11 @@ app.setStyleSheet(style)
 #show window
 window.show()
 
-#start stream & main loop
-with sd.OutputStream(channels=2, samplerate=fs, blocksize=1024, latency='high', callback=window.engine.callback, dtype=np.float32):
-     app.exec()
+#get first midi input (test)
+input = mido.get_input_names()[0]
+#start midi callback
+with mido.open_input(input, callback=window.engine.midi_callback) as inport:
+
+     #start stream & main loop
+     with sd.OutputStream(channels=2, samplerate=fs, blocksize=1024, latency='high', callback=window.engine.callback, dtype=np.float32):
+          app.exec()
