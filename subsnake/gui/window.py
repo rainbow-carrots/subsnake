@@ -327,3 +327,7 @@ class MainWindow(QMainWindow):
                     #release gate
                     note = 3 + 12.0*self.engine.octave + offset
                     self.engine.key_released(note)
+
+    def closeEvent(self, event):
+        self.engine.close()
+        return super().closeEvent(event)
