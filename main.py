@@ -22,9 +22,16 @@ WrappedOsc.polyblep_saw(osc_test, np.zeros((16, 2), dtype=np.float32))
 HalSVF.filter_block(filt_test, np.zeros((16, 2), dtype=np.float32), np.zeros((16, 2), dtype=np.float32), HalSVF.clip_sample)
 ADSR.envelope_block(env_test, False, np.zeros((16, 2), dtype=np.float32), np.zeros((16, 2), dtype=np.float32))
 
+#get first midi input (test)
+input = mido.get_input_names()[0]
+
 #instance app
 app = QApplication(sys.argv)
 window = MainWindow()
+
+#start audio & assign midi input
+window.engine.start_audio()
+window.engine.set_midi_input(input)
 
 #load stylesheet
 style_file = resources.files(gui) / 'window.qss'
@@ -34,11 +41,5 @@ app.setStyleSheet(style)
 #show window
 window.show()
 
-#get first midi input (test)
-input = mido.get_input_names()[0]
-#start midi callback
-with mido.open_input(input, callback=window.engine.midi_callback) as inport:
-
-     #start stream & main loop
-     with sd.OutputStream(channels=2, samplerate=fs, blocksize=1024, latency='high', callback=window.engine.callback, dtype=np.float32):
-          app.exec()
+#start app
+app.exec()
