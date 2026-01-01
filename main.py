@@ -22,19 +22,22 @@ WrappedOsc.polyblep_saw(osc_test, np.zeros((16, 2), dtype=np.float32))
 HalSVF.filter_block(filt_test, np.zeros((16, 2), dtype=np.float32), np.zeros((16, 2), dtype=np.float32), HalSVF.clip_sample)
 ADSR.envelope_block(env_test, False, np.zeros((16, 2), dtype=np.float32), np.zeros((16, 2), dtype=np.float32))
 
-#get first midi input (test)
-midi_input = None
-input_list = mido.get_input_names()
-if input_list:
-    midi_input = input_list[0]
-
 #instance app
 app = QApplication(sys.argv)
 window = MainWindow()
 
+#get midi inputs
+input_list = mido.get_input_names()
+if input_list is not None:
+    window.midi_select.addItems(input_list)
+
+#assign midi channels
+midi_channels = np.arange(1, 17)
+for channel in midi_channels:
+    window.channel_select.addItem(str(channel))
+
 #start audio & assign midi input
 window.engine.start_audio()
-window.engine.set_midi_input(midi_input)
 
 #load stylesheet
 style_file = resources.files(gui) / 'window.qss'
