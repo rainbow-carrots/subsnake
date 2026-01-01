@@ -47,3 +47,7 @@ QGroupBox#osc_group {
 QGroupBox#env_group {
     background-color: #bd91a4;
 }
+
+QGroupBox#midi_group {
+    background-color: #bdae91;
+}
