@@ -25,6 +25,7 @@ class AudioEngine():
         self.midi_in_queue = queue.SimpleQueue()
         self.stream = None
         self.midi_input = None
+        self.midi_channel = None
 
     #initialize stream
     def start_audio(self):
@@ -39,6 +40,9 @@ class AudioEngine():
         if port_name:
             self.midi_input = mido.open_input(port_name, callback=self.midi_callback)
 
+    def set_midi_channel(self, channel):
+        self.midi_channel = channel-1
+
     def close(self):
         if self.stream:
             self.stream.stop()
@@ -52,9 +56,9 @@ class AudioEngine():
         #outdata[:] = 0.0
         while not self.midi_in_queue.empty():
             message = self.midi_in_queue.get()
-            if (message.type == 'note_on'):
+            if (message.type == 'note_on') and (message.channel == self.midi_channel):
                 self.key_pressed((message.note - middle_a), message.velocity)
-            elif (message.type == 'note_off'):
+            elif (message.type == 'note_off') and (message.channel == self.midi_channel):
                 self.key_released(message.note - middle_a)
 
         for voice in self.voices:
