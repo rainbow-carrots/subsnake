@@ -7,7 +7,7 @@ from PySide6.QtWidgets import (
     QLabel, QVBoxLayout,
     QHBoxLayout, QWidget,
     QButtonGroup, QPushButton,
-    QGroupBox)
+    QGroupBox, QComboBox)
 
 key_conv = Keys()
 
@@ -19,17 +19,22 @@ class MainWindow(QMainWindow):
         #layouts
         self.osc_grid = QGridLayout()
         osc_buttons = QHBoxLayout()
+        midi_layout = QHBoxLayout()
         self.filt_grid = QGridLayout()
         filt_buttons = QHBoxLayout()
         self.env_grid = QGridLayout()
         self.window_grid = QGridLayout()
 
         #group boxes
+        midi_group = QGroupBox("midi")
         filt_group = QGroupBox("filter")
         osc_group = QGroupBox("oscillator")
         env_group = QGroupBox("envelope")
 
         #labels
+        self.midi_input_label = QLabel("midi in:")
+        self.midi_channel_label = QLabel("channel:")
+
         self.filt_freq_label = QLabel("cutoff:")
         self.filt_res_label = QLabel("feedback:")
         self.filt_drive_label = QLabel("drive:")
@@ -126,7 +131,18 @@ class MainWindow(QMainWindow):
         self.filt_alg_group.addButton(self.filt_alg_band)
         self.filt_alg_group.addButton(self.filt_alg_notch)
 
+        #combo boxes (midi)
+        self.midi_select = QComboBox()
+        self.midi_select.setEditable(False)
+        self.midi_select.setInsertPolicy(QComboBox.InsertAtBottom)
+
+        self.channel_select = QComboBox()
+        self.midi_select.setEditable(False)
+        self.midi_select.setInsertPolicy(QComboBox.InsertAtBottom)
+
+
         #object names
+        midi_group.setObjectName("midi_group")
         filt_group.setObjectName("filt_group")
         osc_group.setObjectName("osc_group")
         env_group.setObjectName("env_group")
@@ -175,15 +191,23 @@ class MainWindow(QMainWindow):
         osc_buttons.addWidget(self.osc_alg_pulse)
         self.osc_grid.addLayout(osc_buttons, 3, 1)
 
+        #add labels & combo boxes (midi)
+        midi_layout.addWidget(self.midi_input_label)
+        midi_layout.addWidget(self.midi_select)
+        midi_layout.addWidget(self.midi_channel_label)
+        midi_layout.addWidget(self.channel_select)
+
         #add layouts to groups
+        midi_group.setLayout(midi_layout)
         filt_group.setLayout(self.filt_grid)
         osc_group.setLayout(self.osc_grid)
         env_group.setLayout(self.env_grid)
 
-        #add groups to window
+        #add groups/midi to window
         self.window_grid.addWidget(filt_group, 0, 0)
         self.window_grid.addWidget(osc_group, 0, 1)
         self.window_grid.addWidget(env_group, 0, 2)
+        self.window_grid.addWidget(midi_group, 1, 0)
 
         #set column spacing
         self.window_grid.setColumnMinimumWidth(5, 30)
@@ -191,7 +215,7 @@ class MainWindow(QMainWindow):
         #gate
         self.env_gate = QPushButton("gate")
         self.env_gate.setCheckable(True)
-        self.window_grid.addWidget(self.env_gate, 4, 2)
+        self.window_grid.addWidget(self.env_gate, 1, 2)
 
         #set layout of window
         window_widget = QWidget()
@@ -201,6 +225,9 @@ class MainWindow(QMainWindow):
         self.engine = AudioEngine()
 
         #connect signals
+        self.midi_select.currentTextChanged.connect(self.update_midi_in)
+        self.channel_select.currentTextChanged.connect(self.update_midi_ch)
+
         self.filt_freq_slider.valueChanged.connect(self.update_filt_freq)
         self.filt_res_slider.valueChanged.connect(self.update_filt_res)
         self.filt_drive_slider.valueChanged.connect(self.update_filt_drive)
@@ -222,6 +249,12 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(window_widget)
     
     #slots
+    def update_midi_in(self, input_name):
+        self.engine.set_midi_input(input_name)
+
+    def update_midi_ch(self, channel):
+        self.engine.set_midi_channel(int(channel))
+
     def update_filt_freq(self, value):
         newFreq = 27.5 * 2**(float(value)/100.0)
         self.engine.update_cutoff(newFreq)
@@ -273,6 +306,7 @@ class MainWindow(QMainWindow):
             newAlg = 2.0
         self.engine.update_algorithm(newAlg)
 
+
     def update_env_attack(self, value):
         att = float(value)/1000.0
         self.engine.update_attack(att)
@@ -291,6 +325,7 @@ class MainWindow(QMainWindow):
     
     def update_gate(self, checked):
         self.engine.update_gate(checked)
+
 
     def keyPressEvent(self, event):
         if (event.isAutoRepeat()):
