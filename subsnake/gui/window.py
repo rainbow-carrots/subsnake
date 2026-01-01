@@ -214,6 +214,7 @@ class MainWindow(QMainWindow):
 
         #gate
         self.env_gate = QPushButton("gate")
+        self.env_gate.setObjectName("env_gate")
         self.env_gate.setCheckable(True)
         self.window_grid.addWidget(self.env_gate, 1, 2)
 
