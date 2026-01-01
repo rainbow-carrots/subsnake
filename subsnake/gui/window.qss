@@ -51,3 +51,13 @@ QGroupBox#env_group {
 QGroupBox#midi_group {
     background-color: #bdae91;
 }
+
+QPushButton#env_gate {
+    color: #000000;
+    background-color: #bd91a4;
+}
+
+QPushButton#env_gate:checked {
+    color: #000000;
+    background-color: #eeb6ce;
+}
