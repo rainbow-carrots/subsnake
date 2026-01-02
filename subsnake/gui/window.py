@@ -1,13 +1,15 @@
 from subsnake.audio.engine import AudioEngine
 from subsnake.gui.keys import Keys
 from PySide6.QtCore import Qt
+from PySide6.QtGui import QAction
 from PySide6.QtWidgets import (
     QMainWindow, QGridLayout,
     QSlider, QRadioButton,
     QLabel, QVBoxLayout,
     QHBoxLayout, QWidget,
     QButtonGroup, QPushButton,
-    QGroupBox, QComboBox)
+    QGroupBox, QComboBox,
+    QToolBar)
 
 key_conv = Keys()
 
@@ -15,6 +17,18 @@ class MainWindow(QMainWindow):
 
     def __init__(self):
         super().__init__()
+
+        #toolbar
+        self.main_toolbar = QToolBar()
+        self.main_toolbar.setMovable(False)
+        self.toggle_midi = QAction("midi", self)
+        self.toggle_midi.setToolTip("show/hide midi menu")
+        self.toggle_midi.setCheckable(True)
+        self.toggle_midi.setChecked(True)
+        self.main_toolbar.addAction(self.toggle_midi)
+        midi_action = self.main_toolbar.widgetForAction(self.toggle_midi)
+        midi_action.setObjectName("toggle_midi")
+        self.addToolBar(self.main_toolbar)
 
         #layouts
         self.osc_grid = QGridLayout()
@@ -26,14 +40,22 @@ class MainWindow(QMainWindow):
         self.window_grid = QGridLayout()
 
         #group boxes
-        midi_group = QGroupBox("midi")
+        group_width = 320
+        self.midi_group = QGroupBox("midi")
         filt_group = QGroupBox("filter")
         osc_group = QGroupBox("oscillator")
         env_group = QGroupBox("envelope")
+        filt_group.setMinimumWidth(group_width)
+        osc_group.setMinimumWidth(group_width)
+        env_group.setMinimumWidth(group_width)
+        self.midi_group.setMinimumWidth(group_width)
+
 
         #labels
         self.midi_input_label = QLabel("midi in:")
         self.midi_channel_label = QLabel("channel:")
+        self.midi_input_label.setAlignment(Qt.AlignCenter)
+        self.midi_channel_label.setAlignment(Qt.AlignCenter)
 
         self.filt_freq_label = QLabel("cutoff:")
         self.filt_res_label = QLabel("feedback:")
@@ -142,7 +164,7 @@ class MainWindow(QMainWindow):
 
 
         #object names
-        midi_group.setObjectName("midi_group")
+        self.midi_group.setObjectName("midi_group")
         filt_group.setObjectName("filt_group")
         osc_group.setObjectName("osc_group")
         env_group.setObjectName("env_group")
@@ -179,16 +201,31 @@ class MainWindow(QMainWindow):
         self.env_grid.addWidget(self.adsr_sus_slider, 2, 1)
         self.env_grid.addWidget(self.adsr_rel_slider, 3, 1)
 
+        #add gate control
+        self.env_gate = QPushButton("gate")
+        self.env_gate.setObjectName("env_gate")
+        self.env_gate.setCheckable(True)
+        self.env_grid.addWidget(self.env_gate, 4, 1)
+
         #add radio buttons
+        filt_buttons.addStretch()
         filt_buttons.addWidget(self.filt_alg_low)
+        filt_buttons.addStretch()
         filt_buttons.addWidget(self.filt_alg_high)
+        filt_buttons.addStretch()
         filt_buttons.addWidget(self.filt_alg_band)
+        filt_buttons.addStretch()
         filt_buttons.addWidget(self.filt_alg_notch)
+        filt_buttons.addStretch()
         self.filt_grid.addLayout(filt_buttons, 4, 1)
 
+        osc_buttons.addStretch()
         osc_buttons.addWidget(self.osc_alg_sin)
+        osc_buttons.addStretch()
         osc_buttons.addWidget(self.osc_alg_saw)
+        osc_buttons.addStretch()
         osc_buttons.addWidget(self.osc_alg_pulse)
+        osc_buttons.addStretch()
         self.osc_grid.addLayout(osc_buttons, 3, 1)
 
         #add labels & combo boxes (midi)
@@ -198,7 +235,8 @@ class MainWindow(QMainWindow):
         midi_layout.addWidget(self.channel_select)
 
         #add layouts to groups
-        midi_group.setLayout(midi_layout)
+        self.midi_group.setLayout(midi_layout)
+        self.midi_group.setMaximumHeight(120)
         filt_group.setLayout(self.filt_grid)
         osc_group.setLayout(self.osc_grid)
         env_group.setLayout(self.env_grid)
@@ -207,16 +245,10 @@ class MainWindow(QMainWindow):
         self.window_grid.addWidget(filt_group, 0, 0)
         self.window_grid.addWidget(osc_group, 0, 1)
         self.window_grid.addWidget(env_group, 0, 2)
-        self.window_grid.addWidget(midi_group, 1, 0)
+        self.window_grid.addWidget(self.midi_group, 1, 0)
 
         #set column spacing
         self.window_grid.setColumnMinimumWidth(5, 30)
-
-        #gate
-        self.env_gate = QPushButton("gate")
-        self.env_gate.setObjectName("env_gate")
-        self.env_gate.setCheckable(True)
-        self.window_grid.addWidget(self.env_gate, 1, 2)
 
         #set layout of window
         window_widget = QWidget()
@@ -228,6 +260,7 @@ class MainWindow(QMainWindow):
         #connect signals
         self.midi_select.currentTextChanged.connect(self.update_midi_in)
         self.channel_select.currentTextChanged.connect(self.update_midi_ch)
+        self.toggle_midi.toggled.connect(self.toggle_midi_box)
 
         self.filt_freq_slider.valueChanged.connect(self.update_filt_freq)
         self.filt_res_slider.valueChanged.connect(self.update_filt_res)
@@ -255,6 +288,9 @@ class MainWindow(QMainWindow):
 
     def update_midi_ch(self, channel):
         self.engine.set_midi_channel(int(channel))
+
+    def toggle_midi_box(self, state):
+        self.midi_group.setVisible(state)
 
     def update_filt_freq(self, value):
         newFreq = 27.5 * 2**(float(value)/100.0)
