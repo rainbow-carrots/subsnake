@@ -38,26 +38,51 @@ QGroupBox::title {
 
 QGroupBox#filt_group {
     background-color: #95c2a1;
+    margin-left: 28px;
+    margin-bottom: 24px;
 }
 
 QGroupBox#osc_group {
     background-color: #91a7bd;
+    margin-bottom: 24px;
 }
 
 QGroupBox#env_group {
     background-color: #bd91a4;
+    margin-bottom: 24px;
 }
 
 QGroupBox#midi_group {
-    background-color: #bdae91;
+    background-color: #ab8ebe;
+    margin-bottom: 24px;
+    margin-left: 28px;
 }
 
 QPushButton#env_gate {
     color: #000000;
     background-color: #bd91a4;
+    border: 1px solid white;
+    border-radius: 6px;
+    height: 24px;
+    text-align: center;
 }
 
 QPushButton#env_gate:checked {
     color: #000000;
     background-color: #eeb6ce;
+}
+
+QToolButton#toggle_midi {
+    width: 60px;
+    height: 24px;
+    color: #000000;
+    background-color: #857093;
+    border: 1px solid white;
+    border-radius: 6px;
+    margin-left: 36px;
+    margin-top: 18px;
+}
+
+QToolButton#toggle_midi:checked {
+    background-color: #ab8ebe;
 }
