@@ -67,6 +67,10 @@ QPushButton#env_gate {
     text-align: center;
 }
 
+QPushButton#env_gate::hover {
+    background-color: #d19fb4;
+}
+
 QPushButton#env_gate:checked {
     color: #000000;
     background-color: #eeb6ce;
