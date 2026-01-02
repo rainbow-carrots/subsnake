@@ -24,7 +24,7 @@ class MainWindow(QMainWindow):
         self.toggle_midi = QAction("midi", self)
         self.toggle_midi.setToolTip("show/hide midi menu")
         self.toggle_midi.setCheckable(True)
-        self.toggle_midi.setChecked(True)
+        self.toggle_midi.setChecked(False)
         self.main_toolbar.addAction(self.toggle_midi)
         midi_action = self.main_toolbar.widgetForAction(self.toggle_midi)
         midi_action.setObjectName("toggle_midi")
@@ -49,6 +49,7 @@ class MainWindow(QMainWindow):
         osc_group.setMinimumWidth(group_width)
         env_group.setMinimumWidth(group_width)
         self.midi_group.setMinimumWidth(group_width)
+        self.midi_group.hide()
 
 
         #labels
