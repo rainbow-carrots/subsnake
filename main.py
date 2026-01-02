@@ -24,6 +24,7 @@ ADSR.envelope_block(env_test, False, np.zeros((16, 2), dtype=np.float32), np.zer
 #instance app
 app = QApplication(sys.argv)
 window = MainWindow()
+window.setObjectName("main_window")
 
 #get midi inputs
 input_list = mido.get_input_names()
