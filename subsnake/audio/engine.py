@@ -64,7 +64,7 @@ class AudioEngine():
         for voice in self.voices:
             voice.callback(self.voice_output)
             outdata += self.voice_output
-        outdata *= 0.353553391
+        outdata *= 0.288675
 
     #midi callback
     def midi_callback(self, message):
