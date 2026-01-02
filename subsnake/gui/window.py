@@ -72,6 +72,7 @@ class MainWindow(QMainWindow):
         self.adsr_dec_label = QLabel("decay:")
         self.adsr_sus_label = QLabel("sustain:")
         self.adsr_rel_label = QLabel("release:")
+        self.adsr_gate_label = QLabel("gate:")
 
         #sliders
         self.filt_freq_slider = QSlider(Qt.Horizontal)
@@ -185,6 +186,7 @@ class MainWindow(QMainWindow):
         self.env_grid.addWidget(self.adsr_dec_label, 1, 0)
         self.env_grid.addWidget(self.adsr_sus_label, 2, 0)
         self.env_grid.addWidget(self.adsr_rel_label, 3, 0)
+        self.env_grid.addWidget(self.adsr_gate_label, 4, 0)
 
         #add sliders
         self.filt_grid.addWidget(self.filt_freq_slider, 0, 1)
@@ -202,7 +204,7 @@ class MainWindow(QMainWindow):
         self.env_grid.addWidget(self.adsr_rel_slider, 3, 1)
 
         #add gate control
-        self.env_gate = QPushButton("gate")
+        self.env_gate = QPushButton("latch")
         self.env_gate.setObjectName("env_gate")
         self.env_gate.setCheckable(True)
         self.env_grid.addWidget(self.env_gate, 4, 1)
