@@ -19,6 +19,14 @@ QRadioButton {
     spacing: 6px;
 }
 
+QToolBar {
+    background-color: #333333;
+    border: 2px groove gray;
+    border-top: none;
+    border-bottom-left-radius: 3px;
+    border-bottom-right-radius: 3px;
+}
+
 QFrame#grid_space_0 {
     min-width: 24px;
 }
@@ -51,11 +59,11 @@ QGroupBox::title {
 
 QGroupBox#filt_group {
     background-color: #95c2a1;
-    margin-left: 28px;
 }
 
 QGroupBox#osc_group {
     background-color: #91a7bd;
+    margin-left: 28px;
 }
 
 QGroupBox#env_group {
@@ -93,8 +101,8 @@ QToolButton#toggle_midi {
     border: 1px solid white;
     border-radius: 6px;
     margin-left: 36px;
-    margin-top: 9px;
-    margin-bottom: 9px;
+    margin-top: 6px;
+    margin-bottom: 6px;
 }
 
 QToolButton#toggle_midi:checked {
