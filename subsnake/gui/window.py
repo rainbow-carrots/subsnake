@@ -82,7 +82,7 @@ class MainWindow(QMainWindow):
         #sliders
         self.filt_freq_slider = QSlider(Qt.Horizontal)
         self.filt_freq_slider.setSingleStep(1)
-        self.filt_freq_slider.setRange(0, 885)
+        self.filt_freq_slider.setRange(0, 800)
         self.filt_freq_slider.setValue(700)
 
         self.filt_res_slider = QSlider(Qt.Horizontal)
