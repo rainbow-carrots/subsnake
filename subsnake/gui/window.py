@@ -9,7 +9,7 @@ from PySide6.QtWidgets import (
     QHBoxLayout, QWidget,
     QButtonGroup, QPushButton,
     QGroupBox, QComboBox,
-    QToolBar)
+    QToolBar, QFrame)
 
 key_conv = Keys()
 
@@ -168,8 +168,15 @@ class MainWindow(QMainWindow):
         self.midi_select.setEditable(False)
         self.midi_select.setInsertPolicy(QComboBox.InsertAtBottom)
 
+        #grid spacers
+        self.grid_space_0 = QFrame()
+        self.grid_space_0.setFrameShape(QFrame.NoFrame)
+        self.grid_space_1 = QFrame()
+        self.grid_space_1.setFrameShape(QFrame.NoFrame)
 
         #object names
+        self.grid_space_0.setObjectName("grid_space_0")
+        self.grid_space_1.setObjectName("grid_space_1")
         self.midi_group.setObjectName("midi_group")
         filt_group.setObjectName("filt_group")
         osc_group.setObjectName("osc_group")
@@ -250,8 +257,10 @@ class MainWindow(QMainWindow):
 
         #add groups/midi to window
         self.window_grid.addWidget(filt_group, 0, 0)
-        self.window_grid.addWidget(osc_group, 0, 1)
-        self.window_grid.addWidget(env_group, 0, 2)
+        self.window_grid.addWidget(self.grid_space_0, 0, 1)
+        self.window_grid.addWidget(osc_group, 0, 2)
+        self.window_grid.addWidget(self.grid_space_1, 0, 3)
+        self.window_grid.addWidget(env_group, 0, 4)
         self.window_grid.addWidget(self.midi_group, 1, 0)
 
         #set column spacing
