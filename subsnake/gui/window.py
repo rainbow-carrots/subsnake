@@ -41,13 +41,17 @@ class MainWindow(QMainWindow):
 
         #group boxes
         group_width = 320
+        group_height = 240
         self.midi_group = QGroupBox("midi")
         filt_group = QGroupBox("filter")
         osc_group = QGroupBox("oscillator")
         env_group = QGroupBox("envelope")
         filt_group.setMinimumWidth(group_width)
+        filt_group.setMinimumHeight(group_height)
         osc_group.setMinimumWidth(group_width)
+        osc_group.setMinimumHeight(group_height)
         env_group.setMinimumWidth(group_width)
+        env_group.setMinimumHeight(group_height)
         self.midi_group.setMinimumWidth(group_width)
         self.midi_group.hide()
 
