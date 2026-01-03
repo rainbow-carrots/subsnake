@@ -57,7 +57,10 @@ class AudioEngine():
         while not self.midi_in_queue.empty():
             message = self.midi_in_queue.get()
             if (message.type == 'note_on') and (message.channel == self.midi_channel):
-                self.key_pressed((message.note - middle_a), message.velocity)
+                if (message.velocity > 0):
+                    self.key_pressed((message.note - middle_a), message.velocity)
+                else:
+                    self.key_released(message.note - middle_a)
             elif (message.type == 'note_off') and (message.channel == self.midi_channel):
                 self.key_released(message.note - middle_a)
 
@@ -73,6 +76,13 @@ class AudioEngine():
 
     #voice assignment
     def assign_voice(self, note):
+        inc = 0
+        for voice in self.voices:      #assign releasing voice with same note
+            if (voice.status == 1) and (voice.base_note == note):
+                self.note_to_voice.update({note: inc})
+                return voice
+            else:
+                inc += 1
         inc = 0
         for voice in self.voices:
             if (voice.status == 0):    #assign first stopped voice
