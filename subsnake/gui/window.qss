@@ -19,6 +19,14 @@ QRadioButton {
     spacing: 6px;
 }
 
+QFrame#grid_space_0 {
+    min-width: 24px;
+}
+
+QFrame#grid_space_1 {
+    min-width: 24px;
+}
+
 QRadioButton::indicator {
     width: 12px;
     height: 12px;
