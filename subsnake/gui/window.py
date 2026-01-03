@@ -256,9 +256,9 @@ class MainWindow(QMainWindow):
         env_group.setLayout(self.env_grid)
 
         #add groups/midi to window
-        self.window_grid.addWidget(filt_group, 0, 0)
+        self.window_grid.addWidget(osc_group, 0, 0)
         self.window_grid.addWidget(self.grid_space_0, 0, 1)
-        self.window_grid.addWidget(osc_group, 0, 2)
+        self.window_grid.addWidget(filt_group, 0, 2)
         self.window_grid.addWidget(self.grid_space_1, 0, 3)
         self.window_grid.addWidget(env_group, 0, 4)
         self.window_grid.addWidget(self.midi_group, 1, 0)
