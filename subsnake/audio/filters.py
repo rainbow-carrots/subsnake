@@ -62,7 +62,7 @@ class HalSVF():
                 oneoverdrive = 1.0/drive
                 for m in range(4):
                     feedback = res_c*(np.tanh(prev_band*drive)*oneoverdrive)
-                    high = input[n, c] - prev_low - feedback
+                    high = clip_sample(input[n, c] - prev_low - feedback, saturate)
                     #clip band
                     newband = freq_c*high + prev_band
                     state[c, 1] = clip_sample(newband, saturate)
@@ -71,13 +71,13 @@ class HalSVF():
                     state[c, 0] = clip_sample(newlow, saturate)
                     notch = high + state[c, 0]
                     if (substate == 0):   #lowpass
-                        subsample += state[c, 0]
+                        subsample += clip_sample(state[c, 0], 1.5)
                     elif (substate == 1): #highpass
-                        subsample += high
+                        subsample += clip_sample(high, 1.5)
                     elif (substate == 2): #bandpass
-                        subsample += state[c, 1]
+                        subsample += clip_sample(state[c, 1], 1.5)
                     elif (substate == 3): #notch
-                        subsample += notch
+                        subsample += clip_sample(notch, 1.5)
                 sample = subsample*0.25
                 output[n, c] = sample
 
