@@ -65,6 +65,7 @@ class AudioEngine():
             voice.callback(self.voice_output)
             outdata += self.voice_output
         outdata *= 0.288675
+        outdata = np.tanh(outdata)
 
     #midi callback
     def midi_callback(self, message):
