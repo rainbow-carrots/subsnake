@@ -17,6 +17,14 @@ class AudioEngine():
         self.voices = [Voice(), Voice(), Voice(), Voice(),
                        Voice(), Voice(), Voice(), Voice(),
                        Voice(), Voice(), Voice(), Voice()]
+        self.stopped_voice_indeces = []
+        self.released_voice_indeces = []
+        voice_index = 0
+        for voice in self.voices:
+            voice.index = voice_index
+            self.stopped_voice_indeces.append(voice_index)
+            voice_index += 1
+
         self.voice_output = np.zeros((1024, 2), dtype=np.float32)
         self.key_to_note = {}
         self.note_to_voice = {}
@@ -43,6 +51,11 @@ class AudioEngine():
     def set_midi_channel(self, channel):
         self.midi_channel = channel-1
 
+    def get_midi_inputs(self):
+        #get midi inputs
+        input_list = mido.get_input_names()
+        return input_list
+
     def close(self):
         if self.stream:
             self.stream.stop()
@@ -65,7 +78,7 @@ class AudioEngine():
                 self.key_released(message.note - middle_a)
 
         for voice in self.voices:
-            voice.callback(self.voice_output)
+            voice.callback(self.voice_output, self.note_to_voice, self.stopped_voice_indeces, self.released_voice_indeces)
             outdata += self.voice_output
         outdata *= 0.288675
         outdata = np.tanh(outdata)
@@ -76,38 +89,25 @@ class AudioEngine():
 
     #voice assignment
     def assign_voice(self, note):
-        inc = 0
-        for voice in self.voices:      #assign releasing voice with same note
-            if (voice.status == 1) and (voice.base_note == note):
-                self.note_to_voice.update({note: inc})
-                return voice
-            else:
-                inc += 1
-        inc = 0
-        for voice in self.voices:
-            if (voice.status == 0):    #assign first stopped voice
-                self.note_to_voice.update({note: inc})
-                return voice
-            else:
-                inc += 1
-        inc = 0
-        for voice in self.voices:
-            if (voice.status == 1):    #assign first released voice
-                note_iter = iter(self.note_to_voice)
-                for n in range(len(self.note_to_voice)):
-                    note_key = next(note_iter)
-                    if (self.note_to_voice[note_key] == inc):
-                        self.note_to_voice.pop(note_key)
-                        break
-                self.note_to_voice.update({note: inc})
-                return voice
-            else:
-                inc += 1
-        first_note = next(iter(self.note_to_voice))
-        first_voice_index = self.note_to_voice.pop(first_note)
-        first_voice = self.voices[first_voice_index]
-        self.note_to_voice.update({note: first_voice_index})
-        return first_voice 
+        if note in self.note_to_voice:      #assign releasing voice of same note
+            if (self.voices[self.note_to_voice[note]].status == 1):
+                return self.voices[self.note_to_voice[note]]
+        elif self.stopped_voice_indeces:    #assign first stopped voice
+            voice_index = self.stopped_voice_indeces.pop(0)
+            self.note_to_voice.update({note: voice_index})
+            return self.voices[voice_index]
+        elif self.released_voice_indeces:   #assign oldest releasing voice
+            voice_index = self.released_voice_indeces.pop(0)
+            if note in self.note_to_voice:
+                self.note_to_voice.pop(note)
+            self.note_to_voice.update({note: voice_index})
+            return self.voices(voice_index)
+        else:                               #steal oldest voice
+            first_note = next(iter(self.note_to_voice))
+            first_voice_index = self.note_to_voice.pop(first_note)
+            first_voice = self.voices[first_voice_index]
+            self.note_to_voice.update({note: first_voice_index})
+            return first_voice 
     
     #key input handlers
     def key_pressed(self, note, velocity):
@@ -121,7 +121,7 @@ class AudioEngine():
 
     def key_released(self, note):
         if note in self.note_to_voice:
-            voice_index = self.note_to_voice.pop(note)
+            voice_index = self.note_to_voice.get(note)
             self.voices[voice_index].env.update_gate(False)
             self.voices[voice_index].status = 1
         
@@ -197,11 +197,18 @@ class Voice():
         self.base_note = 0
         self.velocity = 0.0
         self.status = 0
+        self.index = 0
 
-    def callback(self, output):
+    def callback(self, output, note_to_voice, stopped_voices, released_voices):
             self.osc.process_block(self.osc_out)
             self.filt.process_block(self.osc_out, self.filt_out)
             self.env.process_block(self.filt_out, output)
             output *= self.velocity
-            if (self.env.state[0] == 0.0):
-                 self.status = 0
+            if (self.env.state[0] == 0.0) and (self.status > 0):
+                if self.base_note in note_to_voice:
+                    old_voice = note_to_voice.pop(self.base_note)
+                    if old_voice in released_voices:
+                        old_index = released_voices.index(old_voice)
+                        released_voices.pop(old_index)
+                stopped_voices.append(self.index)    
+                self.status = 0
