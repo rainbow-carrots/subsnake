@@ -93,6 +93,15 @@ QPushButton#env_gate:checked {
     background-color: #eeb6ce;
 }
 
+QPushButton#midi_refresh {
+    color: #000000;
+    background-color: #ab8ebe;
+    font-size: 18px;
+    font-style: bold;
+    max-width: 28px;
+    max-height: 28px;
+}
+
 QToolButton#toggle_midi {
     width: 60px;
     height: 20px;
