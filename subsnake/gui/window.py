@@ -42,7 +42,7 @@ class MainWindow(QMainWindow):
         #group boxes
         group_width = 320
         group_height = 240
-        self.midi_group = QGroupBox("midi")
+        self.midi_group = QGroupBox("midi input")
         filt_group = QGroupBox("filter")
         osc_group = QGroupBox("oscillator")
         env_group = QGroupBox("envelope")
@@ -57,7 +57,7 @@ class MainWindow(QMainWindow):
 
 
         #labels
-        self.midi_input_label = QLabel("midi in:")
+        self.midi_input_label = QLabel("device:")
         self.midi_channel_label = QLabel("channel:")
         self.midi_input_label.setAlignment(Qt.AlignCenter)
         self.midi_channel_label.setAlignment(Qt.AlignCenter)
@@ -168,6 +168,10 @@ class MainWindow(QMainWindow):
         self.midi_select.setEditable(False)
         self.midi_select.setInsertPolicy(QComboBox.InsertAtBottom)
 
+        #refresh button
+        self.midi_refresh = QPushButton("⟳")
+        self.midi_refresh.setCheckable(False)
+
         #grid spacers
         self.grid_space_0 = QFrame()
         self.grid_space_0.setFrameShape(QFrame.NoFrame)
@@ -181,6 +185,7 @@ class MainWindow(QMainWindow):
         filt_group.setObjectName("filt_group")
         osc_group.setObjectName("osc_group")
         env_group.setObjectName("env_group")
+        self.midi_refresh.setObjectName("midi_refresh")
 
         #add labels
         self.filt_grid.addWidget(self.filt_freq_label, 0, 0)
@@ -243,6 +248,7 @@ class MainWindow(QMainWindow):
         self.osc_grid.addLayout(osc_buttons, 3, 1)
 
         #add labels & combo boxes (midi)
+        midi_layout.addWidget(self.midi_refresh)
         midi_layout.addWidget(self.midi_input_label)
         midi_layout.addWidget(self.midi_select)
         midi_layout.addWidget(self.midi_channel_label)
@@ -276,6 +282,7 @@ class MainWindow(QMainWindow):
         #connect signals
         self.midi_select.currentTextChanged.connect(self.update_midi_in)
         self.channel_select.currentTextChanged.connect(self.update_midi_ch)
+        self.midi_refresh.pressed.connect(self.refresh_midi_ins)
         self.toggle_midi.toggled.connect(self.toggle_midi_box)
 
         self.filt_freq_slider.valueChanged.connect(self.update_filt_freq)
@@ -307,6 +314,13 @@ class MainWindow(QMainWindow):
 
     def toggle_midi_box(self, state):
         self.midi_group.setVisible(state)
+
+    def refresh_midi_ins(self):
+        self.midi_select.clear()
+        input_list = self.engine.get_midi_inputs()
+        if input_list:
+            self.midi_select.addItems(input_list)
+            self.midi_select.setCurrentIndex(0)
 
     def update_filt_freq(self, value):
         newFreq = 27.5 * 2**(float(value)/100.0)
