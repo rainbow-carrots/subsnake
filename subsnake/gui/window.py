@@ -40,21 +40,11 @@ class MainWindow(QMainWindow):
         self.window_grid = QGridLayout()
 
         #group boxes
-        group_width = 320
-        group_height = 240
         self.midi_group = QGroupBox("midi input")
         filt_group = QGroupBox("filter")
         osc_group = QGroupBox("oscillator")
         env_group = QGroupBox("envelope")
-        filt_group.setMinimumWidth(group_width)
-        filt_group.setMinimumHeight(group_height)
-        osc_group.setMinimumWidth(group_width)
-        osc_group.setMinimumHeight(group_height)
-        env_group.setMinimumWidth(group_width)
-        env_group.setMinimumHeight(group_height)
-        self.midi_group.setMinimumWidth(group_width)
         self.midi_group.hide()
-
 
         #labels
         self.midi_input_label = QLabel("device:")
@@ -177,10 +167,16 @@ class MainWindow(QMainWindow):
         self.grid_space_0.setFrameShape(QFrame.NoFrame)
         self.grid_space_1 = QFrame()
         self.grid_space_1.setFrameShape(QFrame.NoFrame)
+        self.grid_space_2 = QFrame()
+        self.grid_space_2.setFrameShape(QFrame.NoFrame)
+        self.grid_space_3 = QFrame()
+        self.grid_space_3.setFrameShape(QFrame.NoFrame)
 
         #object names
         self.grid_space_0.setObjectName("grid_space_0")
         self.grid_space_1.setObjectName("grid_space_1")
+        self.grid_space_2.setObjectName("grid_space_2")
+        self.grid_space_3.setObjectName("grid_space_3")
         self.midi_group.setObjectName("midi_group")
         filt_group.setObjectName("filt_group")
         osc_group.setObjectName("osc_group")
@@ -262,12 +258,14 @@ class MainWindow(QMainWindow):
         env_group.setLayout(self.env_grid)
 
         #add groups/midi to window
-        self.window_grid.addWidget(osc_group, 0, 0)
-        self.window_grid.addWidget(self.grid_space_0, 0, 1)
-        self.window_grid.addWidget(filt_group, 0, 2)
-        self.window_grid.addWidget(self.grid_space_1, 0, 3)
-        self.window_grid.addWidget(env_group, 0, 4)
-        self.window_grid.addWidget(self.midi_group, 1, 0)
+        self.window_grid.addWidget(self.grid_space_2, 0, 0)
+        self.window_grid.addWidget(osc_group, 0, 1)
+        self.window_grid.addWidget(self.grid_space_0, 0, 2)
+        self.window_grid.addWidget(filt_group, 0, 3)
+        self.window_grid.addWidget(self.grid_space_1, 0, 4)
+        self.window_grid.addWidget(env_group, 0, 5)
+        self.window_grid.addWidget(self.grid_space_3, 0, 6)
+        self.window_grid.addWidget(self.midi_group, 1, 1)
 
         #set column spacing
         self.window_grid.setColumnMinimumWidth(5, 30)
