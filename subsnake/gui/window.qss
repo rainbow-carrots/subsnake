@@ -27,11 +27,7 @@ QToolBar {
     border-bottom-right-radius: 3px;
 }
 
-QFrame#grid_space_0 {
-    min-width: 24px;
-}
-
-QFrame#grid_space_1 {
+QFrame#grid_space_0, QFrame#grid_space_1, QFrame#grid_space_2, QFrame#grid_space_3 {
     min-width: 24px;
 }
 
@@ -57,13 +53,19 @@ QGroupBox::title {
     padding: 1px;
 }
 
+QGroupBox#filt_group, QGroupBox#osc_group, QGroupBox#env_group {
+    min-height: 200px;
+    max-height: 240px;
+    min-width: 280px;
+    max-width: 320px;
+}
+
 QGroupBox#filt_group {
     background-color: #95c2a1;
 }
 
 QGroupBox#osc_group {
     background-color: #91a7bd;
-    margin-left: 28px;
 }
 
 QGroupBox#env_group {
@@ -72,7 +74,10 @@ QGroupBox#env_group {
 
 QGroupBox#midi_group {
     background-color: #ab8ebe;
-    margin-left: 28px;
+    min-height: 56px;
+    max-height: 64px;
+    min-width: 280px;
+    max-width: 320px;
 }
 
 QPushButton#env_gate {
