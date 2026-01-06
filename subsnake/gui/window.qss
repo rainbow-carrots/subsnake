@@ -2,6 +2,10 @@ MainWindow#main_window {
     background-color: #222024;
 }
 
+QLCDNumber {
+    border: none;
+}
+
 QLabel {
     color: #000000;
 }
