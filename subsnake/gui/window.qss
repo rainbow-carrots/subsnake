@@ -8,6 +8,7 @@ QLCDNumber {
 
 QLabel {
     color: #000000;
+    margin-top: -4.5px;
 }
 
 QGroupBox {
@@ -15,6 +16,8 @@ QGroupBox {
     margin-bottom: 18px;
     border: 1px solid white;
     border-radius: 6px;
+    min-width: 380px;
+    max-width: 480px;
 }
 
 QRadioButton {
@@ -103,8 +106,6 @@ QGroupBox::title {
 QGroupBox#filt_group, QGroupBox#osc_group, QGroupBox#env_group {
     min-height: 200px;
     max-height: 240px;
-    min-width: 280px;
-    max-width: 360px;
 }
 
 QGroupBox#filt_group {
@@ -123,8 +124,6 @@ QGroupBox#midi_group {
     background-color: #ab8ebe;
     min-height: 56px;
     max-height: 64px;
-    min-width: 280px;
-    max-width: 360px;
 }
 
 QPushButton#env_gate {
