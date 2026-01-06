@@ -27,6 +27,10 @@ QToolBar {
     border-bottom-right-radius: 3px;
 }
 
+QGroupBox QSlider {
+    min-height: 18px;
+}
+
 QFrame#grid_space_0, QFrame#grid_space_1, QFrame#grid_space_2, QFrame#grid_space_3 {
     min-width: 24px;
 }
@@ -47,6 +51,45 @@ QGroupBox#osc_group QRadioButton::indicator:checked {
     background-color: #7496b8;
 }
 
+QGroupBox QSlider::handle {
+    width: 16px;
+    height: 16px;
+    border-radius: 3px;
+    border: 1px solid white;
+    margin: -4px 0px;
+}
+
+QGroupBox QSlider::groove {
+    height: 8px;
+    background-color: #333333;
+    border: 1px solid white;
+    border-radius: 3px;
+}
+
+QGroupBox#osc_group QSlider::sub-page {
+    background-color: #7496b8;
+}
+
+QGroupBox#filt_group QSlider::sub-page {
+    background-color: #82c694;
+}
+
+QGroupBox#env_group QSlider::sub-page {
+    background-color: #eeb6ce;
+}
+
+QGroupBox#osc_group QSlider::handle {
+    background-color: #5e89b4;
+}
+
+QGroupBox#filt_group QSlider::handle {
+    background-color: #6ac281;
+}
+
+QGroupBox#env_group QSlider::handle {
+    background-color: #ed95bb;
+}
+
 QGroupBox::title {
     subcontrol-origin: margin;
     subcontrol-position: top center;
@@ -57,11 +100,11 @@ QGroupBox#filt_group, QGroupBox#osc_group, QGroupBox#env_group {
     min-height: 200px;
     max-height: 240px;
     min-width: 280px;
-    max-width: 320px;
+    max-width: 360px;
 }
 
 QGroupBox#filt_group {
-    background-color: #95c2a1;
+    background-color: #a1c7ab;
 }
 
 QGroupBox#osc_group {
@@ -77,7 +120,7 @@ QGroupBox#midi_group {
     min-height: 56px;
     max-height: 64px;
     min-width: 280px;
-    max-width: 320px;
+    max-width: 360px;
 }
 
 QPushButton#env_gate {
@@ -89,7 +132,7 @@ QPushButton#env_gate {
     text-align: center;
 }
 
-QPushButton#env_gate::hover {
+QPushButton#env_gate:hover {
     background-color: #d19fb4;
 }
 
@@ -117,6 +160,10 @@ QToolButton#toggle_midi {
     margin-left: 36px;
     margin-top: 6px;
     margin-bottom: 6px;
+}
+
+QToolButton#toggle_midi:hover {
+    background-color: #a086b1;
 }
 
 QToolButton#toggle_midi:checked {
