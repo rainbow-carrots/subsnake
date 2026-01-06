@@ -5,7 +5,7 @@ from PySide6.QtGui import QAction
 from PySide6.QtWidgets import (
     QMainWindow, QGridLayout,
     QSlider, QRadioButton,
-    QLabel, QVBoxLayout,
+    QLabel, QLCDNumber,
     QHBoxLayout, QWidget,
     QButtonGroup, QPushButton,
     QGroupBox, QComboBox,
@@ -125,6 +125,22 @@ class MainWindow(QMainWindow):
         self.adsr_rel_slider.setRange(1, 1000)
         self.adsr_rel_slider.setValue(500)
 
+        #displays
+        #display, number of digits, type, segment style, small decimal
+        self.osc_freq_display = QLCDNumber()
+        self.osc_amp_display = QLCDNumber()
+        self.osc_width_display = QLCDNumber()
+
+        self.filt_freq_display = QLCDNumber()
+        self.filt_fback_display = QLCDNumber()
+        self.filt_drive_display = QLCDNumber()
+        self.filt_sat_display = QLCDNumber()
+
+        self.adsr_att_display = QLCDNumber()
+        self.adsr_dec_display = QLCDNumber()
+        self.adsr_sus_display = QLCDNumber()
+        self.adsr_rel_display = QLCDNumber()
+
         #radio buttons
         self.osc_alg_sin = QRadioButton("sine")
         self.osc_alg_saw = QRadioButton("saw")
@@ -216,6 +232,21 @@ class MainWindow(QMainWindow):
         self.env_grid.addWidget(self.adsr_sus_slider, 2, 1)
         self.env_grid.addWidget(self.adsr_rel_slider, 3, 1)
 
+        #add displays
+        self.filt_grid.addWidget(self.filt_freq_display, 0, 2)
+        self.filt_grid.addWidget(self.filt_fback_display, 1, 2)
+        self.filt_grid.addWidget(self.filt_drive_display, 2, 2)
+        self.filt_grid.addWidget(self.filt_sat_display, 3, 2)
+
+        self.osc_grid.addWidget(self.osc_freq_display, 0, 2)
+        self.osc_grid.addWidget(self.osc_amp_display, 1, 2)
+        self.osc_grid.addWidget(self.osc_width_display, 2, 2)
+
+        self.env_grid.addWidget(self.adsr_att_display, 0, 2)
+        self.env_grid.addWidget(self.adsr_dec_display, 1, 2)
+        self.env_grid.addWidget(self.adsr_sus_display, 2, 2)
+        self.env_grid.addWidget(self.adsr_rel_display, 3, 2)
+
         #add gate control
         self.env_gate = QPushButton("latch")
         self.env_gate.setObjectName("env_gate")
@@ -302,6 +333,14 @@ class MainWindow(QMainWindow):
         self.env_gate.clicked.connect(self.update_gate)
 
         self.setCentralWidget(window_widget)
+
+    def configure_display(display, num_digits, num_type, dig_style, small_dec):
+        display.setMode(num_type)
+        display.setDigitCount(num_digits)
+        display.setSegmentStyle(dig_style)
+        display.setSmallDecimalPoint(small_dec)
+        return display
+
     
     #slots
     def update_midi_in(self, input_name):
