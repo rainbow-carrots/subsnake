@@ -73,73 +73,63 @@ class MainWindow(QMainWindow):
         self.filt_freq_slider = QSlider(Qt.Horizontal)
         self.filt_freq_slider.setSingleStep(1)
         self.filt_freq_slider.setRange(0, 800)
-        self.filt_freq_slider.setValue(700)
 
         self.filt_res_slider = QSlider(Qt.Horizontal)
         self.filt_res_slider.setSingleStep(1)
         self.filt_res_slider.setRange(0, 200)
-        self.filt_res_slider.setValue(0)
 
         self.filt_drive_slider = QSlider(Qt.Horizontal)
         self.filt_drive_slider.setSingleStep(1)
         self.filt_drive_slider.setRange(1, 360)
-        self.filt_drive_slider.setValue(40)
 
         self.filt_sat_slider = QSlider(Qt.Horizontal)
         self.filt_sat_slider.setSingleStep(1)
         self.filt_sat_slider.setRange(100, 1200)
-        self.filt_sat_slider.setValue(800)
 
         self.osc_freq_slider = QSlider(Qt.Horizontal)
         self.osc_freq_slider.setSingleStep(1)
         self.osc_freq_slider.setRange(-500, 500)
-        self.osc_freq_slider.setValue(0)
 
         self.osc_amp_slider = QSlider(Qt.Horizontal)
         self.osc_amp_slider.setSingleStep(1)
         self.osc_amp_slider.setRange(0, 500)
-        self.osc_amp_slider.setValue(250)
 
         self.osc_width_slider = QSlider(Qt.Horizontal)
         self.osc_width_slider.setSingleStep(1)
         self.osc_width_slider.setRange(0, 500)
-        self.osc_width_slider.setValue(250)
 
         self.adsr_att_slider = QSlider(Qt.Horizontal)
         self.adsr_att_slider.setSingleStep(1)
         self.adsr_att_slider.setRange(1, 1000)
-        self.adsr_att_slider.setValue(10)
 
         self.adsr_dec_slider = QSlider(Qt.Horizontal)
         self.adsr_dec_slider.setSingleStep(1)
         self.adsr_dec_slider.setRange(1, 1000)
-        self.adsr_dec_slider.setValue(500)
 
         self.adsr_sus_slider = QSlider(Qt.Horizontal)
         self.adsr_sus_slider.setSingleStep(1)
         self.adsr_sus_slider.setRange(1, 1000)
-        self.adsr_sus_slider.setValue(500)
 
         self.adsr_rel_slider = QSlider(Qt.Horizontal)
         self.adsr_rel_slider.setSingleStep(1)
         self.adsr_rel_slider.setRange(1, 1000)
-        self.adsr_rel_slider.setValue(500)
 
         #displays
-        #display, number of digits, type, segment style, small decimal
-        self.osc_freq_display = QLCDNumber()
-        self.osc_amp_display = QLCDNumber()
-        self.osc_width_display = QLCDNumber()
+        # args: QLCDDisplay widget, # of digits, mode (hex, dec, oct, bin),
+        # dig_style (outline, filled, flat), small decimal flag (for floats)
+        self.osc_freq_display = self.configure_display(QLCDNumber(), 3, QLCDNumber.Dec, QLCDNumber.Outline, True)
+        self.osc_amp_display = self.configure_display(QLCDNumber(), 3, QLCDNumber.Dec, QLCDNumber.Outline, True)
+        self.osc_width_display = self.configure_display(QLCDNumber(), 3, QLCDNumber.Dec, QLCDNumber.Outline, True)
 
-        self.filt_freq_display = QLCDNumber()
-        self.filt_fback_display = QLCDNumber()
-        self.filt_drive_display = QLCDNumber()
-        self.filt_sat_display = QLCDNumber()
+        self.filt_freq_display = self.configure_display(QLCDNumber(), 5, QLCDNumber.Dec, QLCDNumber.Outline, True)
+        self.filt_fback_display = self.configure_display(QLCDNumber(), 5, QLCDNumber.Dec, QLCDNumber.Outline, True)
+        self.filt_drive_display = self.configure_display(QLCDNumber(), 5, QLCDNumber.Dec, QLCDNumber.Outline, True)
+        self.filt_sat_display = self.configure_display(QLCDNumber(), 5, QLCDNumber.Dec, QLCDNumber.Outline, True)
 
-        self.adsr_att_display = QLCDNumber()
-        self.adsr_dec_display = QLCDNumber()
-        self.adsr_sus_display = QLCDNumber()
-        self.adsr_rel_display = QLCDNumber()
+        self.adsr_att_display = self.configure_display(QLCDNumber(), 3, QLCDNumber.Dec, QLCDNumber.Outline, True)
+        self.adsr_dec_display = self.configure_display(QLCDNumber(), 3, QLCDNumber.Dec, QLCDNumber.Outline, True)
+        self.adsr_sus_display = self.configure_display(QLCDNumber(), 3, QLCDNumber.Dec, QLCDNumber.Outline, True)
+        self.adsr_rel_display = self.configure_display(QLCDNumber(), 3, QLCDNumber.Dec, QLCDNumber.Outline, True)
 
         #radio buttons
         self.osc_alg_sin = QRadioButton("sine")
@@ -332,17 +322,37 @@ class MainWindow(QMainWindow):
 
         self.env_gate.clicked.connect(self.update_gate)
 
+        self.init_params()
         self.setCentralWidget(window_widget)
 
-    def configure_display(display, num_digits, num_type, dig_style, small_dec):
-        display.setMode(num_type)
+    # args: QLCDDisplay widget, # of digits, mode (hex, dec, oct, bin),
+    # dig_style (outline, filled, flat), small decimal flag (for floats)
+    def configure_display(self, display, num_digits, num_mode, dig_style, small_dec):
+        display.setMode(num_mode)
         display.setDigitCount(num_digits)
         display.setSegmentStyle(dig_style)
         display.setSmallDecimalPoint(small_dec)
         return display
+    
+    def init_params(self):
+        self.filt_freq_slider.setValue(700)
+        self.filt_res_slider.setValue(0)
+        self.filt_drive_slider.setValue(40)
+        self.filt_sat_slider.setValue(800)
+
+        self.osc_freq_slider.setValue(0)
+        self.osc_amp_slider.setValue(250)
+        self.osc_width_slider.setValue(250)
+
+        self.adsr_att_slider.setValue(10)
+        self.adsr_dec_slider.setValue(500)
+        self.adsr_sus_slider.setValue(1000)
+        self.adsr_rel_slider.setValue(500)
+
 
     
     #slots
+    # midi
     def update_midi_in(self, input_name):
         self.engine.set_midi_input(input_name)
 
@@ -358,21 +368,25 @@ class MainWindow(QMainWindow):
         if input_list:
             self.midi_select.addItems(input_list)
             self.midi_select.setCurrentIndex(0)
-
+    # filter
     def update_filt_freq(self, value):
         newFreq = 27.5 * 2**(float(value)/100.0)
+        self.filt_freq_display.display(f"{newFreq:.1f}")
         self.engine.update_cutoff(newFreq)
 
     def update_filt_res(self, value):
         newRes = 10.0 / (10.0**(value/100.0))
+        self.filt_fback_display.display(f"{1.0/newRes:.2f}")
         self.engine.update_resonance(newRes)
 
     def update_filt_drive(self, value):
         newDrive = value/40.0
+        self.filt_drive_display.display(f"{newDrive:.2f}")
         self.engine.update_drive(newDrive)
 
     def update_filt_sat(self, value):
         newSat = float(value)/100.0
+        self.filt_sat_display.display(f"{newSat:.2f}")
         self.engine.update_saturate(newSat)
 
     def update_filt_alg(self, button):
@@ -387,17 +401,20 @@ class MainWindow(QMainWindow):
             newAlg = 3.0
         self.engine.update_type(newAlg)
         
-
+    # oscillator
     def update_osc_freq(self, value):
         offset = float(value)/100.0
+        self.osc_freq_display.display(f"{offset:.2f}")
         self.engine.update_pitch(offset)
 
     def update_osc_amp(self, value):
         newAmp = float(value)/500.0
+        self.osc_amp_display.display(f"{newAmp:.2f}")
         self.engine.update_amplitude(newAmp)
 
     def update_osc_width(self, value):
         newWidth = float(value)/500.0
+        self.osc_width_display.display(f"{newWidth:.2f}")
         self.engine.update_width(newWidth)
 
     def update_osc_alg(self, button):
@@ -410,21 +427,25 @@ class MainWindow(QMainWindow):
             newAlg = 2.0
         self.engine.update_algorithm(newAlg)
 
-
+    # envelope
     def update_env_attack(self, value):
         att = float(value)/1000.0
+        self.adsr_att_display.display(f"{att:.2f}")
         self.engine.update_attack(att)
 
     def update_env_decay(self, value):
-        dec = float(value)/100.0
+        dec = float(value)/1000.0
+        self.adsr_dec_display.display(f"{dec:.2f}")
         self.engine.update_decay(dec)
 
     def update_env_sustain(self, value):
         sus = float(value)/1000.0
+        self.adsr_sus_display.display(f"{sus:.2f}")
         self.engine.update_sustain(sus)
 
     def update_env_release(self, value):
         rel = float(value)/1000.0
+        self.adsr_rel_display.display(f"{rel:.2f}")
         self.engine.update_release(rel)
     
     def update_gate(self, checked):
