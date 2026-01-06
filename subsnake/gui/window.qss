@@ -4,6 +4,8 @@ MainWindow#main_window {
 
 QLCDNumber {
     border: none;
+    text-align: right;
+    height: 24px;
 }
 
 QLabel {
