@@ -29,7 +29,9 @@ class AudioEngine():
         self.key_to_note = {}
         self.note_to_voice = {}
         self.octave = 0
-        self.pitch_offset = 0.0
+        self.pitch_offset_1 = 0
+        self.pitch_offset_2 = 0
+        self.detune = 0.0
         self.midi_in_queue = queue.SimpleQueue()
         self.stream = None
         self.midi_input = None
@@ -111,9 +113,11 @@ class AudioEngine():
     
     #key input handlers
     def key_pressed(self, note, velocity):
-        new_pitch = 440.0 * 2**((float(note))/12.0 + self.pitch_offset)
+        new_pitch = 440.0 * 2**((float(note))/12.0 + self.pitch_offset_1)
+        new_pitch2 = 440.0 * 2**((float(note))/12.0 + self.pitch_offset_1) + self.detune
         new_voice = self.assign_voice(note)
         new_voice.osc.update_pitch(new_pitch)
+        new_voice.osc2.update_pitch(new_pitch2)
         new_voice.velocity = float(velocity)/127.0
         new_voice.env.update_gate(True)
         new_voice.status = 2
@@ -127,23 +131,45 @@ class AudioEngine():
         
 
     #voice helper functions
-    def update_pitch(self, offset):
+    def update_pitch(self, offset, osc):
         for voice in self.voices:
-            new_pitch = 440.0 * 2**(float(voice.base_note)/12.0 + offset)
-            voice.osc.update_pitch(new_pitch)
-        self.pitch_offset = offset
+            if (osc == 1):
+                new_pitch = 440.0 * 2**(float(voice.base_note)/12.0 + offset)
+                voice.osc.update_pitch(new_pitch)
+            elif (osc == 2):
+                new_pitch = 440.0 * 2**(float(voice.base_note)/12.0 + offset) + self.detune
+                voice.osc2.update_pitch(new_pitch)
+        if (osc == 1):
+            self.pitch_offset_1 = offset
+        elif (osc == 2):
+            self.pitch_offset_2 = offset
 
-    def update_amplitude(self, newAmp):
+    def update_detune(self, detune):
         for voice in self.voices:
-             voice.osc.update_amplitude(newAmp)
+            new_pitch = 440.0 * 2**(float(voice.base_note)/12.0 + self.pitch_offset_2) + detune
+            voice.osc2.update_pitch(new_pitch)
+        self.detune = detune
 
-    def update_width(self, newWidth):
+    def update_amplitude(self, newAmp, osc):
         for voice in self.voices:
-             voice.osc.update_width(newWidth)
+            if (osc == 1):
+                voice.osc.update_amplitude(newAmp)
+            elif (osc == 2):
+                voice.osc2.update_amplitude(newAmp)
+
+    def update_width(self, newWidth, osc):
+        for voice in self.voices:
+            if (osc == 1):
+                voice.osc.update_width(newWidth)
+            elif (osc == 2):
+                voice.osc2.update_width(newWidth)
     
-    def update_algorithm(self, newAlg):
+    def update_algorithm(self, newAlg, osc):
         for voice in self.voices:
-             voice.osc.update_algorithm(newAlg)
+            if (osc == 1):
+                voice.osc.update_algorithm(newAlg)
+            elif (osc == 2):
+                voice.osc2.update_algorithm(newAlg)
     
     def update_cutoff(self, newFreq):
         for voice in self.voices:
@@ -189,9 +215,11 @@ class AudioEngine():
 class Voice():
     def __init__(self):
         self.osc_out = np.zeros((1024, 2), dtype=np.float32)
+        self.osc2_out = np.zeros((1024, 2), dtype=np.float32)
         self.filt_out = np.zeros((1024, 2), dtype=np.float32)
         #self.env_out = np.zeros((1024, 2), dtype=np.float32)
         self.osc = WrappedOsc(2, 0.5, 55, fs, .5)
+        self.osc2 = WrappedOsc(2, 0.5, 55, fs, .5)
         self.filt = HalSVF(0.0, 3520, 10, 1.0)
         self.env = ADSR(.01, 1.0, 0.5, 1.0)
         self.base_note = 0
@@ -201,6 +229,10 @@ class Voice():
 
     def callback(self, output, note_to_voice, stopped_voices, released_voices):
             self.osc.process_block(self.osc_out)
+            self.osc_out *= 0.5
+            self.osc2.process_block(self.osc2_out)
+            self.osc2_out *= 0.5
+            self.osc_out += self.osc2_out
             self.filt.process_block(self.osc_out, self.filt_out)
             self.env.process_block(self.filt_out, output)
             output *= self.velocity
