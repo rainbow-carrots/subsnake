@@ -114,7 +114,7 @@ class AudioEngine():
     #key input handlers
     def key_pressed(self, note, velocity):
         new_pitch = 440.0 * 2**((float(note))/12.0 + self.pitch_offset_1)
-        new_pitch2 = 440.0 * 2**((float(note))/12.0 + self.pitch_offset_1) + self.detune
+        new_pitch2 = 440.0 * 2**((float(note))/12.0 + self.pitch_offset_2) + self.detune
         new_voice = self.assign_voice(note)
         new_voice.osc.update_pitch(new_pitch)
         new_voice.osc2.update_pitch(new_pitch2)
