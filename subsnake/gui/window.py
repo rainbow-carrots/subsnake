@@ -1,7 +1,7 @@
 from subsnake.audio.engine import AudioEngine
 from subsnake.gui.keys import Keys
 from PySide6.QtCore import Qt
-from PySide6.QtGui import QAction
+from PySide6.QtGui import QAction, QColor, QPalette
 from PySide6.QtWidgets import (
     QMainWindow, QGridLayout,
     QSlider, QRadioButton,
@@ -117,19 +117,34 @@ class MainWindow(QMainWindow):
         #displays
         # args: QLCDDisplay widget, # of digits, mode (hex, dec, oct, bin),
         # dig_style (outline, filled, flat), small decimal flag (for floats)
-        self.osc_freq_display = self.configure_display(QLCDNumber(), 3, QLCDNumber.Dec, QLCDNumber.Outline, True)
-        self.osc_amp_display = self.configure_display(QLCDNumber(), 3, QLCDNumber.Dec, QLCDNumber.Outline, True)
-        self.osc_width_display = self.configure_display(QLCDNumber(), 3, QLCDNumber.Dec, QLCDNumber.Outline, True)
+        self.osc_freq_display = self.configure_display(QLCDNumber(), 3, QLCDNumber.Dec, QLCDNumber.Flat, True)
+        self.osc_amp_display = self.configure_display(QLCDNumber(), 3, QLCDNumber.Dec, QLCDNumber.Flat, True)
+        self.osc_width_display = self.configure_display(QLCDNumber(), 3, QLCDNumber.Dec, QLCDNumber.Flat, True)
 
-        self.filt_freq_display = self.configure_display(QLCDNumber(), 5, QLCDNumber.Dec, QLCDNumber.Outline, True)
-        self.filt_fback_display = self.configure_display(QLCDNumber(), 5, QLCDNumber.Dec, QLCDNumber.Outline, True)
-        self.filt_drive_display = self.configure_display(QLCDNumber(), 5, QLCDNumber.Dec, QLCDNumber.Outline, True)
-        self.filt_sat_display = self.configure_display(QLCDNumber(), 5, QLCDNumber.Dec, QLCDNumber.Outline, True)
+        self.filt_freq_display = self.configure_display(QLCDNumber(), 5, QLCDNumber.Dec, QLCDNumber.Flat, True)
+        self.filt_fback_display = self.configure_display(QLCDNumber(), 5, QLCDNumber.Dec, QLCDNumber.Flat, True)
+        self.filt_drive_display = self.configure_display(QLCDNumber(), 5, QLCDNumber.Dec, QLCDNumber.Flat, True)
+        self.filt_sat_display = self.configure_display(QLCDNumber(), 5, QLCDNumber.Dec, QLCDNumber.Flat, True)
 
-        self.adsr_att_display = self.configure_display(QLCDNumber(), 3, QLCDNumber.Dec, QLCDNumber.Outline, True)
-        self.adsr_dec_display = self.configure_display(QLCDNumber(), 3, QLCDNumber.Dec, QLCDNumber.Outline, True)
-        self.adsr_sus_display = self.configure_display(QLCDNumber(), 3, QLCDNumber.Dec, QLCDNumber.Outline, True)
-        self.adsr_rel_display = self.configure_display(QLCDNumber(), 3, QLCDNumber.Dec, QLCDNumber.Outline, True)
+        self.adsr_att_display = self.configure_display(QLCDNumber(), 3, QLCDNumber.Dec, QLCDNumber.Flat, True)
+        self.adsr_dec_display = self.configure_display(QLCDNumber(), 3, QLCDNumber.Dec, QLCDNumber.Flat, True)
+        self.adsr_sus_display = self.configure_display(QLCDNumber(), 3, QLCDNumber.Dec, QLCDNumber.Flat, True)
+        self.adsr_rel_display = self.configure_display(QLCDNumber(), 3, QLCDNumber.Dec, QLCDNumber.Flat, True)
+
+        #set display palettes
+        self.set_palette(self.osc_freq_display, 0)
+        self.set_palette(self.osc_amp_display, 0)
+        self.set_palette(self.osc_width_display, 0)
+
+        self.set_palette(self.filt_freq_display, 1)
+        self.set_palette(self.filt_fback_display, 1)
+        self.set_palette(self.filt_drive_display, 1)
+        self.set_palette(self.filt_sat_display, 1)
+
+        self.set_palette(self.adsr_att_display, 2)
+        self.set_palette(self.adsr_dec_display, 2)
+        self.set_palette(self.adsr_sus_display, 2)
+        self.set_palette(self.adsr_rel_display, 2)
 
         #radio buttons
         self.osc_alg_sin = QRadioButton("sine")
@@ -325,6 +340,7 @@ class MainWindow(QMainWindow):
         self.init_params()
         self.setCentralWidget(window_widget)
 
+    #helper functions
     # args: QLCDDisplay widget, # of digits, mode (hex, dec, oct, bin),
     # dig_style (outline, filled, flat), small decimal flag (for floats)
     def configure_display(self, display, num_digits, num_mode, dig_style, small_dec):
@@ -349,6 +365,17 @@ class MainWindow(QMainWindow):
         self.adsr_sus_slider.setValue(1000)
         self.adsr_rel_slider.setValue(500)
 
+    def set_palette(self, display, group):
+        if group == 0:      #osc group
+            text_color = QColor("#d2e9ff")
+        elif group == 1:    #filt group
+            text_color = QColor("#edfff2")
+        elif group == 2:    #env group
+            text_color = QColor("#fde7f1")
+        display_palette = display.palette()
+        display_palette.setColor(QPalette.ColorRole.WindowText, text_color)
+        display.setAutoFillBackground(True)
+        display.setPalette(display_palette)
 
     
     #slots
