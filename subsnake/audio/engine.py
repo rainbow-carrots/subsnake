@@ -120,6 +120,7 @@ class AudioEngine():
         new_voice.osc2.update_pitch(new_pitch2)
         new_voice.velocity = float(velocity)/127.0
         new_voice.env.update_gate(True)
+        new_voice.fenv.update_gate(True)
         new_voice.status = 2
         new_voice.base_note = note
 
@@ -127,6 +128,7 @@ class AudioEngine():
         if note in self.note_to_voice:
             voice_index = self.note_to_voice.get(note)
             self.voices[voice_index].env.update_gate(False)
+            self.voices[voice_index].fenv.update_gate(False)
             self.voices[voice_index].status = 1
         
 
@@ -211,17 +213,39 @@ class AudioEngine():
          for voice in self.voices:
               voice.env.update_release(newRelease)
 
+    def update_fenv_attack(self, newAttack):
+        for voice in self.voices:
+             voice.fenv.update_attack(newAttack)
+
+    def update_fenv_decay(self, newDecay):
+        for voice in self.voices:
+             voice.fenv.update_decay(newDecay)
+    
+    def update_fenv_sustain(self, newSustain):
+        for voice in self.voices:
+             voice.fenv.update_sustain(newSustain)
+    
+    def update_fenv_release(self, newRelease):
+        for voice in self.voices:
+            voice.fenv.update_release(newRelease)
+
+    def update_fenv_amount(self, newAmount):
+        for voice in self.voices:
+            voice.filt.update_env_amount(newAmount)
+
 
 class Voice():
     def __init__(self):
         self.osc_out = np.zeros((1024, 2), dtype=np.float32)
         self.osc2_out = np.zeros((1024, 2), dtype=np.float32)
         self.filt_out = np.zeros((1024, 2), dtype=np.float32)
-        #self.env_out = np.zeros((1024, 2), dtype=np.float32)
+        self.fenv_in = np.ones((1024, 2), dtype=np.float32)
+        self.fenv_out = np.zeros((1024, 2), dtype=np.float32)
         self.osc = WrappedOsc(2, 0.5, 55, fs, .5)
         self.osc2 = WrappedOsc(2, 0.5, 55, fs, .5)
         self.filt = HalSVF(0.0, 3520, 10, 1.0)
         self.env = ADSR(.01, 1.0, 0.5, 1.0)
+        self.fenv = ADSR(.01, .5, .5, .5)
         self.base_note = 0
         self.velocity = 0.0
         self.status = 0
@@ -233,7 +257,8 @@ class Voice():
             self.osc2.process_block(self.osc2_out)
             self.osc2_out *= 0.5
             self.osc_out += self.osc2_out
-            self.filt.process_block(self.osc_out, self.filt_out)
+            self.fenv.process_block(self.fenv_in, self.fenv_out)
+            self.filt.process_block(self.osc_out, self.filt_out, self.fenv_out)
             self.env.process_block(self.filt_out, output)
             output *= self.velocity
             if (self.env.state[0] == 0.0) and (self.status > 0):
