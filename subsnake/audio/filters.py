@@ -15,6 +15,7 @@ class HalSVF():
     def __init__(self, type, cutoff, resonance, drive=1.0, saturate=8.0):
         self.cutoff = cutoff
         self.resonance = resonance
+        self.env_amount = 0.0
 
         q = resonance
         f = 2*math.sin(np.pi*(cutoff/(4*fs)))
@@ -22,13 +23,11 @@ class HalSVF():
         #init parameter buffer | lowpass, bandpass, tuning, dampening, type, drive, saturation
         self.state = np.array([[0.0, 0.0, f, q, type, drive, saturate], [0.0, 0.0, f, q, type, drive, saturate]], dtype=np.float32)
     
-    def process_block(self, input, output):
-        self.filter_block(self.state, input, output, HalSVF.clip_sample)
+    def process_block(self, input, output, fenv):
+        self.filter_block(self.state, input, output, fenv, self.env_amount, HalSVF.clip_sample, self.cutoff)
 
     def update_cutoff(self, freq):
-        f = 2*math.sin(np.pi*(freq/(4*fs)))
-        self.state[0, 2] = f
-        self.state[1, 2] = f
+        self.cutoff = freq
 
     def update_resonance(self, res):
         self.state[0, 3] = res
@@ -45,16 +44,23 @@ class HalSVF():
     def update_saturate(self, saturate):
         self.state[0, 6] = saturate
         self.state[1, 6] = saturate
+
+    def update_env_amount(self, amount):
+        self.env_amount = amount
         
     @staticmethod
     @njit(nogil=True, fastmath=True)
-    def filter_block(state, input, output, clip_sample):
+    def filter_block(state, input, output, fenv, fenv_amount, clip_sample, cutoff):
         for c in range (2):
             for n in range(len(output)):
                 subsample = 0.0
                 prev_low = state[c, 0]
                 prev_band = state[c, 1]
-                freq_c = state[c, 2]
+                if (fenv_amount >= 0.0):
+                    new_cutoff = min(cutoff + cutoff*fenv_amount*fenv[n, c], 7040.0)
+                else:
+                    new_cutoff = max(cutoff + cutoff*fenv_amount*fenv[n, c], 0.1)
+                freq_c = 2*math.sin(np.pi*(new_cutoff/(4*fs)))
                 res_c = state[c, 3]
                 substate = int(state[c, 4])
                 drive = state[c, 5]
