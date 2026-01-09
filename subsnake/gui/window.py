@@ -44,6 +44,7 @@ class MainWindow(QMainWindow):
 
         #group boxes
         self.midi_group = QGroupBox("midi input")
+        self.midi_group.setFocusPolicy(Qt.NoFocus)
         filt_group = QGroupBox("filter")
         osc_group = QGroupBox("oscillator 1")
         osc2_group = QGroupBox("oscillator 2")
@@ -271,14 +272,17 @@ class MainWindow(QMainWindow):
         self.midi_select = QComboBox()
         self.midi_select.setEditable(False)
         self.midi_select.setInsertPolicy(QComboBox.InsertAtBottom)
+        self.midi_select.setFocusPolicy(Qt.NoFocus)
 
         self.channel_select = QComboBox()
-        self.midi_select.setEditable(False)
-        self.midi_select.setInsertPolicy(QComboBox.InsertAtBottom)
+        self.channel_select.setEditable(False)
+        self.channel_select.setInsertPolicy(QComboBox.InsertAtBottom)
+        self.channel_select.setFocusPolicy(Qt.NoFocus)
 
         #refresh button
         self.midi_refresh = QPushButton("⟳")
         self.midi_refresh.setCheckable(False)
+        self.midi_refresh.setFocusPolicy(Qt.NoFocus)
 
         #grid spacers
         # row 0
@@ -721,7 +725,7 @@ class MainWindow(QMainWindow):
                     key_text = event.text()
                     print(f"pressed key: {key_text}, offset: {offset}")
                     #set pitch
-                    note = 3 + 12.0*self.engine.octave + offset
+                    note = 3 + 12*self.engine.octave + offset
                     self.engine.key_pressed(note, 127)
                     return super().keyPressEvent(event)
                 else:
@@ -744,7 +748,7 @@ class MainWindow(QMainWindow):
                     key_text = event.text()
                     print(f"released key: {key_text}, offset: {offset}")
                     #release gate
-                    note = 3 + 12.0*self.engine.octave + offset
+                    note = 3 + 12*self.engine.octave + offset
                     self.engine.key_released(note)
 
     def closeEvent(self, event):
