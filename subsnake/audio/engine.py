@@ -2,6 +2,7 @@ import numpy as np
 import mido
 import queue
 import sounddevice as sd
+import random
 from .generators import WrappedOsc
 from .filters import HalSVF
 from .envelopes import ADSR
@@ -23,6 +24,8 @@ class AudioEngine():
         for voice in self.voices:
             voice.index = voice_index
             self.stopped_voice_indeces.append(voice_index)
+            voice.detune_offset = .975 + .050*random.random()
+            #print(f"DEBUG: voice {voice.index}, detune offset: {voice.detune_offset}")
             voice_index += 1
 
         self.voice_output = np.zeros((1024, 2), dtype=np.float32)
@@ -113,10 +116,10 @@ class AudioEngine():
     
     #key input handlers
     def key_pressed(self, note, velocity):
-        new_pitch = 440.0 * 2**((float(note))/12.0 + self.pitch_offset_1)
-        new_pitch2 = 440.0 * 2**((float(note))/12.0 + self.pitch_offset_2) + self.detune
         new_voice = self.assign_voice(note)
         if new_voice is not None:
+            new_pitch = 440.0 * 2**((float(note))/12.0 + self.pitch_offset_1)
+            new_pitch2 = 440.0 * 2**((float(note))/12.0 + self.pitch_offset_2) + self.detune*new_voice.detune_offset
             new_voice.osc.update_pitch(new_pitch)
             new_voice.osc2.update_pitch(new_pitch2)
             new_voice.velocity = float(velocity)/127.0
@@ -140,7 +143,7 @@ class AudioEngine():
                 new_pitch = 440.0 * 2**(float(voice.base_note)/12.0 + offset)
                 voice.osc.update_pitch(new_pitch)
             elif (osc == 2):
-                new_pitch = 440.0 * 2**(float(voice.base_note)/12.0 + offset) + self.detune
+                new_pitch = 440.0 * 2**(float(voice.base_note)/12.0 + offset) + self.detune*voice.detune_offset
                 voice.osc2.update_pitch(new_pitch)
         if (osc == 1):
             self.pitch_offset_1 = offset
@@ -149,7 +152,7 @@ class AudioEngine():
 
     def update_detune(self, detune):
         for voice in self.voices:
-            new_pitch = 440.0 * 2**(float(voice.base_note)/12.0 + self.pitch_offset_2) + detune
+            new_pitch = 440.0 * 2**(float(voice.base_note)/12.0 + self.pitch_offset_2) + detune*voice.detune_offset
             voice.osc2.update_pitch(new_pitch)
         self.detune = detune
 
@@ -251,6 +254,7 @@ class Voice():
         self.velocity = 0.0
         self.status = 0
         self.index = 0
+        self.detune_offset = 0.0
 
     def callback(self, output, note_to_voice, stopped_voices, released_voices):
             self.osc.process_block(self.osc_out)
