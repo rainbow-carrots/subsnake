@@ -116,13 +116,14 @@ class AudioEngine():
         new_pitch = 440.0 * 2**((float(note))/12.0 + self.pitch_offset_1)
         new_pitch2 = 440.0 * 2**((float(note))/12.0 + self.pitch_offset_2) + self.detune
         new_voice = self.assign_voice(note)
-        new_voice.osc.update_pitch(new_pitch)
-        new_voice.osc2.update_pitch(new_pitch2)
-        new_voice.velocity = float(velocity)/127.0
-        new_voice.env.update_gate(True)
-        new_voice.fenv.update_gate(True)
-        new_voice.status = 2
-        new_voice.base_note = note
+        if new_voice is not None:
+            new_voice.osc.update_pitch(new_pitch)
+            new_voice.osc2.update_pitch(new_pitch2)
+            new_voice.velocity = float(velocity)/127.0
+            new_voice.env.update_gate(True)
+            new_voice.fenv.update_gate(True)
+            new_voice.status = 2
+            new_voice.base_note = note
 
     def key_released(self, note):
         if note in self.note_to_voice:
