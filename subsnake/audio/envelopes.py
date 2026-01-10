@@ -14,6 +14,8 @@ class ADSR():
         #   level, stage, attack c, decay c, sustain, release c
         self.state = np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
         self.gate = False
+        self.attack_sample = 0
+        self.release_sample = 0
 
         #time constants & sustain
         self.state[2] = 1.0 - math.exp(-1/(fs*attack))
@@ -22,10 +24,16 @@ class ADSR():
         self.state[5] = 1.0 - math.exp(-1/(fs*release))
 
     def process_block(self, input, output):
-        self.envelope_block(self.state, self.gate, input, output)
+        self.envelope_block(self.state, self.gate, input, output, self.attack_sample, self.release_sample)
     
     def update_gate(self, newGate):
         self.gate = newGate
+    
+    def update_attack_start(self, attack_sample):
+        self.attack_sample = attack_sample
+
+    def update_release_start(self, release_sample):
+        self.release_sample = release_sample
 
     def update_attack(self, newAttack):
         N = fs*newAttack
@@ -45,10 +53,10 @@ class ADSR():
     #ADSR envelope (recursive 1-pole LPF)
     @staticmethod
     @njit(nogil=True, fastmath=True)
-    def envelope_block(state, gate, input, output):
+    def envelope_block(state, gate, input, output, attack_start, release_start):
         for n in range(len(output)):
             if gate:
-                if (state[1] == 0.0):  #start envelope
+                if (state[1] == 0.0) and (n >= attack_start):  #start envelope
                     state[1] = 1.0
                 elif (state[1] == 1.0): #attack
                     state[0] = state[0] + state[2]*(1.0 - state[0])
@@ -68,7 +76,8 @@ class ADSR():
                 if (state[1] == 0.0):   #envelope off
                     state[0] = 0.0
                 elif (state[1] < 4.0):  #attack/decay/sustain -> release
-                    state[1] = 4.0
+                    if (n >= release_start):
+                        state[1] = 4.0
                 else:                   #release
                     state[0] = state[0] + state[5]*(0.0 - state[0])
                     if (state[0] - .01 <= 0.0):
