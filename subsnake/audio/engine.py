@@ -3,6 +3,7 @@ import mido
 import queue
 import sounddevice as sd
 import random
+import time as pytime
 from .generators import WrappedOsc
 from .filters import HalSVF
 from .envelopes import ADSR
@@ -11,7 +12,8 @@ fs = 44100
 blocksize = 1024
 twopi = 2*np.pi
 oneoverpi = 1/np.pi
-middle_a = 69   #nice
+middle_a = 69
+latency = 0.04644   #seconds
 
 class AudioEngine():
     def __init__(self):
@@ -36,9 +38,11 @@ class AudioEngine():
         self.pitch_offset_2 = 0
         self.detune = 0.0
         self.midi_in_queue = queue.SimpleQueue()
+        self.pending_event = None
         self.stream = None
         self.midi_input = None
         self.midi_channel = None
+        self.previous_buffer_dac_time = pytime.perf_counter()
 
     #initialize stream
     def start_audio(self):
@@ -72,16 +76,31 @@ class AudioEngine():
     #audio callback
     def callback(self, outdata, frames, time, status):
         #outdata[:] = 0.0
-        while not self.midi_in_queue.empty():
-            message = self.midi_in_queue.get()
-            if (message.type == 'note_on') and (message.channel == self.midi_channel):
-                if (message.velocity > 0):
-                    self.key_pressed((message.note - middle_a), message.velocity)
-                else:
-                    self.key_released(message.note - middle_a)
-            elif (message.type == 'note_off') and (message.channel == self.midi_channel):
-                self.key_released(message.note - middle_a)
+        frame_width = frames/fs
+        frame_start = time.outputBufferDacTime
+        frame_end = frame_start + frame_width
 
+        while True:
+            if self.pending_event is None:
+                try:
+                    self.pending_event = self.midi_in_queue.get_nowait()
+                except queue.Empty:
+                    break
+            message, timestamp = self.pending_event
+            target_time = timestamp + latency
+            if (target_time >= frame_end):
+                break
+            else:
+                time_offset = timestamp - frame_start
+                sample_offset = max(0, int((time_offset/frame_width)*frames))
+                if (message.type == 'note_on') and (message.channel == self.midi_channel):
+                    if (message.velocity > 0):
+                        self.key_pressed((message.note - middle_a), message.velocity, sample_offset)
+                    else:
+                        self.key_released(message.note - middle_a, sample_offset)
+                elif (message.type == 'note_off') and (message.channel == self.midi_channel):
+                    self.key_released(message.note - middle_a, sample_offset)
+                self.pending_event = None
         for voice in self.voices:
             voice.callback(self.voice_output, self.note_to_voice, self.stopped_voice_indeces, self.released_voice_indeces)
             outdata += self.voice_output
@@ -90,7 +109,8 @@ class AudioEngine():
 
     #midi callback
     def midi_callback(self, message):
-        self.midi_in_queue.put(message)
+        stamped_message = (message, pytime.perf_counter())
+        self.midi_in_queue.put(stamped_message)
 
     #voice assignment
     def assign_voice(self, note):
@@ -115,7 +135,7 @@ class AudioEngine():
             return first_voice 
     
     #key input handlers
-    def key_pressed(self, note, velocity):
+    def key_pressed(self, note, velocity, sample_offset=0):
         new_voice = self.assign_voice(note)
         if new_voice is not None:
             new_pitch = 440.0 * 2**((float(note))/12.0 + self.pitch_offset_1)
@@ -123,15 +143,19 @@ class AudioEngine():
             new_voice.osc.update_pitch(new_pitch)
             new_voice.osc2.update_pitch(new_pitch2)
             new_voice.velocity = float(velocity)/127.0
+            new_voice.env.update_attack_start(sample_offset)
             new_voice.env.update_gate(True)
+            new_voice.fenv.update_attack_start(sample_offset)
             new_voice.fenv.update_gate(True)
             new_voice.status = 2
             new_voice.base_note = note
 
-    def key_released(self, note):
+    def key_released(self, note, sample_offset=0):
         if note in self.note_to_voice:
             voice_index = self.note_to_voice.get(note)
+            self.voices[voice_index].env.update_release_start(sample_offset)
             self.voices[voice_index].env.update_gate(False)
+            self.voices[voice_index].fenv.update_release_start(sample_offset)
             self.voices[voice_index].fenv.update_gate(False)
             self.voices[voice_index].status = 1
         
