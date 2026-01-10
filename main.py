@@ -19,7 +19,7 @@ env_test = np.array([0.0, 0.0, 1.0, 1.0, 0.5, 1.0], dtype=np.float32)
 WrappedOsc.generate_sine(osc_test, np.zeros((16, 2), dtype=np.float32))
 WrappedOsc.polyblep_saw(osc_test, np.zeros((16, 2), dtype=np.float32))
 HalSVF.filter_block(filt_test, np.zeros((16, 2), dtype=np.float32), np.zeros((16, 2), dtype=np.float32), np.ones((16, 2), dtype=np.float32), 0.0, HalSVF.clip_sample, 100)
-ADSR.envelope_block(env_test, False, np.zeros((16, 2), dtype=np.float32), np.zeros((16, 2), dtype=np.float32))
+ADSR.envelope_block(env_test, False, np.zeros((16, 2), dtype=np.float32), np.zeros((16, 2), dtype=np.float32), 0, 0)
 
 #instance app
 app = QApplication(sys.argv)
