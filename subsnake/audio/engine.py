@@ -13,7 +13,7 @@ blocksize = 1024
 twopi = 2*np.pi
 oneoverpi = 1/np.pi
 middle_a = 69
-latency = 0.04644   #seconds
+midi_latency = 0.0029025   #seconds
 
 class AudioEngine():
     def __init__(self):
@@ -27,7 +27,6 @@ class AudioEngine():
             voice.index = voice_index
             self.stopped_voice_indeces.append(voice_index)
             voice.detune_offset = .975 + .050*random.random()
-            #print(f"DEBUG: voice {voice.index}, detune offset: {voice.detune_offset}")
             voice_index += 1
 
         self.voice_output = np.zeros((1024, 2), dtype=np.float32)
@@ -46,7 +45,7 @@ class AudioEngine():
 
     #initialize stream
     def start_audio(self):
-        self.stream = sd.OutputStream(channels=2, samplerate=fs, blocksize=1024, latency='high', callback=self.callback, dtype=np.float32)
+        self.stream = sd.OutputStream(channels=2, samplerate=fs, blocksize=1024, latency=midi_latency, callback=self.callback, dtype=np.float32)
         self.stream.start()
 
     #initialize midi
@@ -75,7 +74,6 @@ class AudioEngine():
 
     #audio callback
     def callback(self, outdata, frames, time, status):
-        #outdata[:] = 0.0
         frame_width = frames/fs
         frame_start = time.outputBufferDacTime
         frame_end = frame_start + frame_width
@@ -87,7 +85,7 @@ class AudioEngine():
                 except queue.Empty:
                     break
             message, timestamp = self.pending_event
-            target_time = timestamp + latency
+            target_time = timestamp + midi_latency
             if (target_time >= frame_end):
                 break
             else:
