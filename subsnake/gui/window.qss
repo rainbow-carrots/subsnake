@@ -13,7 +13,7 @@ QLabel {
     margin-top: -4.5px;
 }
 
-QGroupBox {
+MainWindow QGroupBox {
     margin-top: 18px;
     margin-bottom: 18px;
     border: 1px solid white;
@@ -151,8 +151,8 @@ QGroupBox#fenv_group {
 
 QGroupBox#midi_group {
     background-color: #ab8ebe;
-    min-height: 56px;
-    max-height: 64px;
+    min-height: 120px;
+    max-height: 240px;
 }
 
 QPushButton#env_gate {
