@@ -1,5 +1,6 @@
 from subsnake.audio.engine import AudioEngine
 from subsnake.gui.keys import Keys
+from subsnake.gui.midi_control import MIDIControl
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QAction, QColor, QPalette
 from PySide6.QtWidgets import (
@@ -431,12 +432,16 @@ class MainWindow(QMainWindow):
         self.osc2_grid.addLayout(osc2_buttons, 4, 1)
 
         #add labels & combo boxes (midi)
+        test_control = MIDIControl()
+        test_control.cc_changed.connect(self.update_cc)
+        test_control.param_changed.connect(self.update_param)
         midi_layout.addWidget(self.midi_refresh, 0, 0)
         midi_layout.addWidget(self.midi_input_label, 0, 1)
         midi_layout.addWidget(self.midi_select, 0, 2)
         midi_layout.addWidget(self.midi_channel_label, 0, 3)
         midi_layout.addWidget(self.channel_select, 0, 4)
         midi_stack.addLayout(midi_layout, 0, 0)
+        midi_stack.addWidget(test_control, 1, 0)
 
         #add layouts to groups
         self.midi_group.setLayout(midi_stack)
@@ -715,6 +720,11 @@ class MainWindow(QMainWindow):
         self.fenv_amt_display.display(f"{amt:.2f}")
         self.engine.update_fenv_amount(amt)
 
+    def update_param(self, cc, new_param):
+        print(f"DEBUG: cc: {cc}, new parameter: {new_param}")
+
+    def update_cc(self, new_cc, old_cc, param):
+        print(f"DEBUG: new cc: {new_cc}, old cc: {old_cc}, parameter: {param}")
 
     def keyPressEvent(self, event):
         if (event.isAutoRepeat()):
