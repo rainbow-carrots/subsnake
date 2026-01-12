@@ -2,6 +2,7 @@ from subsnake.audio.engine import AudioEngine
 from subsnake.gui.keys import Keys
 from subsnake.gui.midi_control import MIDIControl
 from subsnake.gui.osc_gui import OscillatorGUI
+from subsnake.gui.osc2_gui import Oscillator2GUI
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QAction, QColor, QPalette
 from PySide6.QtWidgets import (
@@ -36,8 +37,6 @@ class MainWindow(QMainWindow):
         self.addToolBar(self.main_toolbar)
 
         #layouts
-        self.osc2_grid = QGridLayout()
-        osc2_buttons = QHBoxLayout()
         midi_layout = QGridLayout()
         midi_stack = QGridLayout()
         cc_layout = QGridLayout()
@@ -55,7 +54,7 @@ class MainWindow(QMainWindow):
         self.cc_group.setFocusPolicy(Qt.NoFocus)
         filt_group = QGroupBox("filter")
         self.osc_group = OscillatorGUI()
-        osc2_group = QGroupBox("oscillator 2")
+        self.osc2_group = Oscillator2GUI()
         env_group = QGroupBox("envelope")
         fenv_group = QGroupBox("filter envelope")
         self.midi_group.hide()
@@ -78,12 +77,6 @@ class MainWindow(QMainWindow):
         self.filt_drive_label = QLabel("drive:")
         self.filt_sat_label = QLabel("saturate:")
         self.filt_alg_label = QLabel("type:")
-
-        self.osc2_freq_label = QLabel("pitch:")
-        self.osc2_det_label = QLabel("detune:")
-        self.osc2_amp_label = QLabel("level:")
-        self.osc2_width_label = QLabel("width:")
-        self.osc2_alg_label = QLabel("shape:")
 
         self.adsr_att_label = QLabel("attack:")
         self.adsr_dec_label = QLabel("decay:")
@@ -115,26 +108,6 @@ class MainWindow(QMainWindow):
         self.filt_sat_slider = QSlider(Qt.Horizontal)
         self.filt_sat_slider.setSingleStep(1)
         self.filt_sat_slider.setRange(100, 1200)
-
-        # oscillator 2
-        self.osc2_freq_slider = QSlider(Qt.Horizontal)
-        self.osc2_freq_slider.setSingleStep(1)
-        self.osc2_freq_slider.setRange(-200, 200)
-        self.osc2_freq_slider.setValue(1)
-
-        self.osc2_det_slider = QSlider(Qt.Horizontal)
-        self.osc2_det_slider.setSingleStep(1)
-        self.osc2_det_slider.setRange(-200, 200)
-        self.osc2_det_slider.setValue(1)
-
-        self.osc2_amp_slider = QSlider(Qt.Horizontal)
-        self.osc2_amp_slider.setSingleStep(1)
-        self.osc2_amp_slider.setRange(0, 500)
-
-        self.osc2_width_slider = QSlider(Qt.Horizontal)
-        self.osc2_width_slider.setSingleStep(1)
-        self.osc2_width_slider.setRange(0, 500)
-
 
         # amp envelope
         self.adsr_att_slider = QSlider(Qt.Horizontal)
@@ -175,10 +148,6 @@ class MainWindow(QMainWindow):
         self.fenv_amt_slider.setRange(-500, 500)
         self.fenv_amt_slider.setValue(1)
 
-        self.osc2_freq_display = self.configure_display(QLCDNumber(), 3, QLCDNumber.Dec, QLCDNumber.Flat, True)
-        self.osc2_det_display = self.configure_display(QLCDNumber(), 3, QLCDNumber.Dec, QLCDNumber.Flat, True)
-        self.osc2_amp_display = self.configure_display(QLCDNumber(), 3, QLCDNumber.Dec, QLCDNumber.Flat, True)
-        self.osc2_width_display = self.configure_display(QLCDNumber(), 3, QLCDNumber.Dec, QLCDNumber.Flat, True)
 
         self.filt_freq_display = self.configure_display(QLCDNumber(), 5, QLCDNumber.Dec, QLCDNumber.Flat, True)
         self.filt_fback_display = self.configure_display(QLCDNumber(), 5, QLCDNumber.Dec, QLCDNumber.Flat, True)
@@ -196,10 +165,6 @@ class MainWindow(QMainWindow):
         self.fenv_rel_display = self.configure_display(QLCDNumber(), 3, QLCDNumber.Dec, QLCDNumber.Flat, True)
         self.fenv_amt_display = self.configure_display(QLCDNumber(), 3, QLCDNumber.Dec, QLCDNumber.Flat, True)
 
-        self.set_palette(self.osc2_freq_display, 3)
-        self.set_palette(self.osc2_det_display, 3)
-        self.set_palette(self.osc2_amp_display, 3)
-        self.set_palette(self.osc2_width_display, 3)
 
         self.set_palette(self.filt_freq_display, 1)
         self.set_palette(self.filt_fback_display, 1)
@@ -217,10 +182,6 @@ class MainWindow(QMainWindow):
         self.set_palette(self.fenv_rel_display, 2)
         self.set_palette(self.fenv_amt_display, 2)
 
-        self.osc2_alg_sin = QRadioButton("sine")
-        self.osc2_alg_saw = QRadioButton("saw")
-        self.osc2_alg_pulse = QRadioButton("pulse")
-        self.osc2_alg_pulse.setChecked(True)
 
         self.filt_alg_low = QRadioButton("low")
         self.filt_alg_high = QRadioButton("high")
@@ -228,10 +189,6 @@ class MainWindow(QMainWindow):
         self.filt_alg_notch = QRadioButton("notch")
         self.filt_alg_low.setChecked(True)
 
-        self.osc2_alg_group = QButtonGroup()
-        self.osc2_alg_group.addButton(self.osc2_alg_sin)
-        self.osc2_alg_group.addButton(self.osc2_alg_saw)
-        self.osc2_alg_group.addButton(self.osc2_alg_pulse)
 
         self.filt_alg_group = QButtonGroup()
         self.filt_alg_group.addButton(self.filt_alg_low)
@@ -283,7 +240,7 @@ class MainWindow(QMainWindow):
         self.cc_group.setObjectName("cc_group")
         filt_group.setObjectName("filt_group")
         #osc_group.setObjectName("osc_group")
-        osc2_group.setObjectName("osc2_group")
+        #osc2_group.setObjectName("osc2_group")
         env_group.setObjectName("env_group")
         fenv_group.setObjectName("fenv_group")
         self.midi_refresh.setObjectName("midi_refresh")
@@ -295,12 +252,6 @@ class MainWindow(QMainWindow):
         self.filt_grid.addWidget(self.filt_drive_label, 2, 0)
         self.filt_grid.addWidget(self.filt_sat_label, 3, 0)
         self.filt_grid.addWidget(self.filt_alg_label, 4, 0)
-
-        self.osc2_grid.addWidget(self.osc2_freq_label, 0, 0)
-        self.osc2_grid.addWidget(self.osc2_det_label, 1, 0)
-        self.osc2_grid.addWidget(self.osc2_amp_label, 2, 0)
-        self.osc2_grid.addWidget(self.osc2_width_label, 3, 0)
-        self.osc2_grid.addWidget(self.osc2_alg_label, 4, 0)
 
         self.env_grid.addWidget(self.adsr_att_label, 0, 0)
         self.env_grid.addWidget(self.adsr_dec_label, 1, 0)
@@ -320,11 +271,6 @@ class MainWindow(QMainWindow):
         self.filt_grid.addWidget(self.filt_drive_slider, 2, 1)
         self.filt_grid.addWidget(self.filt_sat_slider, 3, 1)
 
-        self.osc2_grid.addWidget(self.osc2_freq_slider, 0, 1)
-        self.osc2_grid.addWidget(self.osc2_det_slider, 1, 1)
-        self.osc2_grid.addWidget(self.osc2_amp_slider, 2, 1)
-        self.osc2_grid.addWidget(self.osc2_width_slider, 3, 1)
-
         self.env_grid.addWidget(self.adsr_att_slider, 0, 1)
         self.env_grid.addWidget(self.adsr_dec_slider, 1, 1)
         self.env_grid.addWidget(self.adsr_sus_slider, 2, 1)
@@ -341,11 +287,6 @@ class MainWindow(QMainWindow):
         self.filt_grid.addWidget(self.filt_fback_display, 1, 2)
         self.filt_grid.addWidget(self.filt_drive_display, 2, 2)
         self.filt_grid.addWidget(self.filt_sat_display, 3, 2)
-
-        self.osc2_grid.addWidget(self.osc2_freq_display, 0, 2)
-        self.osc2_grid.addWidget(self.osc2_det_display, 1, 2)
-        self.osc2_grid.addWidget(self.osc2_amp_display, 2, 2)
-        self.osc2_grid.addWidget(self.osc2_width_display, 3, 2)
 
         self.env_grid.addWidget(self.adsr_att_display, 0, 2)
         self.env_grid.addWidget(self.adsr_dec_display, 1, 2)
@@ -376,15 +317,6 @@ class MainWindow(QMainWindow):
         filt_buttons.addStretch()
         self.filt_grid.addLayout(filt_buttons, 4, 1)
 
-        osc2_buttons.addStretch()
-        osc2_buttons.addWidget(self.osc2_alg_sin)
-        osc2_buttons.addStretch()
-        osc2_buttons.addWidget(self.osc2_alg_saw)
-        osc2_buttons.addStretch()
-        osc2_buttons.addWidget(self.osc2_alg_pulse)
-        osc2_buttons.addStretch()
-        self.osc2_grid.addLayout(osc2_buttons, 4, 1)
-
         #add labels & combo boxes (midi)
         midi_layout.addWidget(self.midi_refresh, 0, 0)
         midi_layout.addWidget(self.midi_input_label, 0, 1)
@@ -405,7 +337,6 @@ class MainWindow(QMainWindow):
         #add layouts to groups
         self.midi_group.setLayout(midi_stack)
         filt_group.setLayout(self.filt_grid)
-        osc2_group.setLayout(self.osc2_grid)
         env_group.setLayout(self.env_grid)
         fenv_group.setLayout(self.fenv_grid)
 
@@ -417,7 +348,7 @@ class MainWindow(QMainWindow):
         self.window_grid.addWidget(self.grid_space_1, 0, 4)
         self.window_grid.addWidget(env_group, 0, 5)
         self.window_grid.addWidget(self.grid_space_3, 0, 6)
-        self.window_grid.addWidget(osc2_group, 1, 1)
+        self.window_grid.addWidget(self.osc2_group, 1, 1)
         self.window_grid.addWidget(fenv_group, 1, 3)
         self.window_grid.addWidget(self.midi_group, 2, 1)
 
@@ -449,11 +380,11 @@ class MainWindow(QMainWindow):
         self.osc_group.width_changed.connect(self.update_osc_width)
         self.osc_group.alg_changed.connect(self.update_osc_alg)
 
-        self.osc2_freq_slider.valueChanged.connect(self.update_osc2_freq)
-        self.osc2_det_slider.valueChanged.connect(self.update_osc2_det)
-        self.osc2_amp_slider.valueChanged.connect(self.update_osc2_amp)
-        self.osc2_width_slider.valueChanged.connect(self.update_osc2_width)
-        self.osc2_alg_group.buttonClicked.connect(self.update_osc2_alg)
+        self.osc2_group.pitch_changed.connect(self.update_osc2_freq)
+        self.osc2_group.detune_changed.connect(self.update_osc2_det)
+        self.osc2_group.level_changed.connect(self.update_osc2_amp)
+        self.osc2_group.width_changed.connect(self.update_osc2_width)
+        self.osc2_group.alg_changed.connect(self.update_osc2_alg)
 
         self.adsr_att_slider.valueChanged.connect(self.update_env_attack)
         self.adsr_dec_slider.valueChanged.connect(self.update_env_decay)
@@ -491,10 +422,10 @@ class MainWindow(QMainWindow):
         self.osc_group.osc_amp_slider.setValue(250)
         self.osc_group.osc_width_slider.setValue(250)
 
-        self.osc2_freq_slider.setValue(0)
-        self.osc2_det_slider.setValue(0)
-        self.osc2_amp_slider.setValue(250)
-        self.osc2_width_slider.setValue(250)
+        self.osc2_group.osc2_freq_slider.setValue(0)
+        self.osc2_group.osc2_det_slider.setValue(0)
+        self.osc2_group.osc2_amp_slider.setValue(250)
+        self.osc2_group.osc2_width_slider.setValue(250)
 
         self.adsr_att_slider.setValue(10)
         self.adsr_dec_slider.setValue(500)
@@ -685,27 +616,18 @@ class MainWindow(QMainWindow):
 
     # oscillator 2
     def update_osc2_freq(self, value):
-        offset = float(value)/100.0
-        self.osc2_freq_display.display(f"{offset:.2f}")
-        self.engine.update_pitch(offset, 2)
+        self.engine.update_pitch(value, 2)
 
     def update_osc2_det(self, value):
-        detune = value/20.0
-        self.osc2_det_display.display(f"{detune:.2f}")
-        self.engine.update_detune(detune)
+        self.engine.update_detune(value)
 
     def update_osc2_amp(self, value):
-        newAmp = float(value)/500.0
-        self.osc2_amp_display.display(f"{newAmp:.2f}")
-        self.engine.update_amplitude(newAmp, 2)
+        self.engine.update_amplitude(value, 2)
 
     def update_osc2_width(self, value):
-        newWidth = float(value)/500.0
-        self.osc2_width_display.display(f"{newWidth:.2f}")
-        self.engine.update_width(newWidth, 2)
+        self.engine.update_width(value, 2)
 
-    def update_osc2_alg(self, button):
-        text = button.text()
+    def update_osc2_alg(self, text):
         if (text == "sine"):
             newAlg = 0.0
         elif (text == "saw"):
