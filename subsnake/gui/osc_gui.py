@@ -1,0 +1,137 @@
+from PySide6.QtWidgets import(
+    QSlider, QLabel, QGridLayout,
+    QRadioButton, QButtonGroup, QLCDNumber,
+    QHBoxLayout, QGroupBox, QWidget
+)
+from PySide6.QtCore import Signal, Qt
+from PySide6.QtGui import QPalette, QColor
+
+class OscillatorGUI(QGroupBox):
+    #signals
+    pitch_changed = Signal(float)
+    level_changed = Signal(float)
+    width_changed = Signal(float)
+    alg_changed = Signal(str)
+
+    def __init__(self):
+        super().__init__()
+        #set title
+        self.setTitle("oscillator 1")
+
+        #layouts
+        osc_layout = QGridLayout()
+        osc_buttons = QHBoxLayout()
+
+        #labels
+        self.osc_freq_label = QLabel("pitch:")
+        self.osc_amp_label = QLabel("level:")
+        self.osc_width_label = QLabel("width:")
+        self.osc_alg_label = QLabel("shape:")
+
+        #sliders
+        self.osc_freq_slider = QSlider(Qt.Horizontal)
+        self.osc_freq_slider.setSingleStep(1)
+        self.osc_freq_slider.setRange(-500, 500)
+        self.osc_freq_slider.setValue(1)
+
+        self.osc_amp_slider = QSlider(Qt.Horizontal)
+        self.osc_amp_slider.setSingleStep(1)
+        self.osc_amp_slider.setRange(0, 500)
+
+        self.osc_width_slider = QSlider(Qt.Horizontal)
+        self.osc_width_slider.setSingleStep(1)
+        self.osc_width_slider.setRange(0, 500)
+
+        #displays
+        self.osc_freq_display = self.configure_display(QLCDNumber(), 3, QLCDNumber.Dec, QLCDNumber.Flat, True)
+        self.osc_amp_display = self.configure_display(QLCDNumber(), 3, QLCDNumber.Dec, QLCDNumber.Flat, True)
+        self.osc_width_display = self.configure_display(QLCDNumber(), 3, QLCDNumber.Dec, QLCDNumber.Flat, True)
+
+        #set display palettes
+        self.set_palette(self.osc_freq_display)
+        self.set_palette(self.osc_amp_display)
+        self.set_palette(self.osc_width_display)
+
+        #radio buttons
+        self.osc_alg_sin = QRadioButton("sine")
+        self.osc_alg_saw = QRadioButton("saw")
+        self.osc_alg_pulse = QRadioButton("pulse")
+        self.osc_alg_pulse.setChecked(True)
+
+        #button groups
+        self.osc_alg_group = QButtonGroup()
+        self.osc_alg_group.addButton(self.osc_alg_sin)
+        self.osc_alg_group.addButton(self.osc_alg_saw)
+        self.osc_alg_group.addButton(self.osc_alg_pulse)
+
+        #add labels
+        osc_layout.addWidget(self.osc_freq_label, 0, 0)
+        osc_layout.addWidget(self.osc_amp_label, 1, 0)
+        osc_layout.addWidget(self.osc_width_label, 2, 0)
+        osc_layout.addWidget(self.osc_alg_label, 3, 0)
+
+        #add sliders
+        osc_layout.addWidget(self.osc_freq_slider, 0, 1)
+        osc_layout.addWidget(self.osc_amp_slider, 1, 1)
+        osc_layout.addWidget(self.osc_width_slider, 2, 1)
+
+        #add displays
+        osc_layout.addWidget(self.osc_freq_display, 0, 2)
+        osc_layout.addWidget(self.osc_amp_display, 1, 2)
+        osc_layout.addWidget(self.osc_width_display, 2, 2)
+
+        #add radio buttons
+        osc_buttons.addStretch()
+        osc_buttons.addWidget(self.osc_alg_sin)
+        osc_buttons.addStretch()
+        osc_buttons.addWidget(self.osc_alg_saw)
+        osc_buttons.addStretch()
+        osc_buttons.addWidget(self.osc_alg_pulse)
+        osc_buttons.addStretch()
+        osc_layout.addLayout(osc_buttons, 3, 1)
+
+        #connect signals
+        self.osc_freq_slider.valueChanged.connect(self.change_pitch)
+        self.osc_amp_slider.valueChanged.connect(self.change_level)
+        self.osc_width_slider.valueChanged.connect(self.change_width)
+        self.osc_alg_group.buttonClicked.connect(self.change_alg)
+
+        #set object name
+        self.setObjectName("osc_group")
+
+        #set layout
+        self.setLayout(osc_layout)
+
+    #helpers
+    def configure_display(self, display, num_digits, num_mode, dig_style, small_dec):
+        display.setMode(num_mode)
+        display.setDigitCount(num_digits)
+        display.setSegmentStyle(dig_style)
+        display.setSmallDecimalPoint(small_dec)
+        return display
+    
+    def set_palette(self, display):
+        text_color = QColor("#d2e9ff")
+        display_palette = display.palette()
+        display_palette.setColor(QPalette.ColorRole.WindowText, text_color)
+        display.setAutoFillBackground(True)
+        display.setPalette(display_palette)
+
+    #slots
+    def change_pitch(self, value):
+        offset = float(value)/100.0
+        self.osc_freq_display.display(f"{offset:.2f}")
+        self.pitch_changed.emit(offset)
+
+    def change_level(self, value):
+        newAmp = float(value)/500.0
+        self.osc_amp_display.display(f"{newAmp:.2f}")
+        self.level_changed.emit(newAmp)
+
+    def change_width(self, value):
+        newWidth = float(value)/500.0
+        self.osc_width_display.display(f"{newWidth:.2f}")
+        self.width_changed.emit(newWidth)
+
+    def change_alg(self, button):
+        self.alg_changed.emit(button.text())
