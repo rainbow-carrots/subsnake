@@ -18,6 +18,9 @@ class MainWindow(QMainWindow):
 
     def __init__(self):
         super().__init__()
+        #attributes
+        self.midi_controls = []
+        self.cc_rows = 0
 
         #toolbar
         self.main_toolbar = QToolBar()
@@ -38,6 +41,8 @@ class MainWindow(QMainWindow):
         osc2_buttons = QHBoxLayout()
         midi_layout = QGridLayout()
         midi_stack = QGridLayout()
+        cc_layout = QGridLayout()
+        self.cc_stack = QGridLayout()
         self.filt_grid = QGridLayout()
         filt_buttons = QHBoxLayout()
         self.env_grid = QGridLayout()
@@ -47,6 +52,8 @@ class MainWindow(QMainWindow):
         #group boxes
         self.midi_group = QGroupBox("midi input")
         self.midi_group.setFocusPolicy(Qt.NoFocus)
+        self.cc_group = QGroupBox("cc assign")
+        self.cc_group.setFocusPolicy(Qt.NoFocus)
         filt_group = QGroupBox("filter")
         osc_group = QGroupBox("oscillator 1")
         osc2_group = QGroupBox("oscillator 2")
@@ -59,6 +66,13 @@ class MainWindow(QMainWindow):
         self.midi_channel_label = QLabel("channel:")
         self.midi_input_label.setAlignment(Qt.AlignCenter)
         self.midi_channel_label.setAlignment(Qt.AlignCenter)
+
+        self.cc_num_label = QLabel("CC")
+        self.cc_group_label = QLabel("module")
+        self.cc_param_label = QLabel("parameter")
+        self.cc_num_label.setAlignment(Qt.AlignCenter)
+        self.cc_group_label.setAlignment(Qt.AlignCenter)
+        self.cc_param_label.setAlignment(Qt.AlignCenter)
 
         self.filt_freq_label = QLabel("cutoff:")
         self.filt_res_label = QLabel("feedback:")
@@ -286,6 +300,11 @@ class MainWindow(QMainWindow):
         self.midi_refresh.setCheckable(False)
         self.midi_refresh.setFocusPolicy(Qt.NoFocus)
 
+        #add midi cc button
+        self.cc_add = QPushButton("+")
+        self.cc_add.setCheckable(False)
+        self.cc_add.setFocusPolicy(Qt.NoFocus)
+
         #grid spacers
         # row 0
         self.grid_space_0 = QFrame()
@@ -306,12 +325,14 @@ class MainWindow(QMainWindow):
         self.grid_space_2.setObjectName("grid_space_2")
         self.grid_space_3.setObjectName("grid_space_3")
         self.midi_group.setObjectName("midi_group")
+        self.cc_group.setObjectName("cc_group")
         filt_group.setObjectName("filt_group")
         osc_group.setObjectName("osc_group")
         osc2_group.setObjectName("osc2_group")
         env_group.setObjectName("env_group")
         fenv_group.setObjectName("fenv_group")
         self.midi_refresh.setObjectName("midi_refresh")
+        self.cc_add.setObjectName("cc_add")
 
         #add labels
         self.filt_grid.addWidget(self.filt_freq_label, 0, 0)
@@ -432,16 +453,21 @@ class MainWindow(QMainWindow):
         self.osc2_grid.addLayout(osc2_buttons, 4, 1)
 
         #add labels & combo boxes (midi)
-        test_control = MIDIControl()
-        test_control.cc_changed.connect(self.update_cc)
-        test_control.param_changed.connect(self.update_param)
         midi_layout.addWidget(self.midi_refresh, 0, 0)
         midi_layout.addWidget(self.midi_input_label, 0, 1)
         midi_layout.addWidget(self.midi_select, 0, 2)
         midi_layout.addWidget(self.midi_channel_label, 0, 3)
         midi_layout.addWidget(self.channel_select, 0, 4)
+
+        #configure midi stack
+        cc_layout.addWidget(self.cc_add, 0, 0)
+        cc_layout.addWidget(self.cc_num_label, 0, 1)
+        cc_layout.addWidget(self.cc_group_label, 0, 2)
+        cc_layout.addWidget(self.cc_param_label, 0, 3)
+        self.cc_stack.addLayout(cc_layout, 0, 0)
+        self.cc_group.setLayout(self.cc_stack)
         midi_stack.addLayout(midi_layout, 0, 0)
-        midi_stack.addWidget(test_control, 1, 0)
+        midi_stack.addWidget(self.cc_group, 1, 0)
 
         #add layouts to groups
         self.midi_group.setLayout(midi_stack)
@@ -477,6 +503,7 @@ class MainWindow(QMainWindow):
         self.midi_select.currentTextChanged.connect(self.update_midi_in)
         self.channel_select.currentTextChanged.connect(self.update_midi_ch)
         self.midi_refresh.pressed.connect(self.refresh_midi_ins)
+        self.cc_add.pressed.connect(self.add_cc)
         self.toggle_midi.toggled.connect(self.toggle_midi_box)
 
         self.filt_freq_slider.valueChanged.connect(self.update_filt_freq)
@@ -562,7 +589,55 @@ class MainWindow(QMainWindow):
         display.setAutoFillBackground(True)
         display.setPalette(display_palette)
 
-    
+    def assign_cc_function(self, module, param):
+        cc_func = None
+        if (module == "oscillator 1"):
+            if (param == "pitch"):
+                cc_func = self.update_osc_freq
+            elif (param == "level"):
+                cc_func = self.update_osc_amp
+            elif (param == "width"):
+                cc_func = self.update_osc_width
+        elif (module == "oscillator 2"):
+            if (param == "pitch"):
+                cc_func = self.update_osc2_freq
+            elif (param == "detune"):
+                cc_func = self.update_osc2_det
+            elif (param == "level"):
+                cc_func = self.update_osc2_amp
+            elif (param == "width"):
+                cc_func = self.update_osc2_width
+        elif (module == "filter"):
+            if (param == "cutoff"):
+                cc_func = self.update_filt_freq
+            elif (param == "feedback"):
+                cc_func = self.update_filt_res
+            elif (param == "drive"):
+                cc_func = self.update_filt_drive
+            elif (param == "saturate"):
+                cc_func = self.update_filt_sat
+        elif (module == "filter env"):
+            if (param == "attack"):
+                cc_func = self.update_fenv_attack
+            elif (param == "decay"):
+                cc_func = self.update_fenv_decay
+            elif (param == "sustain"):
+                cc_func = self.update_fenv_sustain
+            elif (param == "release"):
+                cc_func = self.update_fenv_release
+            elif (param == "depth"):
+                cc_func = self.update_fenv_amount
+        elif (module == "envelope"):
+            if (param == "attack"):
+                cc_func = self.update_env_attack
+            elif (param == "decay"):
+                cc_func = self.update_env_decay
+            elif (param == "sustain"):
+                cc_func = self.update_env_sustain
+            elif (param == "release"):
+                cc_func = self.update_env_release
+        return cc_func
+
     #slots
     # midi
     def update_midi_in(self, input_name):
@@ -580,6 +655,50 @@ class MainWindow(QMainWindow):
         if input_list:
             self.midi_select.addItems(input_list)
             self.midi_select.setCurrentIndex(0)
+
+    def add_cc(self):
+        new_cc = MIDIControl()
+        cc_val = new_cc.cc_select.value()
+        cc_param = new_cc.param_select.currentText()
+        module = new_cc.module_select.currentText()
+        cc_func = self.assign_cc_function(module, cc_param)
+        self.engine.midi_cc_dict.update({cc_val: cc_func})
+        rows = self.cc_rows + 1
+        new_cc.row = rows
+        self.cc_rows += 1
+        self.cc_stack.addWidget(new_cc, rows, 0)
+        new_cc.cc_changed.connect(self.update_cc)
+        new_cc.param_changed.connect(self.update_param)
+        new_cc.cc_deleted.connect(self.delete_cc)
+
+    def update_cc(self, new_cc, old_cc, param):
+        print(f"DEBUG: new cc: {new_cc}, old cc: {old_cc}, parameter: {param}")
+
+    def update_param(self, cc, new_param):
+        print(f"DEBUG: cc: {cc}, new parameter: {new_param}")
+
+    def delete_cc(self, cc, row):
+        if cc in self.engine.midi_cc_dict:
+            self.engine.midi_cc_dict.pop(cc)
+        print(f"DEBUG: delete row {row}")
+        cc_widget = self.cc_stack.itemAtPosition(row, 0).widget()
+        cc_widget.cc_changed.disconnect(self.delete_cc)
+        cc_widget.param_changed.disconnect(self.delete_cc)
+        cc_widget.cc_deleted.disconnect(self.delete_cc)
+        if (row != self.cc_rows):
+            for cc_index in range (row + 1, self.cc_rows + 1):
+                print(cc_index)
+                cc_control = self.cc_stack.itemAtPosition(cc_index, 0).widget()
+                self.cc_stack.removeWidget(cc_control)
+                self.cc_stack.addWidget(cc_control, cc_index - 1, 0)
+                print(f"DEBUG: old row: {cc_control.row}")
+                cc_control.row -= 1
+                print(f"DEBUG: new row: {cc_control.row}")
+        self.cc_stack.removeWidget(cc_widget)
+        self.cc_rows -= 1
+        cc_widget.deleteLater()
+
+
     # filter
     def update_filt_freq(self, value):
         newFreq = 27.5 * 2**(float(value)/100.0)
@@ -719,12 +838,6 @@ class MainWindow(QMainWindow):
         amt = float(value)/100.0
         self.fenv_amt_display.display(f"{amt:.2f}")
         self.engine.update_fenv_amount(amt)
-
-    def update_param(self, cc, new_param):
-        print(f"DEBUG: cc: {cc}, new parameter: {new_param}")
-
-    def update_cc(self, new_cc, old_cc, param):
-        print(f"DEBUG: new cc: {new_cc}, old cc: {old_cc}, parameter: {param}")
 
     def keyPressEvent(self, event):
         if (event.isAutoRepeat()):
