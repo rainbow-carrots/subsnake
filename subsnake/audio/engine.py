@@ -38,6 +38,7 @@ class AudioEngine():
         self.detune = 0.0
         self.midi_in_queue = queue.SimpleQueue()
         self.pending_event = None
+        self.midi_cc_dict = {}
         self.stream = None
         self.midi_input = None
         self.midi_channel = None
