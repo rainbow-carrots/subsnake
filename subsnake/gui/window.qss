@@ -22,6 +22,11 @@ MainWindow QGroupBox {
     max-width: 480px;
 }
 
+QGroupBox#cc_group {
+    min-width: 320px;
+    max-width: 460px;
+}
+
 QRadioButton {
     color: #000000;
     font-size: 12px;
@@ -151,8 +156,8 @@ QGroupBox#fenv_group {
 
 QGroupBox#midi_group {
     background-color: #ab8ebe;
-    min-height: 120px;
-    max-height: 240px;
+    min-height: 180px;
+    max-height: 480px;
 }
 
 QPushButton#env_gate {
@@ -173,13 +178,24 @@ QPushButton#env_gate:checked {
     background-color: #eeb6ce;
 }
 
-QPushButton#midi_refresh {
+QPushButton#midi_refresh, QGroupBox#cc_group QPushButton {
     color: #000000;
-    background-color: #ab8ebe;
     font-size: 18px;
     font-style: bold;
     max-width: 28px;
     max-height: 28px;
+}
+
+QPushButton#midi_refresh {
+    background-color: #ab8ebe;
+}
+
+QPushButton#cc_add {
+    background-color: #9fc983;
+}
+
+QPushButton#cc_delete {
+    background-color: #c77581;
 }
 
 QToolButton#toggle_midi {
