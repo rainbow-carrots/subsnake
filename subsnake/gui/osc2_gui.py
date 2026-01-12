@@ -124,7 +124,7 @@ class Oscillator2GUI(QGroupBox):
         return display
     
     def set_palette(self, display):
-        text_color = QColor("#d2e9ff")
+        text_color = QColor("#bcd7f0")
         display_palette = display.palette()
         display_palette.setColor(QPalette.ColorRole.WindowText, text_color)
         display.setAutoFillBackground(True)
