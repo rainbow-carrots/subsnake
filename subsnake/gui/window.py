@@ -5,14 +5,13 @@ from subsnake.gui.osc_gui import OscillatorGUI
 from subsnake.gui.osc2_gui import Oscillator2GUI
 from subsnake.gui.filt_gui import FilterGUI
 from subsnake.gui.env_gui import EnvelopeGUI
+from subsnake.gui.fenv_gui import FilterEnvGUI
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QAction, QColor, QPalette
 from PySide6.QtWidgets import (
     QMainWindow, QGridLayout,
-    QSlider, QRadioButton,
-    QLabel, QLCDNumber,
-    QHBoxLayout, QWidget,
-    QButtonGroup, QPushButton,
+    QLabel, QWidget,
+    QPushButton,
     QGroupBox, QComboBox,
     QToolBar, QFrame)
 
@@ -43,7 +42,6 @@ class MainWindow(QMainWindow):
         midi_stack = QGridLayout()
         cc_layout = QGridLayout()
         self.cc_stack = QGridLayout()
-        self.fenv_grid = QGridLayout()
         self.window_grid = QGridLayout()
 
         #group boxes
@@ -55,7 +53,7 @@ class MainWindow(QMainWindow):
         self.osc_group = OscillatorGUI()
         self.osc2_group = Oscillator2GUI()
         self.env_group = EnvelopeGUI()
-        fenv_group = QGroupBox("filter envelope")
+        self.fenv_group = FilterEnvGUI()
         self.midi_group.hide()
 
         #labels
@@ -70,46 +68,6 @@ class MainWindow(QMainWindow):
         self.cc_num_label.setAlignment(Qt.AlignCenter)
         self.cc_group_label.setAlignment(Qt.AlignCenter)
         self.cc_param_label.setAlignment(Qt.AlignCenter)
-
-        self.fenv_att_label = QLabel("attack:")
-        self.fenv_dec_label = QLabel("decay:")
-        self.fenv_sus_label = QLabel("sustain:")
-        self.fenv_rel_label = QLabel("release:")
-        self.fenv_amt_label = QLabel("depth:")
-
-        # filter envelope
-        self.fenv_att_slider = QSlider(Qt.Horizontal)
-        self.fenv_att_slider.setSingleStep(1)
-        self.fenv_att_slider.setRange(1, 1000)
-
-        self.fenv_dec_slider = QSlider(Qt.Horizontal)
-        self.fenv_dec_slider.setSingleStep(1)
-        self.fenv_dec_slider.setRange(1, 1000)
-
-        self.fenv_sus_slider = QSlider(Qt.Horizontal)
-        self.fenv_sus_slider.setSingleStep(1)
-        self.fenv_sus_slider.setRange(1, 1000)
-
-        self.fenv_rel_slider = QSlider(Qt.Horizontal)
-        self.fenv_rel_slider.setSingleStep(1)
-        self.fenv_rel_slider.setRange(1, 1000)
-
-        self.fenv_amt_slider = QSlider(Qt.Horizontal)
-        self.fenv_amt_slider.setSingleStep(1)
-        self.fenv_amt_slider.setRange(-500, 500)
-        self.fenv_amt_slider.setValue(1)
-
-        self.fenv_att_display = self.configure_display(QLCDNumber(), 3, QLCDNumber.Dec, QLCDNumber.Flat, True)
-        self.fenv_dec_display = self.configure_display(QLCDNumber(), 3, QLCDNumber.Dec, QLCDNumber.Flat, True)
-        self.fenv_sus_display = self.configure_display(QLCDNumber(), 3, QLCDNumber.Dec, QLCDNumber.Flat, True)
-        self.fenv_rel_display = self.configure_display(QLCDNumber(), 3, QLCDNumber.Dec, QLCDNumber.Flat, True)
-        self.fenv_amt_display = self.configure_display(QLCDNumber(), 3, QLCDNumber.Dec, QLCDNumber.Flat, True)
-
-        self.set_palette(self.fenv_att_display, 2)
-        self.set_palette(self.fenv_dec_display, 2)
-        self.set_palette(self.fenv_sus_display, 2)
-        self.set_palette(self.fenv_rel_display, 2)
-        self.set_palette(self.fenv_amt_display, 2)
 
         #combo boxes (midi)
         self.midi_select = QComboBox()
@@ -150,27 +108,8 @@ class MainWindow(QMainWindow):
         self.grid_space_3.setObjectName("grid_space_3")
         self.midi_group.setObjectName("midi_group")
         self.cc_group.setObjectName("cc_group")
-        fenv_group.setObjectName("fenv_group")
         self.midi_refresh.setObjectName("midi_refresh")
         self.cc_add.setObjectName("cc_add")
-
-        self.fenv_grid.addWidget(self.fenv_att_label, 0, 0)
-        self.fenv_grid.addWidget(self.fenv_dec_label, 1, 0)
-        self.fenv_grid.addWidget(self.fenv_sus_label, 2, 0)
-        self.fenv_grid.addWidget(self.fenv_rel_label, 3, 0)
-        self.fenv_grid.addWidget(self.fenv_amt_label, 4, 0)
-
-        self.fenv_grid.addWidget(self.fenv_att_slider, 0, 1)
-        self.fenv_grid.addWidget(self.fenv_dec_slider, 1, 1)
-        self.fenv_grid.addWidget(self.fenv_sus_slider, 2, 1)
-        self.fenv_grid.addWidget(self.fenv_rel_slider, 3, 1)
-        self.fenv_grid.addWidget(self.fenv_amt_slider, 4, 1)
-
-        self.fenv_grid.addWidget(self.fenv_att_display, 0, 2)
-        self.fenv_grid.addWidget(self.fenv_dec_display, 1, 2)
-        self.fenv_grid.addWidget(self.fenv_sus_display, 2, 2)
-        self.fenv_grid.addWidget(self.fenv_rel_display, 3, 2)
-        self.fenv_grid.addWidget(self.fenv_amt_display, 4, 2)
 
         #add labels & combo boxes (midi)
         midi_layout.addWidget(self.midi_refresh, 0, 0)
@@ -191,7 +130,6 @@ class MainWindow(QMainWindow):
 
         #add layouts to groups
         self.midi_group.setLayout(midi_stack)
-        fenv_group.setLayout(self.fenv_grid)
 
         #add groups/midi to window
         self.window_grid.addWidget(self.grid_space_2, 0, 0)
@@ -202,7 +140,7 @@ class MainWindow(QMainWindow):
         self.window_grid.addWidget(self.env_group, 0, 5)
         self.window_grid.addWidget(self.grid_space_3, 0, 6)
         self.window_grid.addWidget(self.osc2_group, 1, 1)
-        self.window_grid.addWidget(fenv_group, 1, 3)
+        self.window_grid.addWidget(self.fenv_group, 1, 3)
         self.window_grid.addWidget(self.midi_group, 2, 1)
 
         #set column spacing
@@ -245,11 +183,11 @@ class MainWindow(QMainWindow):
         self.env_group.release_changed.connect(self.update_env_release)
         self.env_group.gate_changed.connect(self.update_env_gate)
 
-        self.fenv_att_slider.valueChanged.connect(self.update_fenv_attack)
-        self.fenv_dec_slider.valueChanged.connect(self.update_fenv_decay)
-        self.fenv_sus_slider.valueChanged.connect(self.update_fenv_sustain)
-        self.fenv_rel_slider.valueChanged.connect(self.update_fenv_release)
-        self.fenv_amt_slider.valueChanged.connect(self.update_fenv_amount)
+        self.fenv_group.attack_changed.connect(self.update_fenv_attack)
+        self.fenv_group.decay_changed.connect(self.update_fenv_decay)
+        self.fenv_group.sustain_changed.connect(self.update_fenv_sustain)
+        self.fenv_group.release_changed.connect(self.update_fenv_release)
+        self.fenv_group.amount_changed.connect(self.update_fenv_amount)
 
         self.init_params()
         self.setCentralWidget(window_widget)
@@ -284,11 +222,11 @@ class MainWindow(QMainWindow):
         self.env_group.adsr_sus_slider.setValue(1000)
         self.env_group.adsr_rel_slider.setValue(500)
 
-        self.fenv_att_slider.setValue(10)
-        self.fenv_dec_slider.setValue(500)
-        self.fenv_sus_slider.setValue(1000)
-        self.fenv_rel_slider.setValue(500)
-        self.fenv_amt_slider.setValue(0)
+        self.fenv_group.fenv_att_slider.setValue(10)
+        self.fenv_group.fenv_dec_slider.setValue(500)
+        self.fenv_group.fenv_sus_slider.setValue(1000)
+        self.fenv_group.fenv_rel_slider.setValue(500)
+        self.fenv_group.fenv_amt_slider.setValue(0)
 
     def set_palette(self, display, group):
         if group == 0:      #osc group
@@ -497,29 +435,19 @@ class MainWindow(QMainWindow):
 
     # filter envelope
     def update_fenv_attack(self, value):
-        att = float(value)/1000.0
-        self.fenv_att_display.display(f"{att:.2f}")
-        self.engine.update_fenv_attack(att)
+        self.engine.update_fenv_attack(value)
 
     def update_fenv_decay(self, value):
-        dec = float(value)/1000.0
-        self.fenv_dec_display.display(f"{dec:.2f}")
-        self.engine.update_fenv_decay(dec)
+        self.engine.update_fenv_decay(value)
 
     def update_fenv_sustain(self, value):
-        sus = float(value)/1000.0
-        self.fenv_sus_display.display(f"{sus:.2f}")
-        self.engine.update_fenv_sustain(sus)
+        self.engine.update_fenv_sustain(value)
 
     def update_fenv_release(self, value):
-        rel = float(value)/1000.0
-        self.fenv_rel_display.display(f"{rel:.2f}")
-        self.engine.update_fenv_release(rel)
+        self.engine.update_fenv_release(value)
     
     def update_fenv_amount(self, value):
-        amt = float(value)/100.0
-        self.fenv_amt_display.display(f"{amt:.2f}")
-        self.engine.update_fenv_amount(amt)
+        self.engine.update_fenv_amount(value)
 
     def keyPressEvent(self, event):
         if (event.isAutoRepeat()):
