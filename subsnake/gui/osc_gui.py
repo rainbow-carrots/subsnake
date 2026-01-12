@@ -1,7 +1,7 @@
 from PySide6.QtWidgets import(
     QSlider, QLabel, QGridLayout,
     QRadioButton, QButtonGroup, QLCDNumber,
-    QHBoxLayout, QGroupBox, QWidget
+    QHBoxLayout, QGroupBox
 )
 from PySide6.QtCore import Signal, Qt
 from PySide6.QtGui import QPalette, QColor
