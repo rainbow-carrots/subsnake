@@ -3,6 +3,7 @@ from subsnake.gui.keys import Keys
 from subsnake.gui.midi_control import MIDIControl
 from subsnake.gui.osc_gui import OscillatorGUI
 from subsnake.gui.osc2_gui import Oscillator2GUI
+from subsnake.gui.filt_gui import FilterGUI
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QAction, QColor, QPalette
 from PySide6.QtWidgets import (
@@ -41,8 +42,6 @@ class MainWindow(QMainWindow):
         midi_stack = QGridLayout()
         cc_layout = QGridLayout()
         self.cc_stack = QGridLayout()
-        self.filt_grid = QGridLayout()
-        filt_buttons = QHBoxLayout()
         self.env_grid = QGridLayout()
         self.fenv_grid = QGridLayout()
         self.window_grid = QGridLayout()
@@ -52,7 +51,7 @@ class MainWindow(QMainWindow):
         self.midi_group.setFocusPolicy(Qt.NoFocus)
         self.cc_group = QGroupBox("cc assign")
         self.cc_group.setFocusPolicy(Qt.NoFocus)
-        filt_group = QGroupBox("filter")
+        self.filt_group = FilterGUI()
         self.osc_group = OscillatorGUI()
         self.osc2_group = Oscillator2GUI()
         env_group = QGroupBox("envelope")
@@ -72,12 +71,6 @@ class MainWindow(QMainWindow):
         self.cc_group_label.setAlignment(Qt.AlignCenter)
         self.cc_param_label.setAlignment(Qt.AlignCenter)
 
-        self.filt_freq_label = QLabel("cutoff:")
-        self.filt_res_label = QLabel("feedback:")
-        self.filt_drive_label = QLabel("drive:")
-        self.filt_sat_label = QLabel("saturate:")
-        self.filt_alg_label = QLabel("type:")
-
         self.adsr_att_label = QLabel("attack:")
         self.adsr_dec_label = QLabel("decay:")
         self.adsr_sus_label = QLabel("sustain:")
@@ -89,25 +82,6 @@ class MainWindow(QMainWindow):
         self.fenv_sus_label = QLabel("sustain:")
         self.fenv_rel_label = QLabel("release:")
         self.fenv_amt_label = QLabel("depth:")
-
-        #sliders
-        # filter
-        self.filt_freq_slider = QSlider(Qt.Horizontal)
-        self.filt_freq_slider.setSingleStep(1)
-        self.filt_freq_slider.setRange(0, 800)
-
-        self.filt_res_slider = QSlider(Qt.Horizontal)
-        self.filt_res_slider.setSingleStep(1)
-        self.filt_res_slider.setRange(0, 200)
-        self.filt_res_slider.setValue(1)
-
-        self.filt_drive_slider = QSlider(Qt.Horizontal)
-        self.filt_drive_slider.setSingleStep(1)
-        self.filt_drive_slider.setRange(1, 360)
-
-        self.filt_sat_slider = QSlider(Qt.Horizontal)
-        self.filt_sat_slider.setSingleStep(1)
-        self.filt_sat_slider.setRange(100, 1200)
 
         # amp envelope
         self.adsr_att_slider = QSlider(Qt.Horizontal)
@@ -148,12 +122,7 @@ class MainWindow(QMainWindow):
         self.fenv_amt_slider.setRange(-500, 500)
         self.fenv_amt_slider.setValue(1)
 
-
-        self.filt_freq_display = self.configure_display(QLCDNumber(), 5, QLCDNumber.Dec, QLCDNumber.Flat, True)
-        self.filt_fback_display = self.configure_display(QLCDNumber(), 5, QLCDNumber.Dec, QLCDNumber.Flat, True)
-        self.filt_drive_display = self.configure_display(QLCDNumber(), 5, QLCDNumber.Dec, QLCDNumber.Flat, True)
-        self.filt_sat_display = self.configure_display(QLCDNumber(), 5, QLCDNumber.Dec, QLCDNumber.Flat, True)
-
+        #displays
         self.adsr_att_display = self.configure_display(QLCDNumber(), 3, QLCDNumber.Dec, QLCDNumber.Flat, True)
         self.adsr_dec_display = self.configure_display(QLCDNumber(), 3, QLCDNumber.Dec, QLCDNumber.Flat, True)
         self.adsr_sus_display = self.configure_display(QLCDNumber(), 3, QLCDNumber.Dec, QLCDNumber.Flat, True)
@@ -165,12 +134,6 @@ class MainWindow(QMainWindow):
         self.fenv_rel_display = self.configure_display(QLCDNumber(), 3, QLCDNumber.Dec, QLCDNumber.Flat, True)
         self.fenv_amt_display = self.configure_display(QLCDNumber(), 3, QLCDNumber.Dec, QLCDNumber.Flat, True)
 
-
-        self.set_palette(self.filt_freq_display, 1)
-        self.set_palette(self.filt_fback_display, 1)
-        self.set_palette(self.filt_drive_display, 1)
-        self.set_palette(self.filt_sat_display, 1)
-
         self.set_palette(self.adsr_att_display, 2)
         self.set_palette(self.adsr_dec_display, 2)
         self.set_palette(self.adsr_sus_display, 2)
@@ -181,20 +144,6 @@ class MainWindow(QMainWindow):
         self.set_palette(self.fenv_sus_display, 2)
         self.set_palette(self.fenv_rel_display, 2)
         self.set_palette(self.fenv_amt_display, 2)
-
-
-        self.filt_alg_low = QRadioButton("low")
-        self.filt_alg_high = QRadioButton("high")
-        self.filt_alg_band = QRadioButton("band")
-        self.filt_alg_notch = QRadioButton("notch")
-        self.filt_alg_low.setChecked(True)
-
-
-        self.filt_alg_group = QButtonGroup()
-        self.filt_alg_group.addButton(self.filt_alg_low)
-        self.filt_alg_group.addButton(self.filt_alg_high)
-        self.filt_alg_group.addButton(self.filt_alg_band)
-        self.filt_alg_group.addButton(self.filt_alg_notch)
 
         #combo boxes (midi)
         self.midi_select = QComboBox()
@@ -228,9 +177,6 @@ class MainWindow(QMainWindow):
         self.grid_space_3 = QFrame()
         self.grid_space_3.setFrameShape(QFrame.NoFrame)
 
-        # row 1
-        #   add if needed
-
         #object names
         self.grid_space_0.setObjectName("grid_space_0")
         self.grid_space_1.setObjectName("grid_space_1")
@@ -238,20 +184,10 @@ class MainWindow(QMainWindow):
         self.grid_space_3.setObjectName("grid_space_3")
         self.midi_group.setObjectName("midi_group")
         self.cc_group.setObjectName("cc_group")
-        filt_group.setObjectName("filt_group")
-        #osc_group.setObjectName("osc_group")
-        #osc2_group.setObjectName("osc2_group")
         env_group.setObjectName("env_group")
         fenv_group.setObjectName("fenv_group")
         self.midi_refresh.setObjectName("midi_refresh")
         self.cc_add.setObjectName("cc_add")
-
-        #add labels
-        self.filt_grid.addWidget(self.filt_freq_label, 0, 0)
-        self.filt_grid.addWidget(self.filt_res_label, 1, 0)
-        self.filt_grid.addWidget(self.filt_drive_label, 2, 0)
-        self.filt_grid.addWidget(self.filt_sat_label, 3, 0)
-        self.filt_grid.addWidget(self.filt_alg_label, 4, 0)
 
         self.env_grid.addWidget(self.adsr_att_label, 0, 0)
         self.env_grid.addWidget(self.adsr_dec_label, 1, 0)
@@ -265,12 +201,6 @@ class MainWindow(QMainWindow):
         self.fenv_grid.addWidget(self.fenv_rel_label, 3, 0)
         self.fenv_grid.addWidget(self.fenv_amt_label, 4, 0)
 
-        #add sliders
-        self.filt_grid.addWidget(self.filt_freq_slider, 0, 1)
-        self.filt_grid.addWidget(self.filt_res_slider, 1, 1)
-        self.filt_grid.addWidget(self.filt_drive_slider, 2, 1)
-        self.filt_grid.addWidget(self.filt_sat_slider, 3, 1)
-
         self.env_grid.addWidget(self.adsr_att_slider, 0, 1)
         self.env_grid.addWidget(self.adsr_dec_slider, 1, 1)
         self.env_grid.addWidget(self.adsr_sus_slider, 2, 1)
@@ -281,12 +211,6 @@ class MainWindow(QMainWindow):
         self.fenv_grid.addWidget(self.fenv_sus_slider, 2, 1)
         self.fenv_grid.addWidget(self.fenv_rel_slider, 3, 1)
         self.fenv_grid.addWidget(self.fenv_amt_slider, 4, 1)
-
-        #add displays
-        self.filt_grid.addWidget(self.filt_freq_display, 0, 2)
-        self.filt_grid.addWidget(self.filt_fback_display, 1, 2)
-        self.filt_grid.addWidget(self.filt_drive_display, 2, 2)
-        self.filt_grid.addWidget(self.filt_sat_display, 3, 2)
 
         self.env_grid.addWidget(self.adsr_att_display, 0, 2)
         self.env_grid.addWidget(self.adsr_dec_display, 1, 2)
@@ -304,18 +228,6 @@ class MainWindow(QMainWindow):
         self.env_gate.setObjectName("env_gate")
         self.env_gate.setCheckable(True)
         self.env_grid.addWidget(self.env_gate, 4, 1)
-
-        #add radio buttons
-        filt_buttons.addStretch()
-        filt_buttons.addWidget(self.filt_alg_low)
-        filt_buttons.addStretch()
-        filt_buttons.addWidget(self.filt_alg_high)
-        filt_buttons.addStretch()
-        filt_buttons.addWidget(self.filt_alg_band)
-        filt_buttons.addStretch()
-        filt_buttons.addWidget(self.filt_alg_notch)
-        filt_buttons.addStretch()
-        self.filt_grid.addLayout(filt_buttons, 4, 1)
 
         #add labels & combo boxes (midi)
         midi_layout.addWidget(self.midi_refresh, 0, 0)
@@ -336,7 +248,6 @@ class MainWindow(QMainWindow):
 
         #add layouts to groups
         self.midi_group.setLayout(midi_stack)
-        filt_group.setLayout(self.filt_grid)
         env_group.setLayout(self.env_grid)
         fenv_group.setLayout(self.fenv_grid)
 
@@ -344,7 +255,7 @@ class MainWindow(QMainWindow):
         self.window_grid.addWidget(self.grid_space_2, 0, 0)
         self.window_grid.addWidget(self.osc_group, 0, 1)
         self.window_grid.addWidget(self.grid_space_0, 0, 2)
-        self.window_grid.addWidget(filt_group, 0, 3)
+        self.window_grid.addWidget(self.filt_group, 0, 3)
         self.window_grid.addWidget(self.grid_space_1, 0, 4)
         self.window_grid.addWidget(env_group, 0, 5)
         self.window_grid.addWidget(self.grid_space_3, 0, 6)
@@ -369,11 +280,11 @@ class MainWindow(QMainWindow):
         self.cc_add.pressed.connect(self.add_cc)
         self.toggle_midi.toggled.connect(self.toggle_midi_box)
 
-        self.filt_freq_slider.valueChanged.connect(self.update_filt_freq)
-        self.filt_res_slider.valueChanged.connect(self.update_filt_res)
-        self.filt_drive_slider.valueChanged.connect(self.update_filt_drive)
-        self.filt_sat_slider.valueChanged.connect(self.update_filt_sat)
-        self.filt_alg_group.buttonClicked.connect(self.update_filt_alg)
+        self.filt_group.freq_changed.connect(self.update_filt_freq)
+        self.filt_group.res_changed.connect(self.update_filt_res)
+        self.filt_group.drive_changed.connect(self.update_filt_drive)
+        self.filt_group.sat_changed.connect(self.update_filt_sat)
+        self.filt_group.alg_changed.connect(self.update_filt_alg)
 
         self.osc_group.pitch_changed.connect(self.update_osc_freq)
         self.osc_group.level_changed.connect(self.update_osc_amp)
@@ -413,10 +324,10 @@ class MainWindow(QMainWindow):
         return display
     
     def init_params(self):
-        self.filt_freq_slider.setValue(700)
-        self.filt_res_slider.setValue(0)
-        self.filt_drive_slider.setValue(40)
-        self.filt_sat_slider.setValue(800)
+        self.filt_group.filt_freq_slider.setValue(700)
+        self.filt_group.filt_res_slider.setValue(0)
+        self.filt_group.filt_drive_slider.setValue(40)
+        self.filt_group.filt_sat_slider.setValue(800)
 
         self.osc_group.osc_freq_slider.setValue(0)
         self.osc_group.osc_amp_slider.setValue(250)
@@ -563,28 +474,19 @@ class MainWindow(QMainWindow):
 
 
     # filter
-    def update_filt_freq(self, value):
-        newFreq = 27.5 * 2**(float(value)/100.0)
-        self.filt_freq_display.display(f"{newFreq:.1f}")
+    def update_filt_freq(self, newFreq):
         self.engine.update_cutoff(newFreq)
 
-    def update_filt_res(self, value):
-        newRes = 10.0 / (10.0**(value/100.0))
-        self.filt_fback_display.display(f"{1.0/newRes:.2f}")
+    def update_filt_res(self, newRes):
         self.engine.update_resonance(newRes)
 
-    def update_filt_drive(self, value):
-        newDrive = value/40.0
-        self.filt_drive_display.display(f"{newDrive:.2f}")
+    def update_filt_drive(self, newDrive):
         self.engine.update_drive(newDrive)
 
-    def update_filt_sat(self, value):
-        newSat = float(value)/100.0
-        self.filt_sat_display.display(f"{newSat:.2f}")
+    def update_filt_sat(self, newSat):
         self.engine.update_saturate(newSat)
 
-    def update_filt_alg(self, button):
-        text = button.text()
+    def update_filt_alg(self, text):
         if (text == "low"):
             newAlg = 0.0
         elif (text == "high"):
