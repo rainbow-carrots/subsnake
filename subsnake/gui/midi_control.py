@@ -7,15 +7,15 @@ from PySide6.QtCore import Signal
 class MIDIControl(QWidget):
     
     #signals
-    param_changed = Signal(int, str)
-    cc_changed = Signal(int, int, str)
+    param_changed = Signal(int, str, str)
+    cc_changed = Signal(int, int, str, str)
     cc_deleted = Signal(int, int)
     
     def __init__(self):
         super().__init__()
 
         #attributes
-        self.prev_cc = 0
+        self.prev_cc = 63
         self.row = 0
 
         #layout
@@ -62,10 +62,10 @@ class MIDIControl(QWidget):
 
     def update_param(self, new_param):
         current_cc = self.cc_select.value()
-        self.param_changed.emit(current_cc, new_param)
+        self.param_changed.emit(current_cc, new_param, self.module_select.currentText())
 
     def update_cc(self, new_cc):
-        self.cc_changed.emit(new_cc, self.prev_cc, self.param_select.currentText())
+        self.cc_changed.emit(new_cc, self.prev_cc, self.param_select.currentText(), self.module_select.currentText())
         self.prev_cc = new_cc
 
     def delete_cc(self):
