@@ -15,8 +15,8 @@ class MIDISettings(QGroupBox):
 
     #signals (cc)
     cc_added = Signal(int, str, str)
-    cc_param_changed = Signal(int, str)
-    cc_changed = Signal(int, int, str)
+    cc_param_changed = Signal(int, str, str)
+    cc_changed = Signal(int, int, str, str)
     cc_deleted = Signal(int)
 
     def __init__(self):
@@ -125,11 +125,11 @@ class MIDISettings(QGroupBox):
         new_cc.cc_deleted.connect(self.delete_cc)
         self.cc_added.emit(cc_val, cc_param, module)
 
-    def update_cc(self, new_cc, old_cc, param):
-        self.cc_changed.emit(new_cc, old_cc, param)
+    def update_cc(self, new_cc, old_cc, param, module):
+        self.cc_changed.emit(new_cc, old_cc, param, module)
 
-    def update_param(self, cc, new_param):
-        self.cc_param_changed.emit(cc, new_param)
+    def update_param(self, cc, new_param, module):
+        self.cc_param_changed.emit(cc, new_param, module)
 
     def delete_cc(self, cc, row):
         print(f"DEBUG: delete row {row}")
