@@ -29,12 +29,12 @@ window.setObjectName("main_window")
 #get midi inputs
 input_list = mido.get_input_names()
 if input_list is not None:
-    window.midi_select.addItems(input_list)
+    window.midi_group.midi_select.addItems(input_list)
 
 #assign midi channels
 midi_channels = np.arange(1, 17)
 for channel in midi_channels:
-    window.channel_select.addItem(str(channel))
+    window.midi_group.channel_select.addItem(str(channel))
 
 #start audio & assign midi input
 window.engine.start_audio()
