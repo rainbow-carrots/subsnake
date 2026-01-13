@@ -19,7 +19,7 @@ class MainWindow(QMainWindow):
 
     def __init__(self):
         super().__init__()
-        
+
         #attributes
         self.midi_controls = []
         self.cc_rows = 0
@@ -168,54 +168,54 @@ class MainWindow(QMainWindow):
         self.fenv_group.fenv_rel_slider.setValue(500)
         self.fenv_group.fenv_amt_slider.setValue(0)
 
-    def assign_cc_function(self, module, param):
-        cc_func = None
+    def assign_cc_slider(self, module, param):
+        cc_slider = None
         if (module == "oscillator 1"):
             if (param == "pitch"):
-                cc_func = self.update_osc_freq
+                cc_slider = self.osc_group.osc_freq_slider
             elif (param == "level"):
-                cc_func = self.update_osc_amp
+                cc_slider = self.osc_group.osc_amp_slider
             elif (param == "width"):
-                cc_func = self.update_osc_width
+                cc_slider = self.osc_group.osc_width_slider
         elif (module == "oscillator 2"):
             if (param == "pitch"):
-                cc_func = self.update_osc2_freq
+                cc_slider = self.osc2_group.osc2_freq_slider
             elif (param == "detune"):
-                cc_func = self.update_osc2_det
+                cc_slider = self.osc2_group.osc2_det_slider
             elif (param == "level"):
-                cc_func = self.update_osc2_amp
+                cc_slider = self.osc2_group.osc2_amp_slider
             elif (param == "width"):
-                cc_func = self.update_osc2_width
+                cc_slider = self.osc2_group.osc2_width_slider
         elif (module == "filter"):
             if (param == "cutoff"):
-                cc_func = self.update_filt_freq
+                cc_slider = self.filt_group.filt_freq_slider
             elif (param == "feedback"):
-                cc_func = self.update_filt_res
+                cc_slider = self.filt_group.filt_res_slider
             elif (param == "drive"):
-                cc_func = self.update_filt_drive
+                cc_slider = self.filt_group.filt_drive_slider
             elif (param == "saturate"):
-                cc_func = self.update_filt_sat
+                cc_slider = self.filt_group.filt_sat_slider
         elif (module == "filter env"):
             if (param == "attack"):
-                cc_func = self.update_fenv_attack
+                cc_slider = self.fenv_group.fenv_att_slider
             elif (param == "decay"):
-                cc_func = self.update_fenv_decay
+                cc_slider = self.fenv_group.fenv_dec_slider
             elif (param == "sustain"):
-                cc_func = self.update_fenv_sustain
+                cc_slider = self.fenv_group.fenv_sus_slider
             elif (param == "release"):
-                cc_func = self.update_fenv_release
+                cc_slider = self.fenv_group.fenv_rel_slider
             elif (param == "depth"):
-                cc_func = self.update_fenv_amount
+                cc_slider = self.fenv_group.fenv_amt_slider
         elif (module == "envelope"):
             if (param == "attack"):
-                cc_func = self.update_env_attack
+                cc_slider = self.env_group.adsr_att_slider
             elif (param == "decay"):
-                cc_func = self.update_env_decay
+                cc_slider = self.env_group.adsr_dec_slider
             elif (param == "sustain"):
-                cc_func = self.update_env_sustain
+                cc_slider = self.env_group.adsr_sus_slider
             elif (param == "release"):
-                cc_func = self.update_env_release
-        return cc_func
+                cc_slider = self.env_group.adsr_rel_slider
+        return cc_slider
 
     #slots
     # midi
@@ -236,14 +236,22 @@ class MainWindow(QMainWindow):
             self.midi_group.midi_select.setCurrentIndex(0)
 
     def add_cc(self, cc_val, cc_param, module):
-        cc_func = self.assign_cc_function(module, cc_param)
-        self.engine.midi_cc_dict.update({cc_val: cc_func})
+        cc_slider = self.assign_cc_slider(module, cc_param)
+        if cc_val not in self.engine.midi_cc_dict:
+            self.engine.midi_cc_dict.update({cc_val: cc_slider})
 
-    def update_cc(self, new_cc, old_cc, param):
-        print(f"DEBUG: new cc: {new_cc}, old cc: {old_cc}, parameter: {param}")
+    def update_cc(self, new_cc, old_cc, param, module):
+        if old_cc in self.engine.midi_cc_dict:
+            self.engine.midi_cc_dict.pop(old_cc)
+        if new_cc not in self.engine.midi_cc_dict:
+            self.engine.midi_cc_dict.update({new_cc: self.assign_cc_slider(module, param)})
+            
 
-    def update_param(self, cc, new_param):
-        print(f"DEBUG: cc: {cc}, new parameter: {new_param}")
+    def update_param(self, cc, new_param, module):
+        if cc in self.engine.midi_cc_dict:
+            self.engine.midi_cc_dict.pop(cc)
+        self.engine.midi_cc_dict.update({cc: self.assign_cc_slider(module, new_param)})
+
 
     def delete_cc(self, cc):
         if cc in self.engine.midi_cc_dict:
