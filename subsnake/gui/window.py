@@ -17,7 +17,7 @@ key_conv = Keys()
 
 class MainWindow(QMainWindow):
 
-    def __init__(self):
+    def __init__(self, engine):
         super().__init__()
 
         #attributes
@@ -88,7 +88,7 @@ class MainWindow(QMainWindow):
         window_widget.setLayout(self.window_grid)
 
         #start audio engine
-        self.engine = AudioEngine()
+        self.engine = engine
 
         #connect signals
         self.midi_group.input_changed.connect(self.update_midi_in)
