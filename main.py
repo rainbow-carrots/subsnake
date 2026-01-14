@@ -4,7 +4,7 @@ import mido
 from PySide6.QtWidgets import QApplication
 from subsnake.gui import MainWindow
 import subsnake.gui as gui
-from subsnake.audio import WrappedOsc, HalSVF, ADSR
+from subsnake.audio import WrappedOsc, HalSVF, ADSR, AudioEngine
 from importlib import resources
 
 fs = 44100
@@ -25,9 +25,12 @@ ADSR.envelope_block(env_test, False, np.zeros((16, 2), dtype=np.float32), np.zer
 input_list = mido.get_input_names()
 midi_channels = np.arange(1, 17)
 
+#init audio engine
+engine = AudioEngine()
+
 #instance app
 app = QApplication(sys.argv)
-window = MainWindow()
+window = MainWindow(engine)
 window.setObjectName("main_window")
 
 #add midi inputs
