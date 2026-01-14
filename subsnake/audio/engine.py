@@ -55,7 +55,7 @@ class AudioEngine():
 
     #initialize stream
     def start_audio(self):
-        self.stream = sd.OutputStream(channels=2, samplerate=fs, blocksize=1024, latency=midi_latency, callback=self.callback, dtype=np.float32)
+        self.stream = sd.OutputStream(channels=2, samplerate=fs, blocksize=1024, latency="low", callback=self.callback, dtype=np.float32)
         self.stream.start()
 
     #initialize midi
