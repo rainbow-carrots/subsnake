@@ -4,9 +4,11 @@ import queue
 import sounddevice as sd
 import random
 import time as pytime
+from PySide6.QtCore import QMutex, QThreadPool
 from .generators import WrappedOsc
 from .filters import HalSVF
 from .envelopes import ADSR
+from .workers import KeyPressWorker, KeyReleaseWorker
 
 fs = 44100
 blocksize = 1024
@@ -37,12 +39,22 @@ class AudioEngine():
         self.pitch_offset_2 = 0
         self.detune = 0.0
         self.midi_in_queue = queue.SimpleQueue()
+        self.key_press_events = queue.SimpleQueue()
+        self.key_release_events = queue.SimpleQueue()
         self.pending_event = None
         self.midi_cc_dict = {}
+        self.midi_cc_values = {}
         self.stream = None
         self.midi_input = None
         self.midi_channel = None
         self.previous_buffer_dac_time = pytime.perf_counter()
+        self.mutex = QMutex()
+        self.threadpool = QThreadPool()
+        self.key_press_worker = KeyPressWorker(self)
+        self.threadpool.start(self.key_press_worker)
+        self.key_release_worker = KeyReleaseWorker(self)
+        self.threadpool.start(self.key_release_worker)
+        self.run_threads = True
 
     #initialize stream
     def start_audio(self):
@@ -69,9 +81,11 @@ class AudioEngine():
         if self.stream:
             self.stream.stop()
             self.stream.close()
-        
+            
         if self.midi_input:
             self.midi_input.close()
+
+        self.run_threads = False
 
     #audio callback
     def callback(self, outdata, frames, time, status):
@@ -94,11 +108,11 @@ class AudioEngine():
                 sample_offset = max(0, int((time_offset/frame_width)*frames))
                 if (message.type == 'note_on') and (message.channel == self.midi_channel):
                     if (message.velocity > 0):
-                        self.key_pressed((message.note - middle_a), message.velocity, sample_offset)
+                        self.key_press_events.put((message.note - middle_a, message.velocity, sample_offset))
                     else:
-                        self.key_released(message.note - middle_a, sample_offset)
+                        self.key_release_events.put((message.note - middle_a, sample_offset))
                 elif (message.type == 'note_off') and (message.channel == self.midi_channel):
-                    self.key_released(message.note - middle_a, sample_offset)
+                    self.key_release_events.put((message.note - middle_a, sample_offset))
                 self.pending_event = None
         for voice in self.voices:
             voice.callback(self.voice_output, self.note_to_voice, self.stopped_voice_indeces, self.released_voice_indeces)
@@ -109,55 +123,14 @@ class AudioEngine():
     #midi callback
     def midi_callback(self, message):
         stamped_message = (message, pytime.perf_counter())
-        self.midi_in_queue.put(stamped_message)
-
-    #voice assignment
-    def assign_voice(self, note):
-        if note in self.note_to_voice:      #assign releasing voice of same note
-            if (self.voices[self.note_to_voice[note]].status == 1):
-                return self.voices[self.note_to_voice[note]]
-        elif self.stopped_voice_indeces:    #assign first stopped voice
-            voice_index = self.stopped_voice_indeces.pop(0)
-            self.note_to_voice.update({note: voice_index})
-            return self.voices[voice_index]
-        elif self.released_voice_indeces:   #assign oldest releasing voice
-            voice_index = self.released_voice_indeces.pop(0)
-            if note in self.note_to_voice:
-                self.note_to_voice.pop(note)
-            self.note_to_voice.update({note: voice_index})
-            return self.voices(voice_index)
-        else:                               #steal oldest voice
-            first_note = next(iter(self.note_to_voice))
-            first_voice_index = self.note_to_voice.pop(first_note)
-            first_voice = self.voices[first_voice_index]
-            self.note_to_voice.update({note: first_voice_index})
-            return first_voice 
+        self.midi_in_queue.put(stamped_message) 
     
     #key input handlers
     def key_pressed(self, note, velocity, sample_offset=0):
-        new_voice = self.assign_voice(note)
-        if new_voice is not None:
-            new_pitch = 440.0 * 2**((float(note))/12.0 + self.pitch_offset_1)
-            new_pitch2 = 440.0 * 2**((float(note))/12.0 + self.pitch_offset_2) + self.detune*new_voice.detune_offset
-            new_voice.osc.update_pitch(new_pitch)
-            new_voice.osc2.update_pitch(new_pitch2)
-            new_voice.velocity = float(velocity)/127.0
-            new_voice.env.update_attack_start(sample_offset)
-            new_voice.env.update_gate(True)
-            new_voice.fenv.update_attack_start(sample_offset)
-            new_voice.fenv.update_gate(True)
-            new_voice.status = 2
-            new_voice.base_note = note
+        self.key_press_events.put((note, velocity, sample_offset))
 
     def key_released(self, note, sample_offset=0):
-        if note in self.note_to_voice:
-            voice_index = self.note_to_voice.get(note)
-            self.voices[voice_index].env.update_release_start(sample_offset)
-            self.voices[voice_index].env.update_gate(False)
-            self.voices[voice_index].fenv.update_release_start(sample_offset)
-            self.voices[voice_index].fenv.update_gate(False)
-            self.voices[voice_index].status = 1
-        
+        self.key_release_events.put((note, sample_offset))
 
     #voice helper functions
     def update_pitch(self, offset, osc):
