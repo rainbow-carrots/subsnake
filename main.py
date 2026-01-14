@@ -21,18 +21,20 @@ WrappedOsc.polyblep_saw(osc_test, np.zeros((16, 2), dtype=np.float32))
 HalSVF.filter_block(filt_test, np.zeros((16, 2), dtype=np.float32), np.zeros((16, 2), dtype=np.float32), np.ones((16, 2), dtype=np.float32), 0.0, HalSVF.clip_sample, 100)
 ADSR.envelope_block(env_test, False, np.zeros((16, 2), dtype=np.float32), np.zeros((16, 2), dtype=np.float32), 0, 0)
 
+#get midi inputs & channels
+input_list = mido.get_input_names()
+midi_channels = np.arange(1, 17)
+
 #instance app
 app = QApplication(sys.argv)
 window = MainWindow()
 window.setObjectName("main_window")
 
-#get midi inputs
-input_list = mido.get_input_names()
+#add midi inputs
 if input_list is not None:
     window.midi_group.midi_select.addItems(input_list)
 
 #assign midi channels
-midi_channels = np.arange(1, 17)
 for channel in midi_channels:
     window.midi_group.channel_select.addItem(str(channel))
 
