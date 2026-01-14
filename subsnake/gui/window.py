@@ -362,9 +362,8 @@ class MainWindow(QMainWindow):
             if (offset is not None):
                 if (offset < 18):
                     key_text = event.text()
-                    print(f"pressed key: {key_text}, offset: {offset}")
                     #set pitch
-                    note = 3 + 12*self.engine.octave + offset
+                    note = 12*self.engine.octave + offset + 60
                     self.engine.key_pressed(note, 127)
                     return super().keyPressEvent(event)
                 else:
@@ -385,9 +384,8 @@ class MainWindow(QMainWindow):
             if (offset is not None):
                 if (offset < 18):
                     key_text = event.text()
-                    print(f"released key: {key_text}, offset: {offset}")
                     #release gate
-                    note = 3 + 12*self.engine.octave + offset
+                    note = 12*self.engine.octave + offset + 60
                     self.engine.key_released(note)
 
     def closeEvent(self, event):
