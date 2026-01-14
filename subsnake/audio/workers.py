@@ -4,6 +4,7 @@ import queue
 
 middle_a = 69
 midi_latency = 0.0029025   #seconds
+sleeptime = 0.00145125
 
 class KeyEventWorker(QRunnable):
     def __init__(self, engine):
@@ -41,7 +42,7 @@ class KeyEventWorker(QRunnable):
             if not self.frames_queue.empty():
                 new_frame_times = self.frames_queue.get_nowait()
                 self.frame_width, self.frame_start, self.frame_end, self.frames = new_frame_times
-            time.sleep(0.00290249433)
+            time.sleep(sleeptime)
 
     def key_pressed(self, press_event):
         note, velocity, sample_offset = press_event
