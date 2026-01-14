@@ -55,7 +55,7 @@ class AudioEngine():
 
     #initialize stream
     def start_audio(self):
-        self.stream = sd.OutputStream(channels=2, samplerate=fs, blocksize=1024, latency="low", callback=self.callback, dtype=np.float32)
+        self.stream = sd.OutputStream(channels=2, samplerate=fs, blocksize=0, latency="low", callback=self.callback, dtype=np.float32)
         self.stream.start()
 
     #initialize midi
@@ -91,8 +91,8 @@ class AudioEngine():
         frame_end = frame_start + frame_width
         self.frame_times.put((frame_width, frame_start, frame_end, frames))
         for voice in self.voices:
-            voice.callback(self.voice_output, self.note_to_voice, self.stopped_voice_indeces, self.released_voice_indeces)
-            outdata += self.voice_output
+            voice.callback(self.voice_output[:frames], self.note_to_voice, self.stopped_voice_indeces, self.released_voice_indeces, frames)
+            outdata += self.voice_output[:frames]
         outdata *= 0.288675
         outdata = np.tanh(outdata)
 
@@ -232,15 +232,15 @@ class Voice():
         self.index = 0
         self.detune_offset = 0.0
 
-    def callback(self, output, note_to_voice, stopped_voices, released_voices):
-            self.osc.process_block(self.osc_out)
+    def callback(self, output, note_to_voice, stopped_voices, released_voices, frames):
+            self.osc.process_block(self.osc_out[:frames])
             self.osc_out *= 0.5
-            self.osc2.process_block(self.osc2_out)
+            self.osc2.process_block(self.osc2_out[:frames])
             self.osc2_out *= 0.5
             self.osc_out += self.osc2_out
-            self.fenv.process_block(self.fenv_in, self.fenv_out)
-            self.filt.process_block(self.osc_out, self.filt_out, self.fenv_out)
-            self.env.process_block(self.filt_out, output)
+            self.fenv.process_block(self.fenv_in[:frames], self.fenv_out[:frames])
+            self.filt.process_block(self.osc_out[:frames], self.filt_out[:frames], self.fenv_out[:frames])
+            self.env.process_block(self.filt_out[:frames], output)
             output *= self.velocity
             if (self.env.state[0] == 0.0) and (self.status > 0):
                 if self.base_note in note_to_voice:
