@@ -8,7 +8,7 @@ from PySide6.QtCore import QMutex, QThreadPool
 from .generators import WrappedOsc
 from .filters import HalSVF
 from .envelopes import ADSR
-from .workers import KeyPressWorker, KeyReleaseWorker
+from .workers import KeyEventWorker
 
 fs = 44100
 blocksize = 1024
@@ -39,8 +39,7 @@ class AudioEngine():
         self.pitch_offset_2 = 0
         self.detune = 0.0
         self.midi_in_queue = queue.SimpleQueue()
-        self.key_press_events = queue.SimpleQueue()
-        self.key_release_events = queue.SimpleQueue()
+        self.frame_times = queue.SimpleQueue()
         self.pending_event = None
         self.midi_cc_dict = {}
         self.midi_cc_values = {}
@@ -50,10 +49,8 @@ class AudioEngine():
         self.previous_buffer_dac_time = pytime.perf_counter()
         self.mutex = QMutex()
         self.threadpool = QThreadPool()
-        self.key_press_worker = KeyPressWorker(self)
-        self.threadpool.start(self.key_press_worker)
-        self.key_release_worker = KeyReleaseWorker(self)
-        self.threadpool.start(self.key_release_worker)
+        self.key_event_worker = KeyEventWorker(self)
+        self.threadpool.start(self.key_event_worker)
         self.run_threads = True
 
     #initialize stream
@@ -92,28 +89,7 @@ class AudioEngine():
         frame_width = frames/fs
         frame_start = time.outputBufferDacTime
         frame_end = frame_start + frame_width
-
-        while True:
-            if self.pending_event is None:
-                try:
-                    self.pending_event = self.midi_in_queue.get_nowait()
-                except queue.Empty:
-                    break
-            message, timestamp = self.pending_event
-            target_time = timestamp + midi_latency
-            if (target_time >= frame_end):
-                break
-            else:
-                time_offset = timestamp - frame_start
-                sample_offset = max(0, int((time_offset/frame_width)*frames))
-                if (message.type == 'note_on') and (message.channel == self.midi_channel):
-                    if (message.velocity > 0):
-                        self.key_press_events.put((message.note - middle_a, message.velocity, sample_offset))
-                    else:
-                        self.key_release_events.put((message.note - middle_a, sample_offset))
-                elif (message.type == 'note_off') and (message.channel == self.midi_channel):
-                    self.key_release_events.put((message.note - middle_a, sample_offset))
-                self.pending_event = None
+        self.frame_times.put((frame_width, frame_start, frame_end, frames))
         for voice in self.voices:
             voice.callback(self.voice_output, self.note_to_voice, self.stopped_voice_indeces, self.released_voice_indeces)
             outdata += self.voice_output
@@ -126,11 +102,15 @@ class AudioEngine():
         self.midi_in_queue.put(stamped_message) 
     
     #key input handlers
-    def key_pressed(self, note, velocity, sample_offset=0):
-        self.key_press_events.put((note, velocity, sample_offset))
+    def key_pressed(self, note_val, velocity_val, sample_offset=0):
+        note_on_msg = mido.Message("note_on", note=note_val, velocity=velocity_val, channel=self.midi_channel)
+        stamped_message = (note_on_msg, pytime.perf_counter())
+        self.midi_in_queue.put(stamped_message) 
 
-    def key_released(self, note, sample_offset=0):
-        self.key_release_events.put((note, sample_offset))
+    def key_released(self, note_val, sample_offset=0):
+        note_off_msg = mido.Message("note_off", note=note_val, velocity=0, channel=self.midi_channel)
+        stamped_message = (note_off_msg, pytime.perf_counter())
+        self.midi_in_queue.put(stamped_message) 
 
     #voice helper functions
     def update_pitch(self, offset, osc):
