@@ -41,7 +41,7 @@ class AudioEngine():
         self.midi_in_queue = queue.SimpleQueue()
         self.frame_times = queue.SimpleQueue()
         self.pending_event = None
-        self.midi_cc_dict = {}
+        self.midi_cc_functions = {}
         self.midi_cc_values = {}
         self.stream = None
         self.midi_input = None
@@ -113,17 +113,16 @@ class AudioEngine():
         self.midi_in_queue.put(stamped_message) 
 
     #voice helper functions
-    def update_pitch(self, offset, osc):
+    def update_pitch_1(self, offset):
         for voice in self.voices:
-            if (osc == 1):
-                new_pitch = 440.0 * 2**(float(voice.base_note)/12.0 + offset)
-                voice.osc.update_pitch(new_pitch)
-            elif (osc == 2):
-                new_pitch = 440.0 * 2**(float(voice.base_note)/12.0 + offset) + self.detune*voice.detune_offset
-                voice.osc2.update_pitch(new_pitch)
-        if (osc == 1):
+            new_pitch = 440.0 * 2**(float(voice.base_note)/12.0 + offset)
+            voice.osc.update_pitch(new_pitch)
             self.pitch_offset_1 = offset
-        elif (osc == 2):
+
+    def update_pitch_2(self, offset):
+        for voice in self.voices:
+            new_pitch = 440.0 * 2**(float(voice.base_note)/12.0 + offset) + self.detune*voice.detune_offset
+            voice.osc2.update_pitch(new_pitch)
             self.pitch_offset_2 = offset
 
     def update_detune(self, detune):
@@ -132,19 +131,21 @@ class AudioEngine():
             voice.osc2.update_pitch(new_pitch)
         self.detune = detune
 
-    def update_amplitude(self, newAmp, osc):
+    def update_amplitude_1(self, newAmp):
         for voice in self.voices:
-            if (osc == 1):
-                voice.osc.update_amplitude(newAmp)
-            elif (osc == 2):
-                voice.osc2.update_amplitude(newAmp)
+            voice.osc.update_amplitude(newAmp)
 
-    def update_width(self, newWidth, osc):
+    def update_amplitude_2(self, newAmp):
         for voice in self.voices:
-            if (osc == 1):
-                voice.osc.update_width(newWidth)
-            elif (osc == 2):
-                voice.osc2.update_width(newWidth)
+            voice.osc2.update_amplitude(newAmp)
+
+    def update_width_1(self, newWidth):
+        for voice in self.voices:
+            voice.osc.update_width(newWidth)
+
+    def update_width_2(self, newWidth):
+        for voice in self.voices:
+            voice.osc2.update_width(newWidth)
     
     def update_algorithm(self, newAlg, osc):
         for voice in self.voices:
@@ -212,6 +213,93 @@ class AudioEngine():
     def update_fenv_amount(self, newAmount):
         for voice in self.voices:
             voice.filt.update_env_amount(newAmount)
+
+
+    #cc helpers
+    #osc 1
+    def cc_change_pitch_1(self, value):
+        new_pitch = (float(value)/127.0)*10 - 5
+        self.update_pitch_1(new_pitch)
+
+    def cc_change_level_1(self, value):
+        new_level = float(value)/127.0
+        self.update_amplitude_1(new_level)
+
+    def cc_change_width_1(self, value):
+        new_width = float(value)/127.0
+        self.update_width_1(new_width)
+
+    #osc 2
+    def cc_change_pitch_2(self, value):
+        new_pitch = (float(value)/127.0)*10.0 - 5
+        self.update_pitch_2(new_pitch)
+
+    def cc_change_level_2(self, value):
+        new_level = float(value)/127.0
+        self.update_amplitude_2(new_level)
+
+    def cc_change_width_2(self, value):
+        new_width = float(value)/127.0
+        self.update_width_2(new_width)
+
+    def cc_change_detune_2(self, value):
+        new_detune = (float(value)/127.0)*20.0 - 10
+        self.update_detune(new_detune)
+
+    #filt
+    def cc_change_cutoff(self, value):
+        new_freq = 27.5 * 2**((float(value)/127.0)*8.0)
+        self.update_cutoff(new_freq)
+
+    def cc_change_resonance(self, value):
+        new_res = 10.0 / (10.0**((float(value)/127.0)*2.0))
+        self.update_resonance(new_res)
+
+    def cc_change_drive(self, value):
+        new_drive = (float(value)/127.0)*9 + .001
+        self.update_drive(new_drive)
+
+    def cc_change_saturate(self, value):
+        new_sat = (float(value)/127.0)*11.0 + 1.0
+        self.update_saturate(new_sat)
+        
+    #filter env
+    def cc_change_fenv_attack(self, value):
+        new_attack = (float(value)/127.0) + .001
+        self.update_fenv_attack(new_attack)
+
+    def cc_change_fenv_decay(self, value):
+        new_decay = (float(value)/127.0) + .001
+        self.update_fenv_decay(new_decay)
+
+    def cc_change_fenv_sustain(self, value):
+        new_sustain = (float(value)/127.0) + .001
+        self.update_fenv_sustain(new_sustain)
+
+    def cc_change_fenv_release(self, value):
+        new_release = (float(value)/127.0) + .001
+        self.update_fenv_release(new_release)
+
+    def cc_change_fenv_amount(self, value):
+        new_depth = (float(value)/127.0)*10.0 - 5.0
+        self.update_fenv_amount(new_depth)
+
+    #envelope
+    def cc_change_env_attack(self, value):
+        new_attack = (float(value)/127.0) + .001
+        self.update_attack(new_attack)
+
+    def cc_change_env_decay(self, value):
+        new_decay = (float(value)/127.0) + .001
+        self.update_decay(new_decay)
+
+    def cc_change_env_sustain(self, value):
+        new_sustain = (float(value)/127.0) + .001
+        self.update_sustain(new_sustain)
+
+    def cc_change_env_release(self, value):
+        new_release = (float(value)/127.0) + .001
+        self.update_release(new_release)
 
 
 class Voice():
