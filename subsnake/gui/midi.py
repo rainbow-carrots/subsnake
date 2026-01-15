@@ -24,6 +24,7 @@ class MIDISettings(QGroupBox):
 
         #attributes
         self.cc_rows = 0
+        self.row_ccs = {}
 
         #layouts
         midi_layout = QGridLayout()
@@ -112,20 +113,23 @@ class MIDISettings(QGroupBox):
         self.inputs_refreshed.emit()
 
     def add_cc(self):
-        new_cc = MIDIControl()
+        new_cc = MIDIControl(self.row_ccs)
         cc_val = new_cc.cc_select.value()
         cc_param = new_cc.param_select.currentText()
         module = new_cc.module_select.currentText()
-        rows = self.cc_rows + 1
-        new_cc.row = rows
         self.cc_rows += 1
-        self.cc_stack.addWidget(new_cc, rows, 0)
+        new_cc.row = self.cc_rows
+        self.row_ccs.update({new_cc.row: cc_val})
+        print(self.row_ccs)
+        self.cc_stack.addWidget(new_cc, self.cc_rows, 0)
         new_cc.cc_changed.connect(self.update_cc)
         new_cc.param_changed.connect(self.update_param)
         new_cc.cc_deleted.connect(self.delete_cc)
         self.cc_added.emit(cc_val, cc_param, module)
 
-    def update_cc(self, new_cc, old_cc, param, module):
+    def update_cc(self, new_cc, old_cc, param, module, row):
+        self.row_ccs.update({row: new_cc})
+        print(self.row_ccs)
         self.cc_changed.emit(new_cc, old_cc, param, module)
 
     def update_param(self, cc, new_param, module):
@@ -133,19 +137,23 @@ class MIDISettings(QGroupBox):
 
     def delete_cc(self, cc, row):
         print(f"DEBUG: delete row {row}")
+        print(f"DEBUG: row_ccs before row deletion: {self.row_ccs}")
+        if row in self.row_ccs:
+            self.row_ccs.pop(row)
         cc_widget = self.cc_stack.itemAtPosition(row, 0).widget()
         cc_widget.cc_changed.disconnect(self.update_cc)
         cc_widget.param_changed.disconnect(self.update_param)
         cc_widget.cc_deleted.disconnect(self.delete_cc)
         if (row != self.cc_rows):
             for cc_index in range (row + 1, self.cc_rows + 1):
-                print(cc_index)
                 cc_control = self.cc_stack.itemAtPosition(cc_index, 0).widget()
                 self.cc_stack.removeWidget(cc_control)
                 self.cc_stack.addWidget(cc_control, cc_index - 1, 0)
-                print(f"DEBUG: old row: {cc_control.row}")
+                if cc_control.row in self.row_ccs:
+                    self.row_ccs.pop(cc_control.row)
                 cc_control.row -= 1
-                print(f"DEBUG: new row: {cc_control.row}")
+                self.row_ccs.update({cc_control.row: cc_control.cc_select.value()})
+        print(f"DEBUG: row_ccs after row deletion: {self.row_ccs}")
         self.cc_stack.removeWidget(cc_widget)
         self.cc_rows -= 1
         cc_widget.deleteLater()
