@@ -8,15 +8,20 @@ class MIDIControl(QWidget):
     
     #signals
     param_changed = Signal(int, str, str)
-    cc_changed = Signal(int, int, str, str)
+    cc_changed = Signal(int, int, str, str, int)
     cc_deleted = Signal(int, int)
     
-    def __init__(self):
+    def __init__(self, row_ccs):
         super().__init__()
 
         #attributes
         self.prev_cc = 63
         self.row = 0
+        self.row_ccs = row_ccs
+
+        while self.prev_cc in self.row_ccs.values():
+            self.prev_cc += 1
+            print(f"new cc: {self.prev_cc}")
 
         #layout
         layout = QGridLayout()
@@ -34,7 +39,7 @@ class MIDIControl(QWidget):
 
         #init widgets
         self.cc_select.setRange(0, 127)
-        self.cc_select.setValue(63)
+        self.cc_select.setValue(self.prev_cc)
         self.module_select.addItems(["oscillator 1", "oscillator 2", "filter", "filter env", "envelope"])
         self.module_select.setCurrentIndex(0)
         self.param_select.addItems(self.param_names[0])
@@ -65,7 +70,17 @@ class MIDIControl(QWidget):
         self.param_changed.emit(current_cc, new_param, self.module_select.currentText())
 
     def update_cc(self, new_cc):
-        self.cc_changed.emit(new_cc, self.prev_cc, self.param_select.currentText(), self.module_select.currentText())
+        while new_cc in self.row_ccs.values():
+            if (self.prev_cc < new_cc):
+                if (new_cc < 127):
+                    new_cc += 1
+            elif (self.prev_cc > new_cc):
+                if (new_cc > 0):
+                    new_cc -= 1
+        self.cc_select.blockSignals(True)
+        self.cc_select.setValue(new_cc)
+        self.cc_select.blockSignals(False)
+        self.cc_changed.emit(new_cc, self.prev_cc, self.param_select.currentText(), self.module_select.currentText(), self.row)
         self.prev_cc = new_cc
 
     def delete_cc(self):
