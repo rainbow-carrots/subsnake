@@ -168,54 +168,54 @@ class MainWindow(QMainWindow):
         self.fenv_group.fenv_rel_slider.setValue(500)
         self.fenv_group.fenv_amt_slider.setValue(0)
 
-    def assign_cc_slider(self, module, param):
-        cc_slider = None
+    def assign_cc_function(self, module, param):
+        cc_function = None
         if (module == "oscillator 1"):
             if (param == "pitch"):
-                cc_slider = self.osc_group.osc_freq_slider
+                cc_function = self.engine.cc_change_pitch_1
             elif (param == "level"):
-                cc_slider = self.osc_group.osc_amp_slider
+                cc_function = self.engine.cc_change_level_1
             elif (param == "width"):
-                cc_slider = self.osc_group.osc_width_slider
+                cc_function = self.engine.cc_change_width_1
         elif (module == "oscillator 2"):
             if (param == "pitch"):
-                cc_slider = self.osc2_group.osc2_freq_slider
+                cc_function = self.engine.cc_change_pitch_2
             elif (param == "detune"):
-                cc_slider = self.osc2_group.osc2_det_slider
+                cc_function = self.engine.cc_change_detune_2
             elif (param == "level"):
-                cc_slider = self.osc2_group.osc2_amp_slider
+                cc_function = self.engine.cc_change_level_2
             elif (param == "width"):
-                cc_slider = self.osc2_group.osc2_width_slider
+                cc_function = self.engine.cc_change_width_2
         elif (module == "filter"):
             if (param == "cutoff"):
-                cc_slider = self.filt_group.filt_freq_slider
+                cc_function = self.engine.cc_change_cutoff
             elif (param == "feedback"):
-                cc_slider = self.filt_group.filt_res_slider
+                cc_function = self.engine.cc_change_resonance
             elif (param == "drive"):
-                cc_slider = self.filt_group.filt_drive_slider
+                cc_function = self.engine.cc_change_drive
             elif (param == "saturate"):
-                cc_slider = self.filt_group.filt_sat_slider
+                cc_function = self.engine.cc_change_saturate
         elif (module == "filter env"):
             if (param == "attack"):
-                cc_slider = self.fenv_group.fenv_att_slider
+                cc_function = self.engine.cc_change_fenv_attack
             elif (param == "decay"):
-                cc_slider = self.fenv_group.fenv_dec_slider
+                cc_function = self.engine.cc_change_fenv_decay
             elif (param == "sustain"):
-                cc_slider = self.fenv_group.fenv_sus_slider
+                cc_function = self.engine.cc_change_fenv_sustain
             elif (param == "release"):
-                cc_slider = self.fenv_group.fenv_rel_slider
+                cc_function = self.engine.cc_change_fenv_release
             elif (param == "depth"):
-                cc_slider = self.fenv_group.fenv_amt_slider
+                cc_function = self.engine.cc_change_fenv_amount
         elif (module == "envelope"):
             if (param == "attack"):
-                cc_slider = self.env_group.adsr_att_slider
+                cc_function = self.engine.cc_change_env_attack
             elif (param == "decay"):
-                cc_slider = self.env_group.adsr_dec_slider
+                cc_function = self.engine.cc_change_env_decay
             elif (param == "sustain"):
-                cc_slider = self.env_group.adsr_sus_slider
+                cc_function = self.engine.cc_change_env_sustain
             elif (param == "release"):
-                cc_slider = self.env_group.adsr_rel_slider
-        return cc_slider
+                cc_function = self.engine.cc_change_env_release
+        return cc_function
 
     #slots
     # midi
@@ -236,26 +236,26 @@ class MainWindow(QMainWindow):
             self.midi_group.midi_select.setCurrentIndex(0)
 
     def add_cc(self, cc_val, cc_param, module):
-        cc_slider = self.assign_cc_slider(module, cc_param)
-        if cc_val not in self.engine.midi_cc_dict:
-            self.engine.midi_cc_dict.update({cc_val: cc_slider})
+        cc_function = self.assign_cc_function(module, cc_param)
+        if cc_val not in self.engine.midi_cc_functions:
+            self.engine.midi_cc_functions.update({cc_val: cc_function})
 
     def update_cc(self, new_cc, old_cc, param, module):
-        if old_cc in self.engine.midi_cc_dict:
-            self.engine.midi_cc_dict.pop(old_cc)
-        if new_cc not in self.engine.midi_cc_dict:
-            self.engine.midi_cc_dict.update({new_cc: self.assign_cc_slider(module, param)})
+        if old_cc in self.engine.midi_cc_functions:
+            self.engine.midi_cc_functions.pop(old_cc)
+        if new_cc not in self.engine.midi_cc_functions:
+            self.engine.midi_cc_functions.update({new_cc: self.assign_cc_function(module, param)})
             
 
     def update_param(self, cc, new_param, module):
-        if cc in self.engine.midi_cc_dict:
-            self.engine.midi_cc_dict.pop(cc)
-        self.engine.midi_cc_dict.update({cc: self.assign_cc_slider(module, new_param)})
+        if cc in self.engine.midi_cc_functions:
+            self.engine.midi_cc_functions.pop(cc)
+        self.engine.midi_cc_functions.update({cc: self.assign_cc_function(module, new_param)})
 
 
     def delete_cc(self, cc):
-        if cc in self.engine.midi_cc_dict:
-            self.engine.midi_cc_dict.pop(cc)
+        if cc in self.engine.midi_cc_functions:
+            self.engine.midi_cc_functions.pop(cc)
 
     # filter
     def update_filt_freq(self, newFreq):
@@ -283,13 +283,13 @@ class MainWindow(QMainWindow):
         
     # oscillator 1
     def update_osc_freq(self, value):
-        self.engine.update_pitch(value, 1)
+        self.engine.update_pitch_1(value)
 
     def update_osc_amp(self, value):
-        self.engine.update_amplitude(value, 1)
+        self.engine.update_amplitude_1(value)
 
     def update_osc_width(self, value):
-        self.engine.update_width(value, 1)
+        self.engine.update_width_1(value)
 
     def update_osc_alg(self, text):
         if (text == "sine"):
@@ -302,16 +302,16 @@ class MainWindow(QMainWindow):
 
     # oscillator 2
     def update_osc2_freq(self, value):
-        self.engine.update_pitch(value, 2)
+        self.engine.update_pitch_2(value)
 
     def update_osc2_det(self, value):
         self.engine.update_detune(value)
 
     def update_osc2_amp(self, value):
-        self.engine.update_amplitude(value, 2)
+        self.engine.update_amplitude_2(value)
 
     def update_osc2_width(self, value):
-        self.engine.update_width(value, 2)
+        self.engine.update_width_2(value)
 
     def update_osc2_alg(self, text):
         if (text == "sine"):
