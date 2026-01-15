@@ -38,6 +38,12 @@ class KeyEventWorker(QRunnable):
                             self.key_released((message.note - middle_a, sample_offset))
                     elif (message.type == 'note_off') and (message.channel == self.engine.midi_channel):
                         self.key_released((message.note - middle_a, sample_offset))
+                    elif (message.type == "control_change") and (message.channel == self.engine.midi_channel):
+                        if (message.control in self.engine.midi_cc_functions):
+                            self.engine.midi_cc_values.update({message.control: message.value})
+                            print(f"DEBUG: control change #{message.control}, value:{self.engine.midi_cc_values[message.control]}")
+                            cc_update_function = self.engine.midi_cc_functions[message.control]
+                            cc_update_function(message.value)
                     self.pending_event = None
             if not self.frames_queue.empty():
                 new_frame_times = self.frames_queue.get_nowait()
@@ -90,4 +96,3 @@ class KeyEventWorker(QRunnable):
             first_voice = self.engine.voices[first_voice_index]
             self.engine.note_to_voice.update({note: first_voice_index})
             return first_voice
-    
