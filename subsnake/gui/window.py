@@ -6,6 +6,7 @@ from subsnake.gui.filt_gui import FilterGUI
 from subsnake.gui.env_gui import EnvelopeGUI
 from subsnake.gui.fenv_gui import FilterEnvGUI
 from subsnake.gui.midi import MIDISettings
+from subsnake.gui.cc_sliders import UpdateSliders
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QAction
 from PySide6.QtWidgets import (
@@ -22,6 +23,7 @@ class MainWindow(QMainWindow):
 
         #attributes
         self.midi_controls = []
+        self.midi_cc_sliders = {}
         self.cc_rows = 0
 
         #toolbar
@@ -132,6 +134,10 @@ class MainWindow(QMainWindow):
         self.init_params()
         self.setCentralWidget(window_widget)
 
+        #start slider cc update timer
+        self.slider_timer = UpdateSliders(self.engine, self)
+        self.slider_timer.start()
+
     #helper functions
     # args: QLCDDisplay widget, # of digits, mode (hex, dec, oct, bin),
     # dig_style (outline, filled, flat), small decimal flag (for floats)
@@ -237,25 +243,37 @@ class MainWindow(QMainWindow):
 
     def add_cc(self, cc_val, cc_param, module):
         cc_function = self.assign_cc_function(module, cc_param)
+        cc_slider = self.slider_timer.assign_cc_slider(module, cc_param)
         if cc_val not in self.engine.midi_cc_functions:
             self.engine.midi_cc_functions.update({cc_val: cc_function})
+        if cc_val not in self.midi_cc_sliders:
+            self.midi_cc_sliders.update({cc_val: cc_slider})
 
     def update_cc(self, new_cc, old_cc, param, module):
         if old_cc in self.engine.midi_cc_functions:
             self.engine.midi_cc_functions.pop(old_cc)
+        if old_cc in self.midi_cc_sliders:
+            self.midi_cc_sliders.pop(old_cc)
         if new_cc not in self.engine.midi_cc_functions:
             self.engine.midi_cc_functions.update({new_cc: self.assign_cc_function(module, param)})
+        if new_cc not in self.midi_cc_sliders:
+            self.midi_cc_sliders.update({new_cc: self.slider_timer.assign_cc_slider(module, param)})
             
 
     def update_param(self, cc, new_param, module):
         if cc in self.engine.midi_cc_functions:
             self.engine.midi_cc_functions.pop(cc)
+        if cc in self.midi_cc_sliders:
+            self.midi_cc_sliders.pop(cc)
         self.engine.midi_cc_functions.update({cc: self.assign_cc_function(module, new_param)})
+        self.midi_cc_sliders.update({cc: self.slider_timer.assign_cc_slider(module, new_param)})
 
 
     def delete_cc(self, cc):
         if cc in self.engine.midi_cc_functions:
             self.engine.midi_cc_functions.pop(cc)
+        if cc in self.midi_cc_sliders:
+            self.midi_cc_sliders.pop(cc)
 
     # filter
     def update_filt_freq(self, newFreq):
