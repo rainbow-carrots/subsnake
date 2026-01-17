@@ -1,7 +1,7 @@
 from PySide6.QtWidgets import (
     QGroupBox, QGridLayout,
     QLabel, QComboBox,
-    QPushButton
+    QPushButton, QScrollArea
 )
 from PySide6.QtCore import Signal, Qt
 from PySide6.QtGui import QColor, QPalette
@@ -32,9 +32,11 @@ class MIDISettings(QGroupBox):
         cc_layout = QGridLayout()
         self.cc_stack = QGridLayout()
 
-        #internal group box
+        #internal group box & scroll area
+        self.cc_group_scroll = QScrollArea()
         self.cc_group = QGroupBox("cc assign")
         self.cc_group.setFocusPolicy(Qt.NoFocus)
+        self.cc_group.setAutoFillBackground(True)
 
         #labels (midi settings)
         self.midi_input_label = QLabel("device:")
@@ -92,7 +94,10 @@ class MIDISettings(QGroupBox):
         self.cc_stack.addLayout(cc_layout, 0, 0)
         self.cc_group.setLayout(self.cc_stack)
         midi_stack.addLayout(midi_layout, 0, 0)
-        midi_stack.addWidget(self.cc_group, 1, 0)
+        self.cc_group_scroll.setWidget(self.cc_group)
+        self.cc_group_scroll.setWidgetResizable(True)
+        self.cc_group_scroll.setAlignment(Qt.AlignCenter)
+        midi_stack.addWidget(self.cc_group_scroll, 1, 0)
 
         #set layout
         self.setLayout(midi_stack)
