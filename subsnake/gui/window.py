@@ -24,6 +24,7 @@ class MainWindow(QMainWindow):
         #attributes
         self.midi_controls = []
         self.midi_cc_sliders = {}
+        self.midi_cc_displays = {}
         self.cc_rows = 0
 
         #toolbar
@@ -244,20 +245,27 @@ class MainWindow(QMainWindow):
     def add_cc(self, cc_val, cc_param, module):
         cc_function = self.assign_cc_function(module, cc_param)
         cc_slider = self.slider_timer.assign_cc_slider(module, cc_param)
+        cc_display = self.slider_timer.assign_cc_display(module, cc_param)
         if cc_val not in self.engine.midi_cc_functions:
             self.engine.midi_cc_functions.update({cc_val: cc_function})
         if cc_val not in self.midi_cc_sliders:
             self.midi_cc_sliders.update({cc_val: cc_slider})
+        if cc_val not in self.midi_cc_displays:
+            self.midi_cc_displays.update({cc_val: (cc_display, module, cc_param)})
 
     def update_cc(self, new_cc, old_cc, param, module):
         if old_cc in self.engine.midi_cc_functions:
             self.engine.midi_cc_functions.pop(old_cc)
         if old_cc in self.midi_cc_sliders:
             self.midi_cc_sliders.pop(old_cc)
+        if old_cc in self.midi_cc_displays:
+            self.midi_cc_displays.pop(old_cc)
         if new_cc not in self.engine.midi_cc_functions:
             self.engine.midi_cc_functions.update({new_cc: self.assign_cc_function(module, param)})
         if new_cc not in self.midi_cc_sliders:
             self.midi_cc_sliders.update({new_cc: self.slider_timer.assign_cc_slider(module, param)})
+        if new_cc not in self.midi_cc_displays:
+            self.midi_cc_displays.update({new_cc: (self.slider_timer.assign_cc_display(module, param), module, param)})
             
 
     def update_param(self, cc, new_param, module):
@@ -265,8 +273,11 @@ class MainWindow(QMainWindow):
             self.engine.midi_cc_functions.pop(cc)
         if cc in self.midi_cc_sliders:
             self.midi_cc_sliders.pop(cc)
+        if cc in self.midi_cc_displays:
+            self.midi_cc_displays.pop(cc)
         self.engine.midi_cc_functions.update({cc: self.assign_cc_function(module, new_param)})
         self.midi_cc_sliders.update({cc: self.slider_timer.assign_cc_slider(module, new_param)})
+        self.midi_cc_displays.update({cc: (self.slider_timer.assign_cc_display(module, new_param), module, new_param)})
 
 
     def delete_cc(self, cc):
@@ -274,6 +285,8 @@ class MainWindow(QMainWindow):
             self.engine.midi_cc_functions.pop(cc)
         if cc in self.midi_cc_sliders:
             self.midi_cc_sliders.pop(cc)
+        if cc in self.midi_cc_displays:
+            self.midi_cc_displays.pop(cc)
 
     # filter
     def update_filt_freq(self, newFreq):
