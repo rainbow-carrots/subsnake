@@ -22,9 +22,18 @@ MainWindow QGroupBox {
     max-width: 480px;
 }
 
+QScrollArea {
+    background-color: #ac9ab8;
+    border: 1px solid white;
+    border-radius: 3px;
+}
+
 QGroupBox#cc_group {
+    background-color: #ac9ab8;
     min-width: 320px;
     max-width: 460px;
+    border: 1px solid white;
+    border-radius: 3px;
 }
 
 QRadioButton {
@@ -153,11 +162,10 @@ QGroupBox#fenv_group {
     background-color: #8cbba3;
 }
 
-
 QGroupBox#midi_group {
     background-color: #ab8ebe;
-    min-height: 180px;
-    max-height: 480px;
+    min-height: 200px;
+    max-height: 360px;
 }
 
 QPushButton#env_gate {
