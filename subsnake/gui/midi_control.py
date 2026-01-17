@@ -2,7 +2,7 @@ from PySide6.QtWidgets import (
     QPushButton, QSpinBox, QComboBox,
     QGridLayout, QWidget
 )
-from PySide6.QtCore import Signal
+from PySide6.QtCore import Signal, QEvent, Qt
 
 class MIDIControl(QWidget):
     
@@ -31,6 +31,16 @@ class MIDIControl(QWidget):
         self.cc_select = QSpinBox()
         self.module_select = QComboBox()
         self.param_select = QComboBox()
+
+        #focus policies
+        self.cc_select.setFocusPolicy(Qt.NoFocus)
+        self.module_select.setFocusPolicy(Qt.NoFocus)
+        self.param_select.setFocusPolicy(Qt.NoFocus)
+
+        #event filters
+        self.cc_select.installEventFilter(self)
+        self.module_select.installEventFilter(self)
+        self.param_select.installEventFilter(self)
 
         #param name LUT
         self.param_names = [["pitch", "level", "width"], ["pitch", "detune", "level", "width"],
@@ -85,3 +95,10 @@ class MIDIControl(QWidget):
 
     def delete_cc(self):
         self.cc_deleted.emit(self.cc_select.value(), self.row)
+
+    def eventFilter(self, source, event):
+        widget_type = type(source)
+        if (event.type() == QEvent.Wheel) and ((widget_type == QSpinBox) or (widget_type == QComboBox)):
+            return True
+        else:
+            return super().eventFilter(source, event)
