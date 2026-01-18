@@ -1,6 +1,5 @@
 from PySide6.QtCore import QRunnable
 import time
-import queue
 
 middle_a = 69
 midi_latency = 0.0029025   #seconds
