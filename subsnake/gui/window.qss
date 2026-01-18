@@ -108,9 +108,15 @@ QGroupBox#filt_group QSlider::sub-page {
 QGroupBox#env_group QSlider::sub-page {
     background-color: #eeb6ce;
 }
+
 QGroupBox#fenv_group QSlider::sub-page {
     background-color: #54ba84;
 }
+
+QGroupBox#del_group QSlider::sub-page {
+    background-color: #bf9a6d;
+}
+
 
 QGroupBox#osc_group QSlider::handle {
     background-color: #5e89b4;
@@ -127,9 +133,15 @@ QGroupBox#filt_group QSlider::handle {
 QGroupBox#env_group QSlider::handle {
     background-color: #ed95bb;
 }
+
 QGroupBox#fenv_group QSlider::handle {
     background-color: #309d63;
 }
+
+QGroupBox#del_group QSlider::handle {
+    background-color: #c79354;
+}
+
 
 QGroupBox::title {
     subcontrol-origin: margin;
@@ -160,6 +172,10 @@ QGroupBox#env_group {
 
 QGroupBox#fenv_group {
     background-color: #8cbba3;
+}
+
+QGroupBox#del_group {
+    background-color: #d9b68b;
 }
 
 QGroupBox#midi_group {
