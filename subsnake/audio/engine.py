@@ -9,6 +9,7 @@ from .generators import WrappedOsc
 from .filters import HalSVF
 from .envelopes import ADSR
 from .workers import KeyEventWorker
+from .effects import StereoDelay
 
 fs = 44100
 blocksize = 1024
@@ -22,6 +23,7 @@ class AudioEngine():
         self.voices = [Voice(), Voice(), Voice(), Voice(),
                        Voice(), Voice(), Voice(), Voice(),
                        Voice(), Voice(), Voice(), Voice()]
+        self.delay = StereoDelay(fs)
         self.stopped_voice_indeces = []
         self.released_voice_indeces = []
         voice_index = 0
@@ -93,6 +95,7 @@ class AudioEngine():
         for voice in self.voices:
             voice.callback(self.voice_output[:frames], self.note_to_voice, self.stopped_voice_indeces, self.released_voice_indeces, frames)
             outdata += self.voice_output[:frames]
+        self.delay.process_block(outdata, outdata)
         outdata *= 0.288675
         outdata = np.tanh(outdata)
 
