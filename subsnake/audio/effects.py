@@ -28,5 +28,16 @@ class StereoDelay():
                 if (write_heads[c] >= offset):
                     write_heads[c] -= offset
                 output[n, c] = (1.0-mix)*input[n, c] + mix*buffer[write_heads[c], c]
+
+    #helpers
+    def update_time(self, new_time):
+        self.delay_time = new_time
+        self.offset = int(self.delay_time*self.fs)
+
+    def update_feedback(self, new_feedback):
+        self.delay_feedback = new_feedback
+
+    def update_mix(self, new_mix):
+        self.mix_level = new_mix
             
 
