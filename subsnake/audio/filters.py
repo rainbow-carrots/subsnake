@@ -1,6 +1,4 @@
-import sys
 import numpy as np
-import sounddevice as sd
 import math
 from numba import njit
 
