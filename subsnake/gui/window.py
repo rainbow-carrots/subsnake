@@ -1,4 +1,3 @@
-from subsnake.audio.engine import AudioEngine
 from subsnake.gui.keys import Keys
 from subsnake.gui.osc_gui import OscillatorGUI
 from subsnake.gui.osc2_gui import Oscillator2GUI
