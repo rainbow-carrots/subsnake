@@ -217,6 +217,15 @@ class AudioEngine():
         for voice in self.voices:
             voice.filt.update_env_amount(newAmount)
 
+    def update_del_time(self, newTime):
+        self.delay.update_time(newTime)
+
+    def update_del_feedback(self, newFeedback):
+        self.delay.update_feedback(newFeedback)
+
+    def updat_del_mix(self, newMix):
+        self.delay.update_mix(newMix)
+
 
     #cc helpers
     #osc 1
