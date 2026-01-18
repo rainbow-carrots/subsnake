@@ -6,6 +6,7 @@ from subsnake.gui.env_gui import EnvelopeGUI
 from subsnake.gui.fenv_gui import FilterEnvGUI
 from subsnake.gui.midi import MIDISettings
 from subsnake.gui.cc_sliders import UpdateSliders
+from subsnake.gui.delay_gui import DelayGUI
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QAction
 from PySide6.QtWidgets import (
@@ -52,6 +53,7 @@ class MainWindow(QMainWindow):
         self.osc2_group = Oscillator2GUI()
         self.env_group = EnvelopeGUI()
         self.fenv_group = FilterEnvGUI()
+        self.del_group = DelayGUI()
 
         #grid spacers
         # row 0
@@ -80,6 +82,7 @@ class MainWindow(QMainWindow):
         self.window_grid.addWidget(self.grid_space_3, 0, 6)
         self.window_grid.addWidget(self.osc2_group, 1, 1)
         self.window_grid.addWidget(self.fenv_group, 1, 3)
+        self.window_grid.addWidget(self.del_group, 1, 5)
         self.window_grid.addWidget(self.midi_group, 2, 1)
 
         #set column spacing
@@ -131,6 +134,10 @@ class MainWindow(QMainWindow):
         self.fenv_group.release_changed.connect(self.update_fenv_release)
         self.fenv_group.amount_changed.connect(self.update_fenv_amount)
 
+        self.del_group.time_changed.connect(self.update_del_time)
+        self.del_group.feedback_changed.connect(self.update_del_feedback)
+        self.del_group.mix_changed.connect(self.update_del_mix)
+
         self.init_params()
         self.setCentralWidget(window_widget)
 
@@ -173,6 +180,10 @@ class MainWindow(QMainWindow):
         self.fenv_group.fenv_sus_slider.setValue(1000)
         self.fenv_group.fenv_rel_slider.setValue(500)
         self.fenv_group.fenv_amt_slider.setValue(0)
+
+        self.del_group.del_time_slider.setValue(100)
+        self.del_group.del_feedback_slider.setValue(500)
+        self.del_group.del_mix_slider.setValue(500)
 
     def assign_cc_function(self, module, param):
         cc_function = None
@@ -383,6 +394,16 @@ class MainWindow(QMainWindow):
     
     def update_fenv_amount(self, value):
         self.engine.update_fenv_amount(value)
+
+    # delay
+    def update_del_time(self, value):
+        self.engine.update_del_time(value)
+    
+    def update_del_feedback(self, value):
+        self.engine.update_del_feedback(value)
+
+    def update_del_mix(self, value):
+        self.engine.updat_del_mix(value)
 
     def keyPressEvent(self, event):
         if (event.isAutoRepeat()):
