@@ -4,7 +4,6 @@ from PySide6.QtWidgets import (
     QPushButton, QScrollArea
 )
 from PySide6.QtCore import Signal, Qt
-from PySide6.QtGui import QColor, QPalette
 from subsnake.gui.midi_control import MIDIControl
 
 class MIDISettings(QGroupBox):
