@@ -75,7 +75,7 @@ class DelayGUI(QGroupBox):
 
     #slots
     def change_time(self, value):
-        new_time = float(value)/100.0
+        new_time = float(value)/500.0
         self.del_time_display.display(f"{new_time:.2f}")
         self.time_changed.emit(new_time)
 
