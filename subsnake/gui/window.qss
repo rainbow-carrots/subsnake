@@ -222,22 +222,41 @@ QPushButton#cc_delete {
     background-color: #c77581;
 }
 
-QToolButton#toggle_midi {
-    width: 60px;
-    height: 20px;
+QPushButton#toggle_midi {
+    max-width: 60px;
+    height: 36px;
     color: #000000;
     background-color: #857093;
     border: 1px solid white;
     border-radius: 6px;
-    margin-left: 36px;
-    margin-top: 6px;
-    margin-bottom: 6px;
 }
 
-QToolButton#toggle_midi:hover {
+QPushButton#toggle_midi:hover {
     background-color: #a086b1;
 }
 
-QToolButton#toggle_midi:checked {
+QPushButton#toggle_midi:checked {
     background-color: #ab8ebe;
+}
+
+PatchManager#patch_manager {
+    background-color: #f2999f;
+    border: 1px solid white;
+    border-radius: 6px;
+    margin-left: 36px;
+    margin-right: 36px;
+    max-width: 320px;
+}
+
+PatchManager QPushButton {
+    background-color: #e86f77;
+    width: 60px;
+    height: 20px;
+    color: #000000;
+    border: 1px solid white;
+    border-radius: 6px;
+}
+
+QWidget#toolbar_widget {
+    max-height: 60px;
 }
