@@ -9,7 +9,6 @@ from subsnake.gui.cc_sliders import UpdateSliders
 from subsnake.gui.delay_gui import DelayGUI
 from subsnake.gui.patch import PatchManager
 from PySide6.QtCore import Qt
-from PySide6.QtGui import QAction
 from PySide6.QtWidgets import (
     QMainWindow, QGridLayout,
     QFrame, QWidget,
@@ -23,6 +22,7 @@ class MainWindow(QMainWindow):
         super().__init__()
 
         #attributes
+        self.param_sliders = {}
         self.midi_controls = []
         self.midi_cc_sliders = {}
         self.midi_cc_displays = {}
@@ -61,6 +61,10 @@ class MainWindow(QMainWindow):
         self.env_group = EnvelopeGUI()
         self.fenv_group = FilterEnvGUI()
         self.del_group = DelayGUI()
+
+        #init slider dictionary
+        self.init_sliders_dict()
+
 
         #grid spacers
         # row 0
@@ -145,6 +149,8 @@ class MainWindow(QMainWindow):
         self.del_group.feedback_changed.connect(self.update_del_feedback)
         self.del_group.mix_changed.connect(self.update_del_mix)
 
+        self.patch_manager.patch_loaded.connect(self.load_patch)
+
         self.init_params()
         self.setCentralWidget(window_widget)
 
@@ -161,6 +167,36 @@ class MainWindow(QMainWindow):
         display.setSegmentStyle(dig_style)
         display.setSmallDecimalPoint(small_dec)
         return display
+    
+    def init_sliders_dict(self):
+        self.param_sliders.update({"osc_freq": self.osc_group.osc_freq_slider})
+        self.param_sliders.update({"osc_amp": self.osc_group.osc_amp_slider})
+        self.param_sliders.update({"osc_width": self.osc_group.osc_width_slider})
+
+        self.param_sliders.update({"osc2_freq": self.osc2_group.osc2_freq_slider})
+        self.param_sliders.update({"osc2_det": self.osc2_group.osc2_det_slider})
+        self.param_sliders.update({"osc2_amp": self.osc2_group.osc2_amp_slider})
+        self.param_sliders.update({"osc2_width": self.osc2_group.osc2_width_slider})
+
+        self.param_sliders.update({"filt_freq": self.filt_group.filt_freq_slider})
+        self.param_sliders.update({"filt_res": self.filt_group.filt_res_slider})
+        self.param_sliders.update({"filt_drive": self.filt_group.filt_drive_slider})
+        self.param_sliders.update({"filt_sat": self.filt_group.filt_sat_slider})
+
+        self.param_sliders.update({"fenv_att": self.fenv_group.fenv_att_slider})
+        self.param_sliders.update({"fenv_dec": self.fenv_group.fenv_dec_slider})
+        self.param_sliders.update({"fenv_sus": self.fenv_group.fenv_sus_slider})
+        self.param_sliders.update({"fenv_rel": self.fenv_group.fenv_rel_slider})
+
+        self.param_sliders.update({"env_att": self.env_group.adsr_att_slider})
+        self.param_sliders.update({"env_dec": self.env_group.adsr_dec_slider})
+        self.param_sliders.update({"env_sus": self.env_group.adsr_sus_slider})
+        self.param_sliders.update({"env_rel": self.env_group.adsr_rel_slider})
+
+        self.param_sliders.update({"del_time": self.del_group.del_time_slider})
+        self.param_sliders.update({"del_fback": self.del_group.del_feedback_slider})
+        self.param_sliders.update({"del_mix": self.del_group.del_mix_slider})
+
     
     def init_params(self):
         self.filt_group.filt_freq_slider.setValue(700)
@@ -191,6 +227,11 @@ class MainWindow(QMainWindow):
         self.del_group.del_time_slider.setValue(100)
         self.del_group.del_feedback_slider.setValue(500)
         self.del_group.del_mix_slider.setValue(500)
+
+    def load_patch(self, patch):
+        for param in patch:
+            if param in self.param_sliders:
+                self.param_sliders[param].setValue(patch[param])
 
     def assign_cc_function(self, module, param):
         cc_function = None
