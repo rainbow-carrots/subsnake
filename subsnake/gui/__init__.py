@@ -10,3 +10,4 @@ from .fenv_gui import FilterEnvGUI
 from .cc_sliders import UpdateSliders
 from .delay_gui import DelayGUI
 from .lcd import ClickLCD
+from .patch import PatchManager
