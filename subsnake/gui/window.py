@@ -7,12 +7,13 @@ from subsnake.gui.fenv_gui import FilterEnvGUI
 from subsnake.gui.midi import MIDISettings
 from subsnake.gui.cc_sliders import UpdateSliders
 from subsnake.gui.delay_gui import DelayGUI
+from subsnake.gui.patch import PatchManager
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QAction
 from PySide6.QtWidgets import (
     QMainWindow, QGridLayout,
     QFrame, QWidget,
-    QToolBar)
+    QToolBar, QPushButton)
 
 key_conv = Keys()
 
@@ -30,13 +31,19 @@ class MainWindow(QMainWindow):
         #toolbar
         self.main_toolbar = QToolBar()
         self.main_toolbar.setMovable(False)
-        self.toggle_midi = QAction("midi", self)
+        self.patch_manager = PatchManager()
+        self.toggle_midi = QPushButton("midi")
         self.toggle_midi.setToolTip("show/hide midi menu")
         self.toggle_midi.setCheckable(True)
         self.toggle_midi.setChecked(False)
-        self.main_toolbar.addAction(self.toggle_midi)
-        midi_action = self.main_toolbar.widgetForAction(self.toggle_midi)
-        midi_action.setObjectName("toggle_midi")
+        self.toolbar_layout = QGridLayout()
+        self.toolbar_layout.addWidget(self.toggle_midi, 0, 0)
+        self.toolbar_layout.addWidget(self.patch_manager, 0, 1)
+        self.toolbar_widget = QWidget()
+        self.toolbar_widget.setLayout(self.toolbar_layout)
+        self.toolbar_widget.setObjectName("toolbar_widget")
+        self.main_toolbar.addWidget(self.toolbar_widget)
+        self.toggle_midi.setObjectName("toggle_midi")
         self.addToolBar(self.main_toolbar)
 
         #layouts
