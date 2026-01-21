@@ -4,6 +4,7 @@ from PySide6.QtWidgets import(
 )
 from PySide6.QtCore import Signal, Qt
 from PySide6.QtGui import QPalette, QColor
+from subsnake.gui.lcd import ClickLCD
 
 class FilterEnvGUI(QGroupBox):
     #signals
@@ -51,11 +52,11 @@ class FilterEnvGUI(QGroupBox):
         self.fenv_amt_slider.setValue(1)
 
         #displays
-        self.fenv_att_display = self.configure_display(QLCDNumber(), 3, QLCDNumber.Dec, QLCDNumber.Flat, True)
-        self.fenv_dec_display = self.configure_display(QLCDNumber(), 3, QLCDNumber.Dec, QLCDNumber.Flat, True)
-        self.fenv_sus_display = self.configure_display(QLCDNumber(), 3, QLCDNumber.Dec, QLCDNumber.Flat, True)
-        self.fenv_rel_display = self.configure_display(QLCDNumber(), 3, QLCDNumber.Dec, QLCDNumber.Flat, True)
-        self.fenv_amt_display = self.configure_display(QLCDNumber(), 3, QLCDNumber.Dec, QLCDNumber.Flat, True)
+        self.fenv_att_display = self.configure_display(ClickLCD(), 3, QLCDNumber.Dec, QLCDNumber.Flat, True)
+        self.fenv_dec_display = self.configure_display(ClickLCD(), 3, QLCDNumber.Dec, QLCDNumber.Flat, True)
+        self.fenv_sus_display = self.configure_display(ClickLCD(), 3, QLCDNumber.Dec, QLCDNumber.Flat, True)
+        self.fenv_rel_display = self.configure_display(ClickLCD(), 3, QLCDNumber.Dec, QLCDNumber.Flat, True)
+        self.fenv_amt_display = self.configure_display(ClickLCD(), 3, QLCDNumber.Dec, QLCDNumber.Flat, True)
 
         #set display palettes
         self.set_palette(self.fenv_att_display)
@@ -91,6 +92,12 @@ class FilterEnvGUI(QGroupBox):
         self.fenv_sus_slider.valueChanged.connect(self.change_sustain)
         self.fenv_rel_slider.valueChanged.connect(self.change_release)
         self.fenv_amt_slider.valueChanged.connect(self.change_amount)
+
+        self.fenv_att_display.double_clicked.connect(self.reset_attack)
+        self.fenv_dec_display.double_clicked.connect(self.reset_decay)
+        self.fenv_sus_display.double_clicked.connect(self.reset_sustain)
+        self.fenv_rel_display.double_clicked.connect(self.reset_release)
+        self.fenv_amt_display.double_clicked.connect(self.reset_amount)
 
         #set layout
         self.setLayout(fenv_layout)
@@ -138,3 +145,18 @@ class FilterEnvGUI(QGroupBox):
         amt = float(value)/100.0
         self.fenv_amt_display.display(f"{amt:.2f}")
         self.amount_changed.emit(amt)
+
+    def reset_attack(self):
+        self.fenv_att_slider.setValue(10)
+
+    def reset_decay(self):
+        self.fenv_dec_slider.setValue(500)
+
+    def reset_sustain(self):
+        self.fenv_sus_slider.setValue(1000)
+
+    def reset_release(self):
+        self.fenv_rel_slider.setValue(500)
+
+    def reset_amount(self):
+        self.fenv_amt_slider.setValue(0)

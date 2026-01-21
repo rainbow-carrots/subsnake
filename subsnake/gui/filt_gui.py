@@ -5,6 +5,7 @@ from PySide6.QtWidgets import(
 )
 from PySide6.QtCore import Signal, Qt
 from PySide6.QtGui import QPalette, QColor
+from subsnake.gui.lcd import ClickLCD
 
 class FilterGUI(QGroupBox):
     #signals
@@ -49,10 +50,10 @@ class FilterGUI(QGroupBox):
         self.filt_sat_slider.setRange(100, 1200)
 
         #displays
-        self.filt_freq_display = self.configure_display(QLCDNumber(), 5, QLCDNumber.Dec, QLCDNumber.Flat, True)
-        self.filt_fback_display = self.configure_display(QLCDNumber(), 5, QLCDNumber.Dec, QLCDNumber.Flat, True)
-        self.filt_drive_display = self.configure_display(QLCDNumber(), 5, QLCDNumber.Dec, QLCDNumber.Flat, True)
-        self.filt_sat_display = self.configure_display(QLCDNumber(), 5, QLCDNumber.Dec, QLCDNumber.Flat, True)
+        self.filt_freq_display = self.configure_display(ClickLCD(), 5, QLCDNumber.Dec, QLCDNumber.Flat, True)
+        self.filt_fback_display = self.configure_display(ClickLCD(), 5, QLCDNumber.Dec, QLCDNumber.Flat, True)
+        self.filt_drive_display = self.configure_display(ClickLCD(), 5, QLCDNumber.Dec, QLCDNumber.Flat, True)
+        self.filt_sat_display = self.configure_display(ClickLCD(), 5, QLCDNumber.Dec, QLCDNumber.Flat, True)
 
         #set display palettes
         self.set_palette(self.filt_freq_display)
@@ -112,6 +113,11 @@ class FilterGUI(QGroupBox):
         self.filt_sat_slider.valueChanged.connect(self.change_sat)
         self.filt_alg_group.buttonClicked.connect(self.change_alg)
 
+        self.filt_freq_display.double_clicked.connect(self.reset_freq)
+        self.filt_fback_display.double_clicked.connect(self.reset_res)
+        self.filt_drive_display.double_clicked.connect(self.reset_drive)
+        self.filt_sat_display.double_clicked.connect(self.reset_sat)
+
         #set object name
         self.setObjectName("filt_group")
 
@@ -156,3 +162,15 @@ class FilterGUI(QGroupBox):
 
     def change_alg(self, button):
         self.alg_changed.emit(button.text())
+
+    def reset_freq(self):
+        self.filt_freq_slider.setValue(700)
+
+    def reset_res(self):
+        self.filt_res_slider.setValue(0)
+
+    def reset_drive(self):
+        self.filt_drive_slider.setValue(40)
+
+    def reset_sat(self):
+        self.filt_sat_slider.setValue(100)

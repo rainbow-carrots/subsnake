@@ -5,6 +5,7 @@ from PySide6.QtWidgets import(
 )
 from PySide6.QtCore import Signal, Qt
 from PySide6.QtGui import QPalette, QColor
+from subsnake.gui.lcd import ClickLCD
 
 class Oscillator2GUI(QGroupBox):
     #signals
@@ -50,10 +51,10 @@ class Oscillator2GUI(QGroupBox):
         self.osc2_width_slider.setRange(0, 500)
 
         #displays
-        self.osc2_freq_display = self.configure_display(QLCDNumber(), 3, QLCDNumber.Dec, QLCDNumber.Flat, True)
-        self.osc2_det_display = self.configure_display(QLCDNumber(), 3, QLCDNumber.Dec, QLCDNumber.Flat, True)
-        self.osc2_amp_display = self.configure_display(QLCDNumber(), 3, QLCDNumber.Dec, QLCDNumber.Flat, True)
-        self.osc2_width_display = self.configure_display(QLCDNumber(), 3, QLCDNumber.Dec, QLCDNumber.Flat, True)
+        self.osc2_freq_display = self.configure_display(ClickLCD(), 3, QLCDNumber.Dec, QLCDNumber.Flat, True)
+        self.osc2_det_display = self.configure_display(ClickLCD(), 3, QLCDNumber.Dec, QLCDNumber.Flat, True)
+        self.osc2_amp_display = self.configure_display(ClickLCD(), 3, QLCDNumber.Dec, QLCDNumber.Flat, True)
+        self.osc2_width_display = self.configure_display(ClickLCD(), 3, QLCDNumber.Dec, QLCDNumber.Flat, True)
 
         #set display palettes
         self.set_palette(self.osc2_freq_display)
@@ -109,6 +110,11 @@ class Oscillator2GUI(QGroupBox):
         self.osc2_width_slider.valueChanged.connect(self.change_width)
         self.osc2_alg_group.buttonClicked.connect(self.change_alg)
 
+        self.osc2_freq_display.double_clicked.connect(self.reset_pitch)
+        self.osc2_det_display.double_clicked.connect(self.reset_detune)
+        self.osc2_amp_display.double_clicked.connect(self.reset_level)
+        self.osc2_width_display.double_clicked.connect(self.reset_width)
+
         #set object name
         self.setObjectName("osc2_group")
 
@@ -153,3 +159,15 @@ class Oscillator2GUI(QGroupBox):
 
     def change_alg(self, button):
         self.alg_changed.emit(button.text())
+
+    def reset_pitch(self):
+        self.osc2_freq_slider.setValue(0)
+
+    def reset_detune(self):
+        self.osc2_det_slider.setValue(0)
+
+    def reset_level(self):
+        self.osc2_amp_slider.setValue(250)
+
+    def reset_width(self):
+        self.osc2_width_slider.setValue(250)

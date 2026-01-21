@@ -5,6 +5,7 @@ from PySide6.QtWidgets import(
 )
 from PySide6.QtCore import Signal, Qt
 from PySide6.QtGui import QPalette, QColor
+from subsnake.gui.lcd import ClickLCD
 
 class DelayGUI(QGroupBox):
     time_changed = Signal(float)
@@ -39,9 +40,9 @@ class DelayGUI(QGroupBox):
         self.del_mix_slider.setSingleStep(1)
 
         #displays
-        self.del_time_display = self.configure_display(QLCDNumber(), 3, QLCDNumber.Dec, QLCDNumber.Flat, True)
-        self.del_feedback_display = self.configure_display(QLCDNumber(), 3, QLCDNumber.Dec, QLCDNumber.Flat, True)
-        self.del_mix_display = self.configure_display(QLCDNumber(), 3, QLCDNumber.Dec, QLCDNumber.Flat, True)
+        self.del_time_display = self.configure_display(ClickLCD(), 3, QLCDNumber.Dec, QLCDNumber.Flat, True)
+        self.del_feedback_display = self.configure_display(ClickLCD(), 3, QLCDNumber.Dec, QLCDNumber.Flat, True)
+        self.del_mix_display = self.configure_display(ClickLCD(), 3, QLCDNumber.Dec, QLCDNumber.Flat, True)
 
         #set display palettes
         self.set_palette(self.del_time_display)
@@ -68,6 +69,10 @@ class DelayGUI(QGroupBox):
         self.del_feedback_slider.valueChanged.connect(self.change_feedback)
         self.del_mix_slider.valueChanged.connect(self.change_mix)
 
+        self.del_time_display.double_clicked.connect(self.reset_time)
+        self.del_feedback_display.double_clicked.connect(self.reset_feedback)
+        self.del_mix_display.double_clicked.connect(self.reset_mix)
+
         #set layout & object name
         self.setLayout(del_layout)
         self.setObjectName("del_group")
@@ -88,6 +93,15 @@ class DelayGUI(QGroupBox):
         new_mix = float(value)/1000.0
         self.del_mix_display.display(f"{new_mix:.2f}")
         self.mix_changed.emit(new_mix)
+
+    def reset_time(self):
+        self.del_time_slider.setValue(100)
+
+    def reset_feedback(self):
+        self.del_feedback_slider.setValue(500)
+
+    def reset_mix(self):
+        self.del_mix_slider.setValue(500)
 
     #helpers
     def configure_display(self, display, num_digits, num_mode, dig_style, small_dec):

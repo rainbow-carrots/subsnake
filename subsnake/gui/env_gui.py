@@ -5,6 +5,7 @@ from PySide6.QtWidgets import(
 )
 from PySide6.QtCore import Signal, Qt
 from PySide6.QtGui import QPalette, QColor
+from subsnake.gui.lcd import ClickLCD
 
 class EnvelopeGUI(QGroupBox):
     #signals
@@ -47,10 +48,10 @@ class EnvelopeGUI(QGroupBox):
         self.adsr_rel_slider.setRange(1, 1000)
 
         #displays
-        self.adsr_att_display = self.configure_display(QLCDNumber(), 3, QLCDNumber.Dec, QLCDNumber.Flat, True)
-        self.adsr_dec_display = self.configure_display(QLCDNumber(), 3, QLCDNumber.Dec, QLCDNumber.Flat, True)
-        self.adsr_sus_display = self.configure_display(QLCDNumber(), 3, QLCDNumber.Dec, QLCDNumber.Flat, True)
-        self.adsr_rel_display = self.configure_display(QLCDNumber(), 3, QLCDNumber.Dec, QLCDNumber.Flat, True)
+        self.adsr_att_display = self.configure_display(ClickLCD(), 3, QLCDNumber.Dec, QLCDNumber.Flat, True)
+        self.adsr_dec_display = self.configure_display(ClickLCD(), 3, QLCDNumber.Dec, QLCDNumber.Flat, True)
+        self.adsr_sus_display = self.configure_display(ClickLCD(), 3, QLCDNumber.Dec, QLCDNumber.Flat, True)
+        self.adsr_rel_display = self.configure_display(ClickLCD(), 3, QLCDNumber.Dec, QLCDNumber.Flat, True)
 
         #set display palettes
         self.set_palette(self.adsr_att_display)
@@ -89,6 +90,11 @@ class EnvelopeGUI(QGroupBox):
         self.adsr_sus_slider.valueChanged.connect(self.change_sustain)
         self.adsr_rel_slider.valueChanged.connect(self.change_release)
         self.env_gate.clicked.connect(self.change_gate)
+
+        self.adsr_att_display.double_clicked.connect(self.reset_attack)
+        self.adsr_dec_display.double_clicked.connect(self.reset_decay)
+        self.adsr_sus_display.double_clicked.connect(self.reset_sustain)
+        self.adsr_rel_display.double_clicked.connect(self.reset_release)
 
         #set layout
         self.setLayout(env_layout)
@@ -134,3 +140,15 @@ class EnvelopeGUI(QGroupBox):
     
     def change_gate(self, checked):
         self.gate_changed.emit(checked)
+
+    def reset_attack(self):
+        self.adsr_att_slider.setValue(10)
+
+    def reset_decay(self):
+        self.adsr_dec_slider.setValue(500)
+
+    def reset_sustain(self):
+        self.adsr_sus_slider.setValue(1000)
+
+    def reset_release(self):
+        self.adsr_rel_slider.setValue(500)
