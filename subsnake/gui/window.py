@@ -154,12 +154,13 @@ class MainWindow(QMainWindow):
 
         self.patch_manager.patch_loaded.connect(self.load_patch)
 
-        self.init_params()
         self.setCentralWidget(window_widget)
 
         #start slider cc update timer
         self.slider_timer = UpdateSliders(self.engine, self)
         self.slider_timer.start()
+
+        self.patch_manager.load_patch(self.patch_manager.patch_select.currentText())
 
     #helper functions
     # args: QLCDDisplay widget, # of digits, mode (hex, dec, oct, bin),
@@ -206,14 +207,11 @@ class MainWindow(QMainWindow):
         self.param_button_groups.append(self.osc2_group.osc2_alg_group)
         self.param_button_groups.append(self.filt_group.filt_alg_group)
 
-    
-    def init_params(self):
-        self.load_patch(self.patch_manager.default_patch)
-
     def load_patch(self, patch):
         for param in patch:
             if param in self.param_sliders:
                 self.param_sliders[param].setValue(patch[param])
+                self.param_sliders[param].valueChanged.emit(patch[param])
             elif param == "osc_wave":
                 self.osc_group.update_wave(patch[param])
             elif param == "osc2_wave":
