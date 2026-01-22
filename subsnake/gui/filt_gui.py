@@ -139,6 +139,17 @@ class FilterGUI(QGroupBox):
         display.setAutoFillBackground(True)
         display.setPalette(display_palette)
 
+    def update_type(self, new_type):
+        if new_type == "low":
+            self.filt_alg_low.setChecked(True)
+        elif new_type == "high":
+            self.filt_alg_high.setChecked(True)
+        elif new_type == "band":
+            self.filt_alg_band.setChecked(True)
+        elif new_type == "notch":
+            self.filt_alg_notch.setChecked(True)
+        self.alg_changed.emit(new_type)
+
     #slots
     def change_freq(self, value):
         newFreq = 27.5 * 2**(float(value)/100.0)
