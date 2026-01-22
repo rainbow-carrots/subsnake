@@ -122,6 +122,15 @@ class OscillatorGUI(QGroupBox):
         display.setAutoFillBackground(True)
         display.setPalette(display_palette)
 
+    def update_wave(self, new_wave):
+        if new_wave == "sine":
+            self.osc_alg_sin.setChecked(True)
+        elif new_wave == "saw":
+            self.osc_alg_saw.setChecked(True)
+        elif new_wave == "pulse":
+            self.osc_alg_pulse.setChecked(True)
+        self.alg_changed.emit(new_wave)
+
     #slots
     def change_pitch(self, value):
         offset = float(value)/100.0
