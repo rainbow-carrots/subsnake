@@ -6,7 +6,7 @@
     "osc2_det": 0,
     "osc2_amp": 250,
     "osc2_width": 250,
-    "filt_freq": 700,
+    "filt_freq": 696,
     "filt_res": 0,
     "filt_drive": 40,
     "filt_sat": 100,
@@ -21,7 +21,7 @@
     "env_rel": 500,
     "del_time": 100,
     "del_fback": 500,
-    "del_mix": 500,
+    "del_mix": 0,
     "osc_wave": "pulse",
     "osc2_wave": "pulse",
     "filt_type": "low"

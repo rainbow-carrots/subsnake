@@ -14,6 +14,7 @@
     "fenv_dec": 242,
     "fenv_sus": 1,
     "fenv_rel": 263,
+    "fenv_amt": 300,
     "env_att": 10,
     "env_dec": 500,
     "env_sus": 1000,
