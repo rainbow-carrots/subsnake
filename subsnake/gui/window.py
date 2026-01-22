@@ -190,6 +190,7 @@ class MainWindow(QMainWindow):
         self.param_sliders.update({"fenv_dec": self.fenv_group.fenv_dec_slider})
         self.param_sliders.update({"fenv_sus": self.fenv_group.fenv_sus_slider})
         self.param_sliders.update({"fenv_rel": self.fenv_group.fenv_rel_slider})
+        self.param_sliders.update({"fenv_amt": self.fenv_group.fenv_amt_slider})
 
         self.param_sliders.update({"env_att": self.env_group.adsr_att_slider})
         self.param_sliders.update({"env_dec": self.env_group.adsr_dec_slider})
