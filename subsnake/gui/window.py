@@ -20,9 +20,12 @@ class MainWindow(QMainWindow):
 
     def __init__(self, engine):
         super().__init__()
+        #set window title
+        self.setWindowTitle("subsnake")
 
         #attributes
         self.param_sliders = {}
+        self.param_button_groups = []
         self.midi_controls = []
         self.midi_cc_sliders = {}
         self.midi_cc_displays = {}
@@ -31,7 +34,7 @@ class MainWindow(QMainWindow):
         #toolbar
         self.main_toolbar = QToolBar()
         self.main_toolbar.setMovable(False)
-        self.patch_manager = PatchManager()
+        self.patch_manager = PatchManager(self.param_sliders, self.param_button_groups)
         self.toggle_midi = QPushButton("midi")
         self.toggle_midi.setToolTip("show/hide midi menu")
         self.toggle_midi.setCheckable(True)
@@ -62,9 +65,9 @@ class MainWindow(QMainWindow):
         self.fenv_group = FilterEnvGUI()
         self.del_group = DelayGUI()
 
-        #init slider dictionary
+        #init slider & button group dictionaries
         self.init_sliders_dict()
-
+        self.init_buttons_dict()
 
         #grid spacers
         # row 0
@@ -196,6 +199,11 @@ class MainWindow(QMainWindow):
         self.param_sliders.update({"del_time": self.del_group.del_time_slider})
         self.param_sliders.update({"del_fback": self.del_group.del_feedback_slider})
         self.param_sliders.update({"del_mix": self.del_group.del_mix_slider})
+    
+    def init_buttons_dict(self):
+        self.param_button_groups.append(self.osc_group.osc_alg_group)
+        self.param_button_groups.append(self.osc2_group.osc2_alg_group)
+        self.param_button_groups.append(self.filt_group.filt_alg_group)
 
     
     def init_params(self):
@@ -232,6 +240,12 @@ class MainWindow(QMainWindow):
         for param in patch:
             if param in self.param_sliders:
                 self.param_sliders[param].setValue(patch[param])
+            elif param == "osc_wave":
+                self.osc_group.update_wave(patch[param])
+            elif param == "osc2_wave":
+                self.osc2_group.update_wave(patch[param])
+            elif param == "filt_type":
+                self.filt_group.update_type(patch[param])
 
     def assign_cc_function(self, module, param):
         cc_function = None
