@@ -207,34 +207,7 @@ class MainWindow(QMainWindow):
 
     
     def init_params(self):
-        self.filt_group.filt_freq_slider.setValue(700)
-        self.filt_group.filt_res_slider.setValue(0)
-        self.filt_group.filt_drive_slider.setValue(40)
-        self.filt_group.filt_sat_slider.setValue(800)
-
-        self.osc_group.osc_freq_slider.setValue(0)
-        self.osc_group.osc_amp_slider.setValue(250)
-        self.osc_group.osc_width_slider.setValue(250)
-
-        self.osc2_group.osc2_freq_slider.setValue(0)
-        self.osc2_group.osc2_det_slider.setValue(0)
-        self.osc2_group.osc2_amp_slider.setValue(250)
-        self.osc2_group.osc2_width_slider.setValue(250)
-
-        self.env_group.adsr_att_slider.setValue(10)
-        self.env_group.adsr_dec_slider.setValue(500)
-        self.env_group.adsr_sus_slider.setValue(1000)
-        self.env_group.adsr_rel_slider.setValue(500)
-
-        self.fenv_group.fenv_att_slider.setValue(10)
-        self.fenv_group.fenv_dec_slider.setValue(500)
-        self.fenv_group.fenv_sus_slider.setValue(1000)
-        self.fenv_group.fenv_rel_slider.setValue(500)
-        self.fenv_group.fenv_amt_slider.setValue(0)
-
-        self.del_group.del_time_slider.setValue(100)
-        self.del_group.del_feedback_slider.setValue(500)
-        self.del_group.del_mix_slider.setValue(500)
+        self.load_patch(self.patch_manager.default_patch)
 
     def load_patch(self, patch):
         for param in patch:
