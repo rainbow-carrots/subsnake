@@ -21,5 +21,8 @@
     "env_rel": 500,
     "del_time": 100,
     "del_fback": 500,
-    "del_mix": 500
+    "del_mix": 500,
+    "osc_wave": "pulse",
+    "osc2_wave": "pulse",
+    "filt_type": "low"
 }
