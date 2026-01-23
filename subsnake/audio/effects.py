@@ -59,5 +59,45 @@ class StereoDelay():
 
     def update_mix(self, new_mix):
         self.mix_level = new_mix
-            
 
+
+class AudioRecorder():
+    def __init__(self, fs):
+        self.fs = fs
+        self.max_buffer_samples = 4*fs*60*5
+        self.record_buffer = np.zeros((self.max_buffer_samples, 2), dtype=np.float32)
+        self.play_head = 0
+        self.record_head = 0
+        self.paused = False
+        self.record = False
+        self.loop = False
+    
+    def play(self):
+        self.paused = False
+
+    def pause(self):
+        self.paused = True
+
+    def stop(self):
+        self.record = False
+        self.play_head = 0
+        self.record_head = 0
+
+    def set_record(self, record_flag):
+        self.record = record_flag
+    
+    def set_loop(self, loop_flag):
+        self.loop = loop_flag
+
+    def process_block(self, indata, outdata):
+        in_frames = len(indata)
+        out_frames = len(outdata)
+        if (self.play_head + out_frames) < self.max_buffer_samples:
+            outdata = self.record_buffer[self.play_head:self.play_head+out_frames]  #read from buffer
+            self.play_head += out_frames
+        if (self.record_head + in_frames) < self.max_buffer_samples:
+            if (self.record):
+                self.record_buffer[self.play_head:self.play_head+in_frames] = indata    #write to buffer
+            self.record_head += in_frames
+
+            
