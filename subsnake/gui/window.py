@@ -119,6 +119,12 @@ class MainWindow(QMainWindow):
         self.engine = engine
 
         #connect signals
+        self.recorder.record.connect(self.update_rec_record)
+        self.recorder.play.connect(self.update_rec_play)
+        self.recorder.pause.connect(self.update_rec_pause)
+        self.recorder.stop.connect(self.update_rec_stop)
+        self.recorder.loop.connect(self.update_rec_loop)
+
         self.midi_group.input_changed.connect(self.update_midi_in)
         self.midi_group.channel_changed.connect(self.update_midi_ch)
         self.midi_group.inputs_refreshed.connect(self.refresh_midi_ins)
@@ -340,6 +346,22 @@ class MainWindow(QMainWindow):
             self.midi_cc_sliders.pop(cc)
         if cc in self.midi_cc_displays:
             self.midi_cc_displays.pop(cc)
+
+    # recorder
+    def update_rec_record(self, state):
+        print(f"record: {state}")
+
+    def update_rec_play(self):
+        print("playing")
+    
+    def update_rec_pause(self):
+        print("paused")
+    
+    def update_rec_stop(self):
+        print("stopped")
+
+    def update_rec_loop(self, state):
+        print(f"looping: {state}")
 
     # filter
     def update_filt_freq(self, newFreq):
