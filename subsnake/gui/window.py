@@ -13,7 +13,8 @@ from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
     QMainWindow, QGridLayout,
     QFrame, QWidget,
-    QToolBar, QPushButton)
+    QToolBar, QPushButton,
+    QHBoxLayout)
 
 key_conv = Keys()
 
@@ -41,10 +42,15 @@ class MainWindow(QMainWindow):
         self.toggle_midi.setToolTip("show/hide midi menu")
         self.toggle_midi.setCheckable(True)
         self.toggle_midi.setChecked(False)
-        self.toolbar_layout = QGridLayout()
-        self.toolbar_layout.addWidget(self.toggle_midi, 0, 0)
-        self.toolbar_layout.addWidget(self.patch_manager, 0, 1)
-        self.toolbar_layout.addWidget(self.recorder, 0, 2)
+        self.toolbar_layout = QHBoxLayout()
+        self.toolbar_layout.setAlignment(Qt.AlignCenter)
+        self.toolbar_layout.addStretch()
+        self.toolbar_layout.addWidget(self.toggle_midi, 0)
+        self.toolbar_layout.addStretch()
+        self.toolbar_layout.addWidget(self.patch_manager, 1)
+        self.toolbar_layout.addStretch()
+        self.toolbar_layout.addWidget(self.recorder, 2)
+        self.toolbar_layout.addStretch()
         self.toolbar_widget = QWidget()
         self.toolbar_widget.setLayout(self.toolbar_layout)
         self.toolbar_widget.setObjectName("toolbar_widget")
