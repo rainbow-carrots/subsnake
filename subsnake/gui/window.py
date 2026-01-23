@@ -8,6 +8,7 @@ from subsnake.gui.midi import MIDISettings
 from subsnake.gui.cc_sliders import UpdateSliders
 from subsnake.gui.delay_gui import DelayGUI
 from subsnake.gui.patch import PatchManager
+from subsnake.gui.record import RecorderGUI
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
     QMainWindow, QGridLayout,
@@ -35,6 +36,7 @@ class MainWindow(QMainWindow):
         self.main_toolbar = QToolBar()
         self.main_toolbar.setMovable(False)
         self.patch_manager = PatchManager(self.param_sliders, self.param_button_groups)
+        self.recorder = RecorderGUI()
         self.toggle_midi = QPushButton("midi")
         self.toggle_midi.setToolTip("show/hide midi menu")
         self.toggle_midi.setCheckable(True)
@@ -42,6 +44,7 @@ class MainWindow(QMainWindow):
         self.toolbar_layout = QGridLayout()
         self.toolbar_layout.addWidget(self.toggle_midi, 0, 0)
         self.toolbar_layout.addWidget(self.patch_manager, 0, 1)
+        self.toolbar_layout.addWidget(self.recorder, 0, 2)
         self.toolbar_widget = QWidget()
         self.toolbar_widget.setLayout(self.toolbar_layout)
         self.toolbar_widget.setObjectName("toolbar_widget")
