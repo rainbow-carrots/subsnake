@@ -5,6 +5,12 @@ from PySide6.QtWidgets import (
 from PySide6.QtCore import Qt, Signal
 
 class RecorderGUI(QWidget):
+    pause = Signal()
+    play = Signal()
+    stop = Signal()
+    loop = Signal(bool)
+    record = Signal(bool)
+    
     def __init__(self):
         super().__init__()
 
@@ -16,6 +22,10 @@ class RecorderGUI(QWidget):
         self.play_button = QPushButton("▶")
         self.stop_button = QPushButton("■")
         self.loop_button = QPushButton("⟳")
+
+        self.record_button.setCheckable(True)
+        self.loop_button.setCheckable(True)
+        self.play_button.setCheckable(True)
 
         self.record_button.setObjectName("record_button")
         self.play_button.setObjectName("play_button")
@@ -58,3 +68,23 @@ class RecorderGUI(QWidget):
         self.setLayout(layout)
         self.setObjectName("recorder")
         self.setAttribute(Qt.WA_StyledBackground, True)
+
+        self.record_button.clicked.connect(self.record_pressed)
+        self.play_button.clicked.connect(self.play_pressed)
+        self.stop_button.pressed.connect(self.stop_pressed)
+        self.loop_button.clicked.connect(self.loop_pressed)
+
+    def record_pressed(self, state):
+        self.record.emit(state)
+
+    def play_pressed(self, state):
+        if state:
+            self.play.emit()
+        else:
+            self.pause.emit()
+
+    def stop_pressed(self):
+        self.stop.emit()
+
+    def loop_pressed(self, state):
+        self.loop.emit(state)
