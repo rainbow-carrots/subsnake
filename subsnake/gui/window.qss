@@ -8,9 +8,13 @@ QLCDNumber {
     height: 24px;
 }
 
-QLabel {
+QGroupBox QLabel {
     color: #000000;
     margin-top: -4.5px;
+}
+
+QWidget QLabel {
+    color: #000000;
 }
 
 MainWindow QGroupBox {
@@ -56,6 +60,11 @@ QGroupBox QSlider {
 
 QFrame#grid_space_0, QFrame#grid_space_1, QFrame#grid_space_2, QFrame#grid_space_3 {
     min-width: 24px;
+}
+
+QFrame#record_spacer_0, QFrame#record_spacer_1, QFrame#record_spacer_2 {
+    min-width:12px;
+    max-width:12px;
 }
 
 QRadioButton::indicator {
@@ -252,6 +261,25 @@ PatchManager QPushButton {
     background-color: #e86f77;
     width: 60px;
     height: 20px;
+    color: #000000;
+    border: 1px solid white;
+    border-radius: 6px;
+}
+
+
+RecorderGUI#recorder {
+    background-color: #99f2da;
+    border: 1px solid white;
+    border-radius: 6px;
+    margin-left: 36px;
+    margin-right: 36px;
+    max-width: 320px;
+}
+
+RecorderGUI QPushButton {
+    max-width: 30px;
+    min-width: 30px;
+    height: 30px;
     color: #000000;
     border: 1px solid white;
     border-radius: 6px;
