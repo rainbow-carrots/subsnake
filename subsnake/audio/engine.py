@@ -9,7 +9,7 @@ from .generators import WrappedOsc
 from .filters import HalSVF
 from .envelopes import ADSR
 from .workers import KeyEventWorker
-from .effects import StereoDelay
+from .effects import StereoDelay, AudioRecorder
 
 fs = 44100
 blocksize = 1024
@@ -24,6 +24,7 @@ class AudioEngine():
                        Voice(), Voice(), Voice(), Voice(),
                        Voice(), Voice(), Voice(), Voice()]
         self.delay = StereoDelay(fs)
+        self.recorder = AudioRecorder(fs)
         self.stopped_voice_indeces = []
         self.released_voice_indeces = []
         voice_index = 0
