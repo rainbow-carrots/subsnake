@@ -262,6 +262,10 @@ PatchManager QPushButton {
     border-radius: 6px;
 }
 
+PatchManager QPushButton:hover {
+    background-color: #b55056;
+}
+
 
 RecorderGUI#recorder {
     background-color: #99f2da;
@@ -297,4 +301,15 @@ QPushButton#record_button, QPushButton#play_button, QPushButton#stop_button {
 
 QPushButton#loop_button {
     background-color: #34cea5;
+    font-style: bold;
+    font-size: 21px;
+}
+
+QPushButton#record_button:hover, QPushButton#play_button:hover, QPushButton#stop_button:hover, QPushButton#loop_button:hover {
+    background-color: #1cb68d;
+}
+
+QPushButton#record_button:checked, QPushButton#loop_button:checked, QPushButton#play_button:checked {
+    color: #e6e6e6;
+    background-color: #158668;
 }
