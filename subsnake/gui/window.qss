@@ -62,11 +62,6 @@ QFrame#grid_space_0, QFrame#grid_space_1, QFrame#grid_space_2, QFrame#grid_space
     min-width: 24px;
 }
 
-QFrame#record_spacer_0, QFrame#record_spacer_1, QFrame#record_spacer_2 {
-    min-width:12px;
-    max-width:12px;
-}
-
 QRadioButton::indicator {
     width: 12px;
     height: 12px;
@@ -232,7 +227,8 @@ QPushButton#cc_delete {
 }
 
 QPushButton#toggle_midi {
-    max-width: 60px;
+    max-width: 100px;
+    min-width: 100px;
     height: 36px;
     color: #000000;
     background-color: #857093;
@@ -287,4 +283,18 @@ RecorderGUI QPushButton {
 
 QWidget#toolbar_widget {
     max-height: 60px;
+}
+
+QFrame#record_spacer_0, QFrame#record_spacer_1, QFrame#record_spacer_2 {
+    min-width:12px;
+    max-width:12px;
+}
+
+QPushButton#record_button, QPushButton#play_button, QPushButton#stop_button {
+    background-color: #34cea5;
+    padding-top: -4px;
+}
+
+QPushButton#loop_button {
+    background-color: #34cea5;
 }
