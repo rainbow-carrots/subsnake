@@ -36,6 +36,7 @@ class AudioEngine():
 
         self.voice_output = np.zeros((1024, 2), dtype=np.float32)
         self.recorder_output = np.zeros((1024, 2), dtype=np.float32)
+        self.delay_output = np.zeros((1024, 2), dtype=np.float32)
         self.key_to_note = {}
         self.note_to_voice = {}
         self.octave = 0
@@ -90,6 +91,7 @@ class AudioEngine():
 
     #audio callback
     def callback(self, outdata, frames, time, status):
+        outdata[:frames] = 0.0
         frame_width = frames/fs
         frame_start = time.outputBufferDacTime
         frame_end = frame_start + frame_width
@@ -97,8 +99,9 @@ class AudioEngine():
         for voice in self.voices:
             voice.callback(self.voice_output[:frames], self.note_to_voice, self.stopped_voice_indeces, self.released_voice_indeces, frames)
             outdata += self.voice_output[:frames]
+        self.recorder.process_block(outdata, self.recorder_output)
         self.delay.process_block(outdata, outdata)
-        self.recorder.process_block(outdata, outdata)
+        outdata += self.recorder_output[:frames]
         outdata *= 0.288675
         outdata = np.tanh(outdata)
 
