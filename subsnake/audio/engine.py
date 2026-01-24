@@ -100,8 +100,8 @@ class AudioEngine():
             voice.callback(self.voice_output[:frames], self.note_to_voice, self.stopped_voice_indeces, self.released_voice_indeces, frames)
             outdata += self.voice_output[:frames]
         self.recorder.process_block(outdata, self.recorder_output)
-        self.delay.process_block(outdata, outdata)
         outdata += self.recorder_output[:frames]
+        self.delay.process_block(outdata, outdata)
         outdata *= 0.288675
         outdata = np.tanh(outdata)
 
