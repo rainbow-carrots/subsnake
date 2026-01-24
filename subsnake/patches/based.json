@@ -1,10 +1,10 @@
 {
     "osc_freq": 0,
-    "osc_amp": 250,
+    "osc_amp": 375,
     "osc_width": 318,
     "osc2_freq": -102,
     "osc2_det": 30,
-    "osc2_amp": 250,
+    "osc2_amp": 404,
     "osc2_width": 174,
     "filt_freq": 565,
     "filt_res": 53,
