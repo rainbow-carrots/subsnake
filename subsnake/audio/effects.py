@@ -95,20 +95,18 @@ class AudioRecorder():
         frames = len(indata)
         #increment end heads, stop recording at end of buffer (if not looping) & reset play heads
         if not self.stopped[0] and not self.paused[0]:
-            #print(f"playing! current playpos: {self.play_heads}")
             if self.record[0]:
                 if (self.end_heads[0] + frames) < self.max_buffer_samples:
-                    self.end_heads[:] += frames
-                    #print(f"recording! new endpos: {self.end_heads}")
+                    if (self.play_heads[0] + frames) >= self.end_heads[0]:
+                        if not self.loop:
+                            self.end_heads[:] += frames
                 else:
                     if not self.loop:
                         self.stopped[0] = True
                         self.record[0] = False
                     self.play_heads[:] = 0
-                #print(f"input data: {indata}")
             self.process_samples(self.record_buffer, indata, outdata, frames, self.paused, self.stopped,
                                 self.record, self.loop, self.play_heads, self.end_heads)
-            #print(f"output data: {outdata[:frames]}")
 
     @staticmethod
     @njit(nogil=True, fastmath=True)
