@@ -84,6 +84,10 @@ class RecorderGUI(QWidget):
             self.pause.emit()
 
     def stop_pressed(self):
+        self.play_pressed(False)
+        self.play_button.setChecked(False)
+        self.record_pressed(False)
+        self.record_button.setChecked(False)
         self.stop.emit()
 
     def loop_pressed(self, state):
