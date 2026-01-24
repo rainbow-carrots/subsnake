@@ -35,6 +35,7 @@ class AudioEngine():
             voice_index += 1
 
         self.voice_output = np.zeros((1024, 2), dtype=np.float32)
+        self.recorder_output = np.zeros((1024, 2), dtype=np.float32)
         self.key_to_note = {}
         self.note_to_voice = {}
         self.octave = 0
@@ -97,6 +98,7 @@ class AudioEngine():
             voice.callback(self.voice_output[:frames], self.note_to_voice, self.stopped_voice_indeces, self.released_voice_indeces, frames)
             outdata += self.voice_output[:frames]
         self.delay.process_block(outdata, outdata)
+        self.recorder.process_block(outdata, outdata)
         outdata *= 0.288675
         outdata = np.tanh(outdata)
 
@@ -114,7 +116,23 @@ class AudioEngine():
     def key_released(self, note_val, sample_offset=0):
         note_off_msg = mido.Message("note_off", note=note_val, velocity=0, channel=self.midi_channel)
         stamped_message = (note_off_msg, pytime.perf_counter())
-        self.midi_in_queue.put(stamped_message) 
+        self.midi_in_queue.put(stamped_message)
+
+    #recorder slots
+    def update_record(self, state):
+        self.recorder.set_record(state)
+
+    def update_play(self):
+        self.recorder.play()
+
+    def update_pause(self):
+        self.recorder.pause()
+
+    def update_stop(self):
+        self.recorder.stop()
+
+    def update_loop(self, state):
+        self.recorder.set_loop(state)
 
     #voice helper functions
     def update_pitch_1(self, offset):
