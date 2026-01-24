@@ -20,7 +20,7 @@ class StereoDelay():
     @staticmethod
     @njit(nogil=True, fastmath=True)
     def delay_block(input, output, buffer, offset_raw, offset_smooth, write_heads, feedback, mix):
-        frames = len(output)
+        frames = len(input)
         buffer_size = len(buffer)
         alpha = .0001
         for c in range (0, 2):
@@ -94,6 +94,7 @@ class AudioRecorder():
     def process_block(self, indata, outdata):
         frames = len(indata)
         #increment end heads, stop recording at end of buffer (if not looping) & reset play heads
+        outdata[:frames] = 0.0
         if not self.stopped[0] and not self.paused[0]:
             if self.record[0]:
                 if (self.end_heads[0] + frames) < self.max_buffer_samples:
@@ -125,7 +126,7 @@ class AudioRecorder():
                         if not loop:
                             stopped[0] = True
                             record[0] = False
-                    outdata[n, c] += read_sample
+                    outdata[n, c] = read_sample
 
 
 
