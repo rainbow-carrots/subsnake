@@ -5,6 +5,7 @@ from PySide6.QtWidgets import QApplication
 from subsnake.gui import MainWindow
 import subsnake.gui as gui
 from subsnake.audio import WrappedOsc, HalSVF, ADSR, AudioEngine
+from subsnake.audio.effects import AudioRecorder
 from importlib import resources
 
 fs = 44100
@@ -20,6 +21,9 @@ WrappedOsc.generate_sine(osc_test, np.zeros((16, 2), dtype=np.float32))
 WrappedOsc.polyblep_saw(osc_test, np.zeros((16, 2), dtype=np.float32))
 HalSVF.filter_block(filt_test, np.zeros((16, 2), dtype=np.float32), np.zeros((16, 2), dtype=np.float32), np.ones((16, 2), dtype=np.float32), 0.0, HalSVF.clip_sample, 100)
 ADSR.envelope_block(env_test, False, np.zeros((16, 2), dtype=np.float32), np.zeros((16, 2), dtype=np.float32), 0, 0)
+AudioRecorder.process_samples(np.zeros((32, 2), dtype=np.float32), np.zeros((16, 2), dtype=np.float32), np.zeros((16, 2), dtype=np.float32), 0,
+                              [False], [True], [False], False, np.zeros((2), dtype=np.int32), np.zeros((2), dtype=np.int32))
+
 
 #get midi inputs & channels
 input_list = mido.get_input_names()
