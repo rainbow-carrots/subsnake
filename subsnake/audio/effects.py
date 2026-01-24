@@ -66,38 +66,68 @@ class AudioRecorder():
         self.fs = fs
         self.max_buffer_samples = 4*fs*60*5
         self.record_buffer = np.zeros((self.max_buffer_samples, 2), dtype=np.float32)
-        self.play_head = 0
-        self.record_head = 0
-        self.paused = False
-        self.record = False
+        self.play_heads = np.zeros((2), dtype=np.int32)
+        self.end_heads = np.zeros((2), dtype=np.int32)
+        self.paused = [False]
+        self.stopped = [True]
+        self.record = [False]
         self.loop = False
     
     def play(self):
-        self.paused = False
+        self.paused[0] = False
+        self.stopped[0] = False
 
     def pause(self):
-        self.paused = True
+        self.paused[0] = True
 
     def stop(self):
-        self.record = False
-        self.play_head = 0
-        self.record_head = 0
+        self.paused[0] = False
+        self.stopped[0] = True
+        self.play_heads[:] = 0
 
     def set_record(self, record_flag):
-        self.record = record_flag
+        self.record[0] = record_flag
     
     def set_loop(self, loop_flag):
         self.loop = loop_flag
 
     def process_block(self, indata, outdata):
-        in_frames = len(indata)
-        out_frames = len(outdata)
-        if (self.play_head + out_frames) < self.max_buffer_samples:
-            outdata = self.record_buffer[self.play_head:self.play_head+out_frames]  #read from buffer
-            self.play_head += out_frames
-        if (self.record_head + in_frames) < self.max_buffer_samples:
-            if (self.record):
-                self.record_buffer[self.play_head:self.play_head+in_frames] = indata    #write to buffer
-            self.record_head += in_frames
+        frames = len(indata)
+        #increment end heads, stop recording at end of buffer (if not looping) & reset play heads
+        if not self.stopped[0] and not self.paused[0]:
+            #print(f"playing! current playpos: {self.play_heads}")
+            if self.record[0]:
+                if (self.end_heads[0] + frames) < self.max_buffer_samples:
+                    self.end_heads[:] += frames
+                    #print(f"recording! new endpos: {self.end_heads}")
+                else:
+                    if not self.loop:
+                        self.stopped[0] = True
+                        self.record[0] = False
+                    self.play_heads[:] = 0
+                #print(f"input data: {indata}")
+            self.process_samples(self.record_buffer, indata, outdata, frames, self.paused, self.stopped,
+                                self.record, self.loop, self.play_heads, self.end_heads)
+            #print(f"output data: {outdata[:frames]}")
 
-            
+    @staticmethod
+    @njit(nogil=True, fastmath=True)
+    def process_samples(rec_buffer, indata, outdata, frames, paused, stopped, record, loop, play_heads, end_heads):
+        for c in range(0, 2):
+            for n in range(0, frames):
+                if not paused[0] and not stopped[0]:
+                    read_sample = rec_buffer[play_heads[c], c]
+                    if record[0]:
+                        rec_buffer[play_heads[c], c] += indata[n, c]
+                    if play_heads[c] < end_heads[c]:
+                        play_heads[c] += 1
+                    else:
+                        play_heads[0] = 0
+                        play_heads[1] = 0
+                        if not loop:
+                            stopped[0] = True
+                            record[0] = False
+                    outdata[n, c] += read_sample
+
+
+
