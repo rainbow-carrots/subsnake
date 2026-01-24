@@ -25,7 +25,7 @@ class StereoDelay():
         alpha = .0001
         for c in range (0, 2):
             for n in range(0, frames):
-                #integate offset & calculate whole/fractional parts
+                #integrate offset & calculate whole/fractional parts
                 offset_smooth[c] = offset_smooth[c]*(1.0 - alpha) + offset_raw*alpha
                 offset = int(offset_smooth[c])
                 offset_frac = offset_smooth[c] - offset
@@ -90,6 +90,12 @@ class AudioRecorder():
     
     def set_loop(self, loop_flag):
         self.loop = loop_flag
+
+    def get_time(self):
+        current_time_seconds = int(float(self.play_heads[0]) / 44100.0)
+        current_time_minutes = current_time_seconds / 60
+        output = (current_time_minutes, current_time_seconds)
+        return output
 
     def process_block(self, indata, outdata):
         frames = len(indata)
