@@ -349,19 +349,19 @@ class MainWindow(QMainWindow):
 
     # recorder
     def update_rec_record(self, state):
-        print(f"record: {state}")
+        self.engine.update_record(state)
 
     def update_rec_play(self):
-        print("playing")
+        self.engine.update_play()
     
     def update_rec_pause(self):
-        print("paused")
+        self.engine.update_pause()
     
     def update_rec_stop(self):
-        print("stopped")
+        self.engine.update_stop()
 
     def update_rec_loop(self, state):
-        print(f"looping: {state}")
+        self.engine.update_loop(state)
 
     # filter
     def update_filt_freq(self, newFreq):
