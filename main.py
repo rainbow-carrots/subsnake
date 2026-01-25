@@ -5,7 +5,7 @@ from PySide6.QtWidgets import QApplication
 from subsnake.gui import MainWindow
 import subsnake.gui as gui
 from subsnake.audio import WrappedOsc, HalSVF, ADSR, AudioEngine
-from subsnake.audio.effects import AudioRecorder
+from subsnake.audio.effects import AudioRecorder, StereoDelay
 from importlib import resources
 
 fs = 44100
@@ -23,6 +23,8 @@ HalSVF.filter_block(filt_test, np.zeros((16, 2), dtype=np.float32), np.zeros((16
 ADSR.envelope_block(env_test, False, np.zeros((16, 2), dtype=np.float32), np.zeros((16, 2), dtype=np.float32), 0, 0)
 AudioRecorder.process_samples(np.zeros((32, 2), dtype=np.float32), np.zeros((16, 2), dtype=np.float32), np.zeros((16, 2), dtype=np.float32), 0,
                               [False], [True], [False], False, np.zeros((2), dtype=np.int32), np.zeros((2), dtype=np.int32))
+StereoDelay.delay_block(np.zeros((32, 2), dtype=np.float32), np.zeros((32, 2), dtype=np.float32), np.zeros((32, 2), dtype=np.float32), 0,
+                        np.zeros((2), dtype=np.int32), np.zeros((2), dtype=np.int32), 0.5, 0.5)
 
 
 #get midi inputs & channels
