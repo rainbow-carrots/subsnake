@@ -91,6 +91,10 @@ class AudioRecorder():
     def set_loop(self, loop_flag):
         self.loop = loop_flag
 
+    def get_status(self):
+        status = (self.stopped, self.paused, self.record)
+        return status
+
     def get_time(self):
         current_time_seconds = int(float(self.play_heads[0]) / 44100.0)
         current_time_minutes = current_time_seconds / 60
