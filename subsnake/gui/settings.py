@@ -4,7 +4,7 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtCore import Signal, Qt
 
-class AudioSettings(QGroupBox):
+class SynthSettings(QGroupBox):
     device_changed = Signal(str)
     rate_changed = Signal(int)
 
@@ -34,8 +34,8 @@ class AudioSettings(QGroupBox):
         layout.addWidget(self.rate_select, 1, 1)
         
         self.setLayout(layout)
-        self.setObjectName("audio_group")
-        self.setTitle("audio settings")
+        self.setObjectName("synth_group")
+        self.setTitle("synth settings")
 
         self.device_select.currentTextChanged.connect(self.change_device)
         self.rate_select.currentTextChanged.connect(self.change_rate)

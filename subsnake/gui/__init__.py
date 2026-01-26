@@ -12,4 +12,4 @@ from .delay_gui import DelayGUI
 from .lcd import ClickLCD
 from .patch import PatchManager
 from .record import RecorderGUI
-from .audio import AudioSettings
+from .settings import SynthSettings

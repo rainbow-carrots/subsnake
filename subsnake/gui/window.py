@@ -5,7 +5,7 @@ from subsnake.gui.filt_gui import FilterGUI
 from subsnake.gui.env_gui import EnvelopeGUI
 from subsnake.gui.fenv_gui import FilterEnvGUI
 from subsnake.gui.midi import MIDISettings
-from subsnake.gui.audio import AudioSettings
+from subsnake.gui.settings import SynthSettings
 from subsnake.gui.gui_timer import UpdateGUI
 from subsnake.gui.delay_gui import DelayGUI
 from subsnake.gui.patch import PatchManager
@@ -46,12 +46,12 @@ class MainWindow(QMainWindow):
         self.toggle_midi.setToolTip("show/hide midi menu")
         self.toggle_midi.setCheckable(True)
         self.toggle_midi.setChecked(False)
-        self.toggle_audio = QPushButton("audio")
-        self.toggle_audio.setToolTip("show/hide audio menu")
-        self.toggle_audio.setCheckable(True)
-        self.toggle_audio.setChecked(False)
+        self.toggle_synth = QPushButton("audio")
+        self.toggle_synth.setToolTip("show/hide synth menu")
+        self.toggle_synth.setCheckable(True)
+        self.toggle_synth.setChecked(False)
         settings_layout.addWidget(self.toggle_midi)
-        settings_layout.addWidget(self.toggle_audio)
+        settings_layout.addWidget(self.toggle_synth)
         self.settings_group.setLayout(settings_layout)
         self.toolbar_layout = QHBoxLayout()
         self.toolbar_layout.setAlignment(Qt.AlignCenter)
@@ -67,7 +67,7 @@ class MainWindow(QMainWindow):
         self.toolbar_widget.setObjectName("toolbar_widget")
         self.main_toolbar.addWidget(self.toolbar_widget)
         self.toggle_midi.setObjectName("toggle_midi")
-        self.toggle_audio.setObjectName("toggle_audio")
+        self.toggle_synth.setObjectName("toggle_synth")
         self.addToolBar(self.main_toolbar)
 
         #layouts
@@ -78,9 +78,9 @@ class MainWindow(QMainWindow):
         self.midi_group.setFocusPolicy(Qt.NoFocus)
         self.midi_group.hide()
 
-        self.audio_group = AudioSettings()
-        self.audio_group.setFocusPolicy(Qt.NoFocus)
-        self.audio_group.hide()
+        self.synth_group = SynthSettings()
+        self.synth_group.setFocusPolicy(Qt.NoFocus)
+        self.synth_group.hide()
         # audio_outputs = self.engine.get_devices()
         # print(audio_outputs)
 
@@ -125,7 +125,7 @@ class MainWindow(QMainWindow):
         self.window_grid.addWidget(self.fenv_group, 1, 3)
         self.window_grid.addWidget(self.del_group, 1, 5)
         self.window_grid.addWidget(self.midi_group, 2, 1)
-        self.window_grid.addWidget(self.audio_group, 2, 3)
+        self.window_grid.addWidget(self.synth_group, 2, 3)
 
         #set column spacing
         self.window_grid.setColumnMinimumWidth(5, 30)
@@ -149,7 +149,7 @@ class MainWindow(QMainWindow):
         self.midi_group.cc_param_changed.connect(self.update_param)
         self.midi_group.cc_deleted.connect(self.delete_cc)
         self.toggle_midi.toggled.connect(self.toggle_midi_box)
-        self.toggle_audio.toggled.connect(self.toggle_audio_box)
+        self.toggle_synth.toggled.connect(self.toggle_synth_box)
 
         self.filt_group.freq_changed.connect(self.update_filt_freq)
         self.filt_group.res_changed.connect(self.update_filt_res)
@@ -365,8 +365,8 @@ class MainWindow(QMainWindow):
             self.midi_cc_displays.pop(cc)
 
     # audio settings
-    def toggle_audio_box(self, state):
-        self.audio_group.setVisible(state)
+    def toggle_synth_box(self, state):
+        self.synth_group.setVisible(state)
 
     # recorder
     def update_rec_record(self, state):

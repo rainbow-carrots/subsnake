@@ -182,7 +182,7 @@ QGroupBox#del_group {
     background-color: #d9b68b;
 }
 
-QGroupBox#midi_group, QGroupBox#audio_group {
+QGroupBox#midi_group, QGroupBox#synth_group {
     min-height: 200px;
     max-height: 360px;
 }
@@ -191,11 +191,11 @@ QGroupBox#midi_group {
     background-color: #ab8ebe;
 }
 
-QGroupBox#audio_group QLabel {
+QGroupBox#synth_group QLabel {
     max-width: 60px;
 }
 
-QGroupBox#audio_group {
+QGroupBox#synth_group {
     background-color: #8eb2be;
 }
 
@@ -237,7 +237,7 @@ QPushButton#cc_delete {
     background-color: #c77581;
 }
 
-QPushButton#toggle_midi, QPushButton#toggle_audio {
+QPushButton#toggle_midi, QPushButton#toggle_synth {
     max-width: 100px;
     min-width: 100px;
     height: 36px;
@@ -258,15 +258,15 @@ QPushButton#toggle_midi:checked {
     background-color: #c1a1d6;
 }
 
-QPushButton#toggle_audio {
+QPushButton#toggle_synth {
     background-color: #708b93;
 }
 
-QPushButton#toggle_audio:hover {
+QPushButton#toggle_synth:hover {
     background-color: #87a5ad;
 }
 
-QPushButton#toggle_audio:checked {
+QPushButton#toggle_synth:checked {
     background-color: #a3c7d1;
 }
 
