@@ -5,6 +5,7 @@ from subsnake.gui.filt_gui import FilterGUI
 from subsnake.gui.env_gui import EnvelopeGUI
 from subsnake.gui.fenv_gui import FilterEnvGUI
 from subsnake.gui.midi import MIDISettings
+from subsnake.gui.audio import AudioSettings
 from subsnake.gui.gui_timer import UpdateGUI
 from subsnake.gui.delay_gui import DelayGUI
 from subsnake.gui.patch import PatchManager
@@ -38,14 +39,23 @@ class MainWindow(QMainWindow):
         self.main_toolbar.setMovable(False)
         self.patch_manager = PatchManager(self.param_sliders, self.param_button_groups)
         self.recorder = RecorderGUI()
+        settings_layout = QHBoxLayout()
+        self.settings_group = QWidget()
         self.toggle_midi = QPushButton("midi")
         self.toggle_midi.setToolTip("show/hide midi menu")
         self.toggle_midi.setCheckable(True)
         self.toggle_midi.setChecked(False)
+        self.toggle_audio = QPushButton("audio")
+        self.toggle_audio.setToolTip("show/hide audio menu")
+        self.toggle_audio.setCheckable(True)
+        self.toggle_audio.setChecked(False)
+        settings_layout.addWidget(self.toggle_midi)
+        settings_layout.addWidget(self.toggle_audio)
+        self.settings_group.setLayout(settings_layout)
         self.toolbar_layout = QHBoxLayout()
         self.toolbar_layout.setAlignment(Qt.AlignCenter)
         self.toolbar_layout.addStretch()
-        self.toolbar_layout.addWidget(self.toggle_midi, 0)
+        self.toolbar_layout.addWidget(self.settings_group, 0)
         self.toolbar_layout.addStretch()
         self.toolbar_layout.addWidget(self.patch_manager, 1)
         self.toolbar_layout.addStretch()
@@ -56,15 +66,20 @@ class MainWindow(QMainWindow):
         self.toolbar_widget.setObjectName("toolbar_widget")
         self.main_toolbar.addWidget(self.toolbar_widget)
         self.toggle_midi.setObjectName("toggle_midi")
+        self.toggle_audio.setObjectName("toggle_audio")
         self.addToolBar(self.main_toolbar)
 
         #layouts
         self.window_grid = QGridLayout()
 
-        #group boxes
+        #settings widgets
         self.midi_group = MIDISettings()
         self.midi_group.setFocusPolicy(Qt.NoFocus)
         self.midi_group.hide()
+
+        self.audio_group = AudioSettings()
+        self.audio_group.setFocusPolicy(Qt.NoFocus)
+        self.audio_group.hide()
 
         #module GUIs
         self.filt_group = FilterGUI()
@@ -107,6 +122,7 @@ class MainWindow(QMainWindow):
         self.window_grid.addWidget(self.fenv_group, 1, 3)
         self.window_grid.addWidget(self.del_group, 1, 5)
         self.window_grid.addWidget(self.midi_group, 2, 1)
+        self.window_grid.addWidget(self.audio_group, 2, 3)
 
         #set column spacing
         self.window_grid.setColumnMinimumWidth(5, 30)
@@ -133,6 +149,7 @@ class MainWindow(QMainWindow):
         self.midi_group.cc_param_changed.connect(self.update_param)
         self.midi_group.cc_deleted.connect(self.delete_cc)
         self.toggle_midi.toggled.connect(self.toggle_midi_box)
+        self.toggle_audio.toggled.connect(self.toggle_audio_box)
 
         self.filt_group.freq_changed.connect(self.update_filt_freq)
         self.filt_group.res_changed.connect(self.update_filt_res)
@@ -284,7 +301,7 @@ class MainWindow(QMainWindow):
         return cc_function
 
     #slots
-    # midi
+    # midi settings
     def update_midi_in(self, input_name):
         self.engine.set_midi_input(input_name)
 
@@ -346,6 +363,10 @@ class MainWindow(QMainWindow):
             self.midi_cc_sliders.pop(cc)
         if cc in self.midi_cc_displays:
             self.midi_cc_displays.pop(cc)
+
+    # audio settings
+    def toggle_audio_box(self, state):
+        self.audio_group.setVisible(state)
 
     # recorder
     def update_rec_record(self, state):
