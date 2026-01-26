@@ -182,10 +182,17 @@ QGroupBox#del_group {
     background-color: #d9b68b;
 }
 
-QGroupBox#midi_group {
-    background-color: #ab8ebe;
+QGroupBox#midi_group, QGroupBox#audio_group {
     min-height: 200px;
     max-height: 360px;
+}
+
+QGroupBox#midi_group {
+    background-color: #ab8ebe;
+}
+
+QGroupBox#audio_group {
+    background-color: #8eb2be;
 }
 
 QPushButton#env_gate {
@@ -226,14 +233,17 @@ QPushButton#cc_delete {
     background-color: #c77581;
 }
 
-QPushButton#toggle_midi {
+QPushButton#toggle_midi, QPushButton#toggle_audio {
     max-width: 100px;
     min-width: 100px;
     height: 36px;
     color: #000000;
-    background-color: #857093;
     border: 1px solid white;
     border-radius: 6px;
+}
+
+QPushButton#toggle_midi {
+    background-color: #857093;
 }
 
 QPushButton#toggle_midi:hover {
@@ -241,7 +251,19 @@ QPushButton#toggle_midi:hover {
 }
 
 QPushButton#toggle_midi:checked {
-    background-color: #ab8ebe;
+    background-color: #c1a1d6;
+}
+
+QPushButton#toggle_audio {
+    background-color: #708b93;
+}
+
+QPushButton#toggle_audio:hover {
+    background-color: #87a5ad;
+}
+
+QPushButton#toggle_audio:checked {
+    background-color: #a3c7d1;
 }
 
 PatchManager#patch_manager {
