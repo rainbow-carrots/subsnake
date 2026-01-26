@@ -35,6 +35,7 @@ class AudioSettings(QGroupBox):
         
         self.setLayout(layout)
         self.setObjectName("audio_group")
+        self.setTitle("audio settings")
 
         self.device_select.currentTextChanged.connect(self.change_device)
         self.rate_select.currentTextChanged.connect(self.change_rate)
