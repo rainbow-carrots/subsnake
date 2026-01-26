@@ -77,6 +77,7 @@ class MIDISettings(QGroupBox):
         self.midi_refresh.setObjectName("midi_refresh")
         self.cc_add.setObjectName("cc_add")
         self.setObjectName("midi_group")
+        self.setTitle("midi settings")
 
         #add labels & combo boxes
         midi_layout.addWidget(self.midi_refresh, 0, 0)
