@@ -63,6 +63,10 @@ class AudioEngine():
         self.stream = sd.OutputStream(channels=2, samplerate=fs, blocksize=0, latency="high", callback=self.callback, dtype=np.float32)
         self.stream.start()
 
+    def get_devices(self):
+        audio_devices = sd.query_devices()
+        return audio_devices
+
     #initialize midi
     def set_midi_input(self, port_name):
         if self.midi_input:
