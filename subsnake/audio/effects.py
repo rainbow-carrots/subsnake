@@ -1,5 +1,6 @@
 import numpy as np
 from numba import njit
+from queue import SimpleQueue
 
 class StereoDelay():
     def __init__(self, fs, delay_time=0.5, delay_feedback=0.5, mix=.5):
@@ -72,6 +73,8 @@ class AudioRecorder():
         self.stopped = [True]
         self.record = [False]
         self.loop = False
+        self.event_queue = SimpleQueue()
+        self.put_stop = [False]
     
     def play(self):
         self.paused[0] = False
@@ -117,11 +120,14 @@ class AudioRecorder():
                         self.record[0] = False
                     self.play_heads[:] = 0
             self.process_samples(self.record_buffer, indata, outdata, frames, self.paused, self.stopped,
-                                self.record, self.loop, self.play_heads, self.end_heads)
+                                self.record, self.loop, self.play_heads, self.end_heads, self.put_stop)
+        if self.put_stop[0]:
+            self.put_stop[0] = False
+            self.event_queue.put("stop")
 
     @staticmethod
     @njit(nogil=True, fastmath=True)
-    def process_samples(rec_buffer, indata, outdata, frames, paused, stopped, record, loop, play_heads, end_heads):
+    def process_samples(rec_buffer, indata, outdata, frames, paused, stopped, record, loop, play_heads, end_heads, put_stop):
         for c in range(0, 2):
             for n in range(0, frames):
                 if not paused[0] and not stopped[0]:
@@ -134,6 +140,7 @@ class AudioRecorder():
                         play_heads[0] = 0
                         play_heads[1] = 0
                         if not loop:
+                            put_stop[0] = True
                             stopped[0] = True
                             record[0] = False
                     outdata[n, c] = read_sample
