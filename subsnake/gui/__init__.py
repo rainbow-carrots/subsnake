@@ -7,7 +7,7 @@ from .osc2_gui import Oscillator2GUI
 from .filt_gui import FilterGUI
 from .env_gui import EnvelopeGUI
 from .fenv_gui import FilterEnvGUI
-from .cc_sliders import UpdateSliders
+from .gui_timer import UpdateGUI
 from .delay_gui import DelayGUI
 from .lcd import ClickLCD
 from .patch import PatchManager

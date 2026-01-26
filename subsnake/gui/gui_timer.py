@@ -1,6 +1,6 @@
 from PySide6.QtCore import QTimer
 
-class UpdateSliders(QTimer):
+class UpdateGUI(QTimer):
     def __init__(self, engine, window):
         super().__init__()
         self.engine = engine
@@ -11,10 +11,10 @@ class UpdateSliders(QTimer):
         self.cc_displays = window.midi_cc_displays
         self.rec_queue = engine.recorder.event_queue
         self.setInterval(17)   #~60fps
-        self.timeout.connect(self.update_sliders)
+        self.timeout.connect(self.update_gui)
 
 
-    def update_sliders(self):
+    def update_gui(self):
         for cc in self.row_ccs.values():
             if (cc in self.cc_values) and (cc in self.cc_sliders):
                 slider_range = self.cc_sliders[cc].maximum() - self.cc_sliders[cc].minimum()
@@ -34,8 +34,12 @@ class UpdateSliders(QTimer):
                     play_button.blockSignals(True)
                     play_button.setChecked(False)
                     play_button.blockSignals(False)
-                rec_button = self.window.recorder.record_button
-                loop_button = self.window.recorder.loop_button
+        window_recorder = self.window.recorder
+        engine_recorder = self.engine.recorder
+        current_mins, current_secs, max_mins, max_secs = engine_recorder.get_time()
+        window_recorder.current_time_label.setText(f"{current_mins:02}:{current_secs:02}")
+        window_recorder.end_time_label.setText(f"{max_mins:02}:{max_secs:02}")
+
 
     def assign_cc_slider(self, module, param):
         cc_slider = None

@@ -5,7 +5,7 @@ from subsnake.gui.filt_gui import FilterGUI
 from subsnake.gui.env_gui import EnvelopeGUI
 from subsnake.gui.fenv_gui import FilterEnvGUI
 from subsnake.gui.midi import MIDISettings
-from subsnake.gui.cc_sliders import UpdateSliders
+from subsnake.gui.gui_timer import UpdateGUI
 from subsnake.gui.delay_gui import DelayGUI
 from subsnake.gui.patch import PatchManager
 from subsnake.gui.record import RecorderGUI
@@ -172,7 +172,7 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(window_widget)
 
         #start slider cc update timer
-        self.slider_timer = UpdateSliders(self.engine, self)
+        self.slider_timer = UpdateGUI(self.engine, self)
         self.slider_timer.start()
 
         self.patch_manager.load_patch(self.patch_manager.patch_select.currentText())
