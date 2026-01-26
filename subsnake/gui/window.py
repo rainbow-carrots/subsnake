@@ -33,6 +33,7 @@ class MainWindow(QMainWindow):
         self.midi_cc_sliders = {}
         self.midi_cc_displays = {}
         self.cc_rows = 0
+        self.engine = engine
 
         #toolbar
         self.main_toolbar = QToolBar()
@@ -80,6 +81,8 @@ class MainWindow(QMainWindow):
         self.audio_group = AudioSettings()
         self.audio_group.setFocusPolicy(Qt.NoFocus)
         self.audio_group.hide()
+        # audio_outputs = self.engine.get_devices()
+        # print(audio_outputs)
 
         #module GUIs
         self.filt_group = FilterGUI()
@@ -130,9 +133,6 @@ class MainWindow(QMainWindow):
         #set layout of window
         window_widget = QWidget()
         window_widget.setLayout(self.window_grid)
-
-        #start audio engine
-        self.engine = engine
 
         #connect signals
         self.recorder.record.connect(self.update_rec_record)
