@@ -191,6 +191,10 @@ QGroupBox#midi_group {
     background-color: #ab8ebe;
 }
 
+QGroupBox#audio_group QLabel {
+    max-width: 60px;
+}
+
 QGroupBox#audio_group {
     background-color: #8eb2be;
 }
