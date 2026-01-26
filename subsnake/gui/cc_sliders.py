@@ -9,6 +9,7 @@ class UpdateSliders(QTimer):
         self.cc_values = engine.midi_cc_values
         self.cc_sliders = window.midi_cc_sliders
         self.cc_displays = window.midi_cc_displays
+        self.rec_queue = engine.recorder.event_queue
         self.setInterval(17)   #~60fps
         self.timeout.connect(self.update_sliders)
 
@@ -25,7 +26,16 @@ class UpdateSliders(QTimer):
                     if cc in self.cc_displays:
                         display, module, param = self.cc_displays[cc]
                         self.update_cc_display(display, module, param, scaled_value)
-
+        if not self.rec_queue.empty():
+            rec_event = self.rec_queue.get_nowait()
+            if rec_event == "stop":
+                play_button = self.window.recorder.play_button
+                if play_button.isChecked():
+                    play_button.blockSignals(True)
+                    play_button.setChecked(False)
+                    play_button.blockSignals(False)
+                rec_button = self.window.recorder.record_button
+                loop_button = self.window.recorder.loop_button
 
     def assign_cc_slider(self, module, param):
         cc_slider = None
