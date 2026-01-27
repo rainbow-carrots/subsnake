@@ -1,5 +1,5 @@
 MainWindow#main_window {
-    background-color: #222024;
+    background-color: #c1c1e3;
 }
 
 QLCDNumber {
@@ -58,7 +58,7 @@ QGroupBox QSlider {
     min-height: 18px;
 }
 
-QFrame#grid_space_0, QFrame#grid_space_1, QFrame#grid_space_2, QFrame#grid_space_3 {
+QFrame#grid_space {
     min-width: 24px;
 }
 
@@ -67,19 +67,19 @@ QRadioButton::indicator {
     height: 12px;
     border-radius: 6.5px;
     border: 1px solid black;
-    background-color: gray;
+    background-color: #bab8b8;
 }
 
 QGroupBox#filt_group QRadioButton::indicator:checked {
-    background-color: #82c694;
+    background-color: #4be372;
 }
 
 QGroupBox#osc_group QRadioButton::indicator:checked {
-    background-color: #7496b8;
+    background-color: #479ef5;
 }
 
 QGroupBox#osc2_group QRadioButton::indicator:checked {
-    background-color: #446c94;
+    background-color: #2bd6c5;
 }
 
 QGroupBox QSlider::handle {
@@ -98,52 +98,52 @@ QGroupBox QSlider::groove {
 }
 
 QGroupBox#osc_group QSlider::sub-page {
-    background-color: #7496b8;
+    background-color: #7ab5f0;
 }
 
 QGroupBox#osc2_group QSlider::sub-page {
-    background-color: #4e769e;
+    background-color: #77d9cf;
 }
 
 QGroupBox#filt_group QSlider::sub-page {
-    background-color: #82c694;
+    background-color: #68d985;
 }
 
 QGroupBox#env_group QSlider::sub-page {
-    background-color: #eeb6ce;
+    background-color: #f57fb0;
 }
 
 QGroupBox#fenv_group QSlider::sub-page {
-    background-color: #54ba84;
+    background-color: #80e866;
 }
 
 QGroupBox#del_group QSlider::sub-page {
-    background-color: #bf9a6d;
+    background-color: #fab055;
 }
 
 
 QGroupBox#osc_group QSlider::handle {
-    background-color: #5e89b4;
+    background-color: #479ef5;
 }
 
 QGroupBox#osc2_group QSlider::handle {
-    background-color: #356290;
+    background-color: #2bd6c5;
 }
 
 QGroupBox#filt_group QSlider::handle {
-    background-color: #6ac281;
+    background-color: #4be372;
 }
 
 QGroupBox#env_group QSlider::handle {
-    background-color: #ed95bb;
+    background-color: #f7599a;
 }
 
 QGroupBox#fenv_group QSlider::handle {
-    background-color: #309d63;
+    background-color: #52e62e;
 }
 
 QGroupBox#del_group QSlider::handle {
-    background-color: #c79354;
+    background-color: #fa9f2f;
 }
 
 
@@ -159,32 +159,32 @@ QGroupBox#filt_group, QGroupBox#osc_group, QGroupBox#osc2_group, QGroupBox#env_g
 }
 
 QGroupBox#filt_group {
-    background-color: #a1c7ab;
+    background-color: #a8edba;
 }
 
 QGroupBox#osc_group {
-    background-color: #91a7bd;
+    background-color: #a9c9e8;
 }
 
 QGroupBox#osc2_group {
-    background-color: #6989a9;
+    background-color: #aae6e0;
 }
 
 QGroupBox#env_group {
-    background-color: #bd91a4;
+    background-color: #f0c0d4;
 }
 
 QGroupBox#fenv_group {
-    background-color: #8cbba3;
+    background-color: #c6fab9;
 }
 
 QGroupBox#del_group {
-    background-color: #d9b68b;
+    background-color: #fcd4a2;
 }
 
 QGroupBox#midi_group, QGroupBox#synth_group {
     min-height: 200px;
-    max-height: 360px;
+    max-height: 280px;
 }
 
 QGroupBox#midi_group {
@@ -237,10 +237,10 @@ QPushButton#cc_delete {
     background-color: #c77581;
 }
 
-QPushButton#toggle_midi, QPushButton#toggle_synth {
+QPushButton#toggle_midi, QPushButton#toggle_synth, QPushButton#toggle_record {
     max-width: 100px;
     min-width: 100px;
-    height: 36px;
+    height: 48px;
     color: #000000;
     border: 1px solid white;
     border-radius: 6px;
@@ -277,6 +277,7 @@ PatchManager#patch_manager {
     margin-left: 36px;
     margin-right: 36px;
     max-width: 320px;
+    min-width: 320px;
 }
 
 PatchManager QPushButton {
@@ -300,6 +301,7 @@ RecorderGUI#recorder {
     margin-left: 36px;
     margin-right: 36px;
     max-width: 320px;
+    min-width: 320px;
 }
 
 RecorderGUI QPushButton {
@@ -309,6 +311,11 @@ RecorderGUI QPushButton {
     color: #000000;
     border: 1px solid white;
     border-radius: 6px;
+}
+
+QWidget#settings_group {
+    max-width:320px;
+    min-width:320px;
 }
 
 QWidget#toolbar_widget {
