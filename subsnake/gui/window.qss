@@ -274,10 +274,8 @@ PatchManager#patch_manager {
     background-color: #f2999f;
     border: 1px solid white;
     border-radius: 6px;
-    margin-left: 36px;
-    margin-right: 36px;
-    max-width: 320px;
-    min-width: 320px;
+    max-width: 360px;
+    min-width: 360px;
 }
 
 PatchManager QPushButton {
@@ -298,10 +296,8 @@ RecorderGUI#recorder {
     background-color: #99f2da;
     border: 1px solid white;
     border-radius: 6px;
-    margin-left: 36px;
-    margin-right: 36px;
-    max-width: 320px;
-    min-width: 320px;
+    max-width: 360px;
+    min-width: 360px;
 }
 
 RecorderGUI QPushButton {
@@ -314,8 +310,8 @@ RecorderGUI QPushButton {
 }
 
 QWidget#settings_group {
-    max-width:320px;
-    min-width:320px;
+    max-width:360px;
+    min-width:360px;
 }
 
 QWidget#toolbar_widget {
