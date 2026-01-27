@@ -42,32 +42,43 @@ class MainWindow(QMainWindow):
         self.recorder = RecorderGUI()
         settings_layout = QHBoxLayout()
         self.settings_group = QWidget()
+        self.settings_group.setAttribute(Qt.WA_StyledBackground, True)
+
         self.toggle_midi = QPushButton("midi")
         self.toggle_midi.setToolTip("show/hide midi menu")
         self.toggle_midi.setCheckable(True)
         self.toggle_midi.setChecked(False)
-        self.toggle_synth = QPushButton("audio")
+        self.toggle_synth = QPushButton("synth")
         self.toggle_synth.setToolTip("show/hide synth menu")
         self.toggle_synth.setCheckable(True)
         self.toggle_synth.setChecked(False)
+        self.toggle_record = QPushButton("recorder")
+        self.toggle_record.setToolTip("show/hide recorder menu")
+        self.toggle_record.setCheckable(True)
+        self.toggle_record.setChecked(False)
+
         settings_layout.addWidget(self.toggle_midi)
         settings_layout.addWidget(self.toggle_synth)
+        settings_layout.addWidget(self.toggle_record)
         self.settings_group.setLayout(settings_layout)
+
         self.toolbar_layout = QHBoxLayout()
         self.toolbar_layout.setAlignment(Qt.AlignCenter)
         self.toolbar_layout.addStretch()
-        self.toolbar_layout.addWidget(self.settings_group, 0)
+        self.toolbar_layout.addWidget(self.settings_group)
         self.toolbar_layout.addStretch()
-        self.toolbar_layout.addWidget(self.patch_manager, 1)
+        self.toolbar_layout.addWidget(self.patch_manager)
         self.toolbar_layout.addStretch()
-        self.toolbar_layout.addWidget(self.recorder, 2)
+        self.toolbar_layout.addWidget(self.recorder)
         self.toolbar_layout.addStretch()
+
         self.toolbar_widget = QWidget()
         self.toolbar_widget.setLayout(self.toolbar_layout)
         self.toolbar_widget.setObjectName("toolbar_widget")
         self.main_toolbar.addWidget(self.toolbar_widget)
         self.toggle_midi.setObjectName("toggle_midi")
         self.toggle_synth.setObjectName("toggle_synth")
+        self.toggle_record.setObjectName("toggle_record")
         self.addToolBar(self.main_toolbar)
 
         #layouts
@@ -108,10 +119,10 @@ class MainWindow(QMainWindow):
         self.grid_space_3.setFrameShape(QFrame.NoFrame)
 
         #object names
-        self.grid_space_0.setObjectName("grid_space_0")
-        self.grid_space_1.setObjectName("grid_space_1")
-        self.grid_space_2.setObjectName("grid_space_2")
-        self.grid_space_3.setObjectName("grid_space_3")
+        self.grid_space_0.setObjectName("grid_space")
+        self.grid_space_1.setObjectName("grid_space")
+        self.grid_space_2.setObjectName("grid_space")
+        self.grid_space_3.setObjectName("grid_space")
 
         #add modules/midi groups to window
         self.window_grid.addWidget(self.grid_space_2, 0, 0)
