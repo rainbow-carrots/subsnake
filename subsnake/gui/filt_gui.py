@@ -133,7 +133,7 @@ class FilterGUI(QGroupBox):
         return display
     
     def set_palette(self, display):
-        text_color = QColor("#edfff2")
+        text_color = QColor("black")
         display_palette = display.palette()
         display_palette.setColor(QPalette.ColorRole.WindowText, text_color)
         display.setAutoFillBackground(True)
