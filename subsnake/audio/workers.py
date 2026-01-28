@@ -2,7 +2,6 @@ from PySide6.QtCore import QRunnable
 import time
 
 middle_a = 69
-midi_latency = 0.0029025   #seconds
 sleeptime = 0.00145125
 
 class KeyEventWorker(QRunnable):
@@ -24,7 +23,7 @@ class KeyEventWorker(QRunnable):
                     self.pending_event = self.midi_queue.get_nowait()
             if self.pending_event is not None:
                 message, timestamp = self.pending_event
-                target_time = timestamp + midi_latency
+                target_time = timestamp + self.engine.stream.latency
                 if (target_time >= self.frame_end):
                     pass    #save pending event for next iteration
                 else:
