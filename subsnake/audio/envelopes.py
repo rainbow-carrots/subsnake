@@ -3,7 +3,6 @@ import math
 from numba import njit
 
 fs = 44100
-blocksize = 1024
 twopi = 2*np.pi
 oneoverpi = 1/np.pi
 
