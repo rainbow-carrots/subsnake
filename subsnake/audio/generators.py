@@ -3,7 +3,6 @@ import math
 from numba import njit
 
 fs = 44100
-blocksize = 1024
 twopi = 2*np.pi
 oneoverpi = 1/np.pi
 
@@ -14,7 +13,7 @@ class WrappedOsc():
         phase_increment = twopi * (frequency/sample_rate)
         self.state = np.array([0.0, amplitude, phase_increment], dtype=np.float32)
         self.state2 = np.array([0.0, amplitude, phase_increment], dtype=np.float32)
-        self.hardSyncBuffer = np.zeros((1024, 2), dtype=np.float32)
+        self.hardSyncBuffer = np.zeros((2048, 2), dtype=np.float32)
         self.alg = alg
         self.pulsewidth = width
     
