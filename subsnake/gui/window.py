@@ -14,8 +14,7 @@ from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
     QMainWindow, QGridLayout,
     QFrame, QWidget,
-    QToolBar, QPushButton,
-    QHBoxLayout)
+    QPushButton, QHBoxLayout)
 
 key_conv = Keys()
 
@@ -36,8 +35,6 @@ class MainWindow(QMainWindow):
         self.engine = engine
 
         #toolbar
-        self.main_toolbar = QToolBar()
-        self.main_toolbar.setMovable(False)
         self.patch_manager = PatchManager(self.param_sliders, self.param_button_groups)
         self.recorder = RecorderGUI()
         settings_layout = QHBoxLayout()
@@ -62,24 +59,9 @@ class MainWindow(QMainWindow):
         settings_layout.addWidget(self.toggle_record)
         self.settings_group.setLayout(settings_layout)
 
-        self.toolbar_layout = QHBoxLayout()
-        self.toolbar_layout.setAlignment(Qt.AlignCenter)
-        self.toolbar_layout.addStretch()
-        self.toolbar_layout.addWidget(self.settings_group)
-        self.toolbar_layout.addStretch()
-        self.toolbar_layout.addWidget(self.patch_manager)
-        self.toolbar_layout.addStretch()
-        self.toolbar_layout.addWidget(self.recorder)
-        self.toolbar_layout.addStretch()
-
-        self.toolbar_widget = QWidget()
-        self.toolbar_widget.setLayout(self.toolbar_layout)
-        self.toolbar_widget.setObjectName("toolbar_widget")
-        self.main_toolbar.addWidget(self.toolbar_widget)
         self.toggle_midi.setObjectName("toggle_midi")
         self.toggle_synth.setObjectName("toggle_synth")
         self.toggle_record.setObjectName("toggle_record")
-        self.addToolBar(self.main_toolbar)
 
         #layouts
         self.window_grid = QGridLayout()
@@ -92,8 +74,6 @@ class MainWindow(QMainWindow):
         self.synth_group = SynthSettings()
         self.synth_group.setFocusPolicy(Qt.NoFocus)
         self.synth_group.hide()
-        # audio_outputs = self.engine.get_devices()
-        # print(audio_outputs)
 
         #module GUIs
         self.filt_group = FilterGUI()
@@ -126,17 +106,24 @@ class MainWindow(QMainWindow):
 
         #add modules/midi groups to window
         self.window_grid.addWidget(self.grid_space_2, 0, 0)
-        self.window_grid.addWidget(self.osc_group, 0, 1)
         self.window_grid.addWidget(self.grid_space_0, 0, 2)
-        self.window_grid.addWidget(self.filt_group, 0, 3)
         self.window_grid.addWidget(self.grid_space_1, 0, 4)
-        self.window_grid.addWidget(self.env_group, 0, 5)
         self.window_grid.addWidget(self.grid_space_3, 0, 6)
-        self.window_grid.addWidget(self.osc2_group, 1, 1)
-        self.window_grid.addWidget(self.fenv_group, 1, 3)
-        self.window_grid.addWidget(self.del_group, 1, 5)
-        self.window_grid.addWidget(self.midi_group, 2, 1)
-        self.window_grid.addWidget(self.synth_group, 2, 3)
+
+        self.window_grid.addWidget(self.settings_group, 0, 1)
+        self.window_grid.addWidget(self.patch_manager, 0, 3)
+        self.window_grid.addWidget(self.recorder, 0, 5)
+
+        self.window_grid.addWidget(self.osc_group, 1, 1)
+        self.window_grid.addWidget(self.filt_group, 1, 3)
+        self.window_grid.addWidget(self.env_group, 1, 5)
+
+        self.window_grid.addWidget(self.osc2_group, 2, 1)
+        self.window_grid.addWidget(self.fenv_group, 2, 3)
+        self.window_grid.addWidget(self.del_group, 2, 5)
+        
+        self.window_grid.addWidget(self.midi_group, 3, 1)
+        self.window_grid.addWidget(self.synth_group, 3, 3)
 
         #set column spacing
         self.window_grid.setColumnMinimumWidth(5, 30)
