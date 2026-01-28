@@ -14,7 +14,7 @@ class KeyEventWorker(QRunnable):
         self.frame_width = 0
         self.frame_start = 0
         self.frame_end = 0
-        self.frames = 1024
+        self.frames = 2048
         self.pending_event = None
 
     def run(self):
