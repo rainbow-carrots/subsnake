@@ -59,6 +59,15 @@ class UpdateGUI(QTimer):
                 cc_slider = self.window.osc2_group.osc2_amp_slider
             elif (param == "width"):
                 cc_slider = self.window.osc2_group.osc2_width_slider
+        elif (module == "oscillator 3"):
+            if (param == "pitch"):
+                cc_slider = self.window.osc3_group.osc3_freq_slider
+            elif (param == "detune"):
+                cc_slider = self.window.osc3_group.osc3_det_slider
+            elif (param == "level"):
+                cc_slider = self.window.osc3_group.osc3_amp_slider
+            elif (param == "width"):
+                cc_slider = self.window.osc3_group.osc3_width_slider
         elif (module == "filter"):
             if (param == "cutoff"):
                 cc_slider = self.window.filt_group.filt_freq_slider
@@ -108,6 +117,15 @@ class UpdateGUI(QTimer):
                 cc_display = self.window.osc2_group.osc2_amp_display
             elif (param == "width"):
                 cc_display = self.window.osc2_group.osc2_width_display
+        elif (module == "oscillator 3"):
+            if (param == "pitch"):
+                cc_display = self.window.osc3_group.osc3_freq_display
+            elif (param == "detune"):
+                cc_display = self.window.osc3_group.osc3_det_display
+            elif (param == "level"):
+                cc_display = self.window.osc3_group.osc3_amp_display
+            elif (param == "width"):
+                cc_display = self.window.osc3_group.osc3_width_display
         elif (module == "filter"):
             if (param == "cutoff"):
                 cc_display = self.window.filt_group.filt_freq_display
@@ -149,6 +167,16 @@ class UpdateGUI(QTimer):
                 display_val = float(value)/500.0
             display.display(f"{display_val:.2f}")
         elif (module == "oscillator 2"):
+            if (param == "pitch"):
+                display_val = float(value)/100.0
+            elif (param == "detune"):
+                display_val = value/20.0
+            elif (param == "level"):
+                display_val = float(value)/500.0
+            elif (param == "width"):
+                display_val = float(value)/500.0
+            display.display(f"{display_val:.2f}")
+        elif (module == "oscillator 3"):
             if (param == "pitch"):
                 display_val = float(value)/100.0
             elif (param == "detune"):
