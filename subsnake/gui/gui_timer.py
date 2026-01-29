@@ -30,10 +30,15 @@ class UpdateGUI(QTimer):
             rec_event = self.rec_queue.get_nowait()
             if rec_event == "stop":
                 play_button = self.window.recorder.play_button
+                rec_button = self.window.recorder.record_button
+                del_button = self.window.recorder.delete_button
                 if play_button.isChecked():
                     play_button.blockSignals(True)
                     play_button.setChecked(False)
                     play_button.blockSignals(False)
+                if rec_button.isChecked():
+                    rec_button.setChecked(False)
+                del_button.setDisabled(False)
         window_recorder = self.window.recorder
         engine_recorder = self.engine.recorder
         current_mins, current_secs, max_mins, max_secs = engine_recorder.get_time()
