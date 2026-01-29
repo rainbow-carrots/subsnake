@@ -1,6 +1,7 @@
 from subsnake.gui.keys import Keys
 from subsnake.gui.osc_gui import OscillatorGUI
 from subsnake.gui.osc2_gui import Oscillator2GUI
+from subsnake.gui.osc3_gui import Oscillator3GUI
 from subsnake.gui.filt_gui import FilterGUI
 from subsnake.gui.env_gui import EnvelopeGUI
 from subsnake.gui.fenv_gui import FilterEnvGUI
@@ -79,6 +80,7 @@ class MainWindow(QMainWindow):
         self.filt_group = FilterGUI()
         self.osc_group = OscillatorGUI()
         self.osc2_group = Oscillator2GUI()
+        self.osc3_group = Oscillator3GUI()
         self.env_group = EnvelopeGUI()
         self.fenv_group = FilterEnvGUI()
         self.del_group = DelayGUI()
@@ -121,9 +123,11 @@ class MainWindow(QMainWindow):
         self.window_grid.addWidget(self.osc2_group, 2, 1)
         self.window_grid.addWidget(self.fenv_group, 2, 3)
         self.window_grid.addWidget(self.del_group, 2, 5)
+
+        self.window_grid.addWidget(self.osc3_group, 3, 1)
         
-        self.window_grid.addWidget(self.midi_group, 3, 1)
-        self.window_grid.addWidget(self.synth_group, 3, 3)
+        self.window_grid.addWidget(self.midi_group, 4, 1)
+        self.window_grid.addWidget(self.synth_group, 4, 3)
 
         #set column spacing
         self.window_grid.setColumnMinimumWidth(5, 30)
@@ -165,6 +169,12 @@ class MainWindow(QMainWindow):
         self.osc2_group.level_changed.connect(self.update_osc2_amp)
         self.osc2_group.width_changed.connect(self.update_osc2_width)
         self.osc2_group.alg_changed.connect(self.update_osc2_alg)
+
+        self.osc3_group.pitch_changed.connect(self.update_osc3_freq)
+        self.osc3_group.detune_changed.connect(self.update_osc3_det)
+        self.osc3_group.level_changed.connect(self.update_osc3_amp)
+        self.osc3_group.width_changed.connect(self.update_osc3_width)
+        self.osc3_group.alg_changed.connect(self.update_osc3_alg)
 
         self.env_group.attack_changed.connect(self.update_env_attack)
         self.env_group.decay_changed.connect(self.update_env_decay)
@@ -212,6 +222,11 @@ class MainWindow(QMainWindow):
         self.param_sliders.update({"osc2_amp": self.osc2_group.osc2_amp_slider})
         self.param_sliders.update({"osc2_width": self.osc2_group.osc2_width_slider})
 
+        self.param_sliders.update({"osc3_freq": self.osc3_group.osc3_freq_slider})
+        self.param_sliders.update({"osc3_det": self.osc3_group.osc3_det_slider})
+        self.param_sliders.update({"osc3_amp": self.osc3_group.osc3_amp_slider})
+        self.param_sliders.update({"osc3_width": self.osc3_group.osc3_width_slider})
+
         self.param_sliders.update({"filt_freq": self.filt_group.filt_freq_slider})
         self.param_sliders.update({"filt_res": self.filt_group.filt_res_slider})
         self.param_sliders.update({"filt_drive": self.filt_group.filt_drive_slider})
@@ -235,6 +250,7 @@ class MainWindow(QMainWindow):
     def init_buttons_dict(self):
         self.param_button_groups.append(self.osc_group.osc_alg_group)
         self.param_button_groups.append(self.osc2_group.osc2_alg_group)
+        self.param_button_groups.append(self.osc3_group.osc3_alg_group)
         self.param_button_groups.append(self.filt_group.filt_alg_group)
 
     def load_patch(self, patch):
@@ -246,6 +262,8 @@ class MainWindow(QMainWindow):
                 self.osc_group.update_wave(patch[param])
             elif param == "osc2_wave":
                 self.osc2_group.update_wave(patch[param])
+            elif param == "osc3_wave":
+                self.osc3_group.update_wave(patch[param])
             elif param == "filt_type":
                 self.filt_group.update_type(patch[param])
 
@@ -267,6 +285,15 @@ class MainWindow(QMainWindow):
                 cc_function = self.engine.cc_change_level_2
             elif (param == "width"):
                 cc_function = self.engine.cc_change_width_2
+        elif (module == "oscillator 3"):
+            if (param == "pitch"):
+                cc_function = self.engine.cc_change_pitch_3
+            elif (param == "detune"):
+                cc_function = self.engine.cc_change_detune_3
+            elif (param == "level"):
+                cc_function = self.engine.cc_change_level_3
+            elif (param == "width"):
+                cc_function = self.engine.cc_change_width_3
         elif (module == "filter"):
             if (param == "cutoff"):
                 cc_function = self.engine.cc_change_cutoff
@@ -430,7 +457,7 @@ class MainWindow(QMainWindow):
         self.engine.update_pitch_2(value)
 
     def update_osc2_det(self, value):
-        self.engine.update_detune(value)
+        self.engine.update_detune_2(value)
 
     def update_osc2_amp(self, value):
         self.engine.update_amplitude_2(value)
@@ -446,6 +473,28 @@ class MainWindow(QMainWindow):
         elif (text == "pulse"):
             newAlg = 2.0
         self.engine.update_algorithm(newAlg, 2)
+
+    # oscillator 3
+    def update_osc3_freq(self, value):
+        self.engine.update_pitch_3(value)
+
+    def update_osc3_det(self, value):
+        self.engine.update_detune_3(value)
+
+    def update_osc3_amp(self, value):
+        self.engine.update_amplitude_3(value)
+
+    def update_osc3_width(self, value):
+        self.engine.update_width_3(value)
+
+    def update_osc3_alg(self, text):
+        if (text == "sine"):
+            newAlg = 0.0
+        elif (text == "saw"):
+            newAlg = 1.0
+        elif (text == "pulse"):
+            newAlg = 2.0
+        self.engine.update_algorithm(newAlg, 3)
 
     # envelope
     def update_env_attack(self, value):
