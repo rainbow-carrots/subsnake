@@ -335,12 +335,12 @@ QWidget#toolbar_widget {
     max-height: 60px;
 }
 
-QFrame#record_spacer_0, QFrame#record_spacer_1, QFrame#record_spacer_2 {
+QFrame#record_spacer {
     min-width:12px;
     max-width:12px;
 }
 
-QPushButton#record_button, QPushButton#play_button, QPushButton#stop_button {
+QPushButton#record_button, QPushButton#play_button, QPushButton#stop_button, QPushButton#delete_button {
     background-color: #34cea5;
     padding-top: -4px;
 }
@@ -351,11 +351,15 @@ QPushButton#loop_button {
     font-size: 21px;
 }
 
-QPushButton#record_button:hover, QPushButton#play_button:hover, QPushButton#stop_button:hover, QPushButton#loop_button:hover {
+QPushButton#record_button:hover, QPushButton#play_button:hover, QPushButton#stop_button:hover, QPushButton#loop_button:hover, QPushButton#delete_button:hover {
     background-color: #1cb68d;
 }
 
 QPushButton#record_button:checked, QPushButton#loop_button:checked, QPushButton#play_button:checked {
     color: #e6e6e6;
     background-color: #158668;
+}
+
+QPushButton#delete_button:disabled {
+    background-color: #8534cea5;
 }
