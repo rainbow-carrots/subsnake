@@ -74,7 +74,11 @@ class AudioRecorder():
         self.record = [False]
         self.loop = False
         self.event_queue = SimpleQueue()
+        self.delete_queue = SimpleQueue()
         self.put_stop = [False]
+
+    def delete(self):
+        self.delete_queue.put("delete")
     
     def play(self):
         self.paused[0] = False
@@ -110,6 +114,13 @@ class AudioRecorder():
         frames = len(indata)
         #increment end heads, stop recording at end of buffer (if not looping) & reset play heads
         outdata[:frames] = 0.0
+        if not self.delete_queue.empty():
+            del_event = self.delete_queue.get_nowait()
+            if del_event == "delete":
+                self.record_buffer[:max(self.end_heads[0], self.end_heads[1])] = 0.0
+                self.play_heads[:] = 0
+                self.end_heads[:] = 0
+                
         if not self.stopped[0] and not self.paused[0]:
             if self.record[0]:
                 if (self.end_heads[0] + frames) < self.max_buffer_samples:
@@ -125,7 +136,7 @@ class AudioRecorder():
                                 self.record, self.loop, self.play_heads, self.end_heads, self.put_stop)
         if self.put_stop[0]:
             self.put_stop[0] = False
-            self.event_queue.put("stop")
+            self.event_queue.put_nowait("stop")
 
     @staticmethod
     @njit(nogil=True, fastmath=True)
