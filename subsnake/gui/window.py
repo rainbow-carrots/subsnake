@@ -137,6 +137,7 @@ class MainWindow(QMainWindow):
         window_widget.setLayout(self.window_grid)
 
         #connect signals
+        self.recorder.delete.connect(self.update_rec_delete)
         self.recorder.record.connect(self.update_rec_record)
         self.recorder.play.connect(self.update_rec_play)
         self.recorder.pause.connect(self.update_rec_pause)
@@ -394,6 +395,9 @@ class MainWindow(QMainWindow):
         self.synth_group.setVisible(state)
 
     # recorder
+    def update_rec_delete(self):
+        self.engine.update_delete()
+
     def update_rec_record(self, state):
         self.engine.update_record(state)
 
