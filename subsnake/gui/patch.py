@@ -20,10 +20,11 @@ class PatchManager(QWidget):
         self.patch_dialog = NewPatchDialog()
         self.default_patch = {"osc_freq": 0, "osc_amp": 250, "osc_width": 250, "osc_wave": "pulse",
                             "osc2_freq": 0, "osc2_det": 0, "osc2_amp": 250, "osc2_width": 250, "osc2_wave": "pulse",
+                            "osc3_freq": 0, "osc3_det": 0, "osc3_amp": 250, "osc3_width": 250, "osc3_wave": "pulse",
                             "filt_freq": 700, "filt_res": 0, "filt_drive": 40, "filt_sat": 100, "filt_type": "low",
                             "fenv_att": 10, "fenv_dec": 500, "fenv_sus": 1000, "fenv_rel": 500, "fenv_amt": 0,
                             "env_att": 10, "env_dec": 500, "env_sus": 1000, "env_rel": 500,
-                            "del_time": 100, "del_fback": 500, "del_mix": 500}
+                            "del_time": 100, "del_fback": 500, "del_mix": 0}
         self.current_patch = {}
         self.sliders_dict = sliders_dict
         self.button_group_list = button_group_list
@@ -92,9 +93,11 @@ class PatchManager(QWidget):
             self.current_patch.update({param: self.sliders_dict[param].value()})
         osc_wave_button = self.button_group_list[0].checkedButton()
         osc2_wave_button = self.button_group_list[1].checkedButton()
-        filt_alg_button = self.button_group_list[2].checkedButton()
+        osc3_wave_button = self.button_group_list[2].checkedButton()
+        filt_alg_button = self.button_group_list[3].checkedButton()
         self.current_patch.update({"osc_wave": osc_wave_button.text()})
         self.current_patch.update({"osc2_wave": osc2_wave_button.text()})
+        self.current_patch.update({"osc3_wave": osc3_wave_button.text()})
         self.current_patch.update({"filt_type": filt_alg_button.text()})
 
 class NewPatchDialog(QDialog):
