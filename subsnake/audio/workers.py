@@ -53,9 +53,11 @@ class KeyEventWorker(QRunnable):
         new_voice = self.assign_voice(note)
         if new_voice is not None:
             new_pitch = 440.0 * 2**((float(note))/12.0 + self.engine.pitch_offset_1)
-            new_pitch2 = 440.0 * 2**((float(note))/12.0 + self.engine.pitch_offset_2) + self.engine.detune*new_voice.detune_offset
+            new_pitch2 = 440.0 * 2**((float(note))/12.0 + self.engine.pitch_offset_2) + self.engine.detune_2*new_voice.detune_offset_2
+            new_pitch3 = 440.0 * 2**((float(note))/12.0 + self.engine.pitch_offset_3) + self.engine.detune_3*new_voice.detune_offset_3
             new_voice.osc.update_pitch(new_pitch)
             new_voice.osc2.update_pitch(new_pitch2)
+            new_voice.osc3.update_pitch(new_pitch3)
             new_voice.velocity = float(velocity)/127.0
             new_voice.env.update_attack_start(sample_offset)
             new_voice.env.update_gate(True)
