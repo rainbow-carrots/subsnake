@@ -82,6 +82,10 @@ QGroupBox#osc2_group QRadioButton::indicator:checked {
     background-color: #2bd6c5;
 }
 
+QGroupBox#osc3_group QRadioButton::indicator:checked {
+    background-color: #2bd6ae;
+}
+
 QGroupBox QSlider::handle {
     width: 16px;
     height: 16px;
@@ -103,6 +107,10 @@ QGroupBox#osc_group QSlider::sub-page {
 
 QGroupBox#osc2_group QSlider::sub-page {
     background-color: #77d9cf;
+}
+
+QGroupBox#osc3_group QSlider::sub-page {
+    background-color: #77d9b2;
 }
 
 QGroupBox#filt_group QSlider::sub-page {
@@ -130,6 +138,10 @@ QGroupBox#osc2_group QSlider::handle {
     background-color: #2bd6c5;
 }
 
+QGroupBox#osc3_group QSlider::handle {
+    background-color: #2bd6ae;
+}
+
 QGroupBox#filt_group QSlider::handle {
     background-color: #4be372;
 }
@@ -151,11 +163,12 @@ QGroupBox::title {
     subcontrol-origin: margin;
     subcontrol-position: top center;
     padding: 1px;
+    color: black;
 }
 
-QGroupBox#filt_group, QGroupBox#osc_group, QGroupBox#osc2_group, QGroupBox#env_group, QGroupBox#fenv_group {
+QGroupBox#filt_group, QGroupBox#osc_group, QGroupBox#osc2_group, QGroupBox#osc3_group, QGroupBox#env_group, QGroupBox#fenv_group, QGroupBox#del_group {
     min-height: 200px;
-    max-height: 240px;
+    max-height: 200px;
 }
 
 QGroupBox#filt_group {
@@ -168,6 +181,10 @@ QGroupBox#osc_group {
 
 QGroupBox#osc2_group {
     background-color: #aae6e0;
+}
+
+QGroupBox#osc3_group {
+    background-color: #aae6ce;
 }
 
 QGroupBox#env_group {
