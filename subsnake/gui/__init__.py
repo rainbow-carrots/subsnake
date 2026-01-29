@@ -4,6 +4,7 @@ from .midi_control import MIDIControl
 from .midi import MIDISettings
 from .osc_gui import OscillatorGUI
 from .osc2_gui import Oscillator2GUI
+from .osc3_gui import Oscillator3GUI
 from .filt_gui import FilterGUI
 from .env_gui import EnvelopeGUI
 from .fenv_gui import FilterEnvGUI
