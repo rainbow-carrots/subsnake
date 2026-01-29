@@ -1,13 +1,17 @@
 {
     "osc_freq": 0,
     "osc_amp": 250,
-    "osc_width": 250,
+    "osc_width": 381,
     "osc2_freq": 0,
-    "osc2_det": 0,
+    "osc2_det": 45,
     "osc2_amp": 250,
-    "osc2_width": 250,
+    "osc2_width": 96,
+    "osc3_freq": 0,
+    "osc3_det": -27,
+    "osc3_amp": 250,
+    "osc3_width": 294,
     "filt_freq": 696,
-    "filt_res": 0,
+    "filt_res": 66,
     "filt_drive": 40,
     "filt_sat": 100,
     "fenv_att": 10,
@@ -24,5 +28,6 @@
     "del_mix": 0,
     "osc_wave": "pulse",
     "osc2_wave": "pulse",
+    "osc3_wave": "pulse",
     "filt_type": "low"
 }
