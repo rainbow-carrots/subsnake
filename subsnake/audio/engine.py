@@ -30,7 +30,8 @@ class AudioEngine():
         for voice in self.voices:
             voice.index = voice_index
             self.stopped_voice_indeces.append(voice_index)
-            voice.detune_offset = .975 + .050*random.random()
+            voice.detune_offset_2 = .975 + .050*random.random()
+            voice.detune_offset_3 = .975 + .050*random.random()
             voice_index += 1
 
         self.voice_output = np.zeros((2048, 2), dtype=np.float32)
@@ -41,7 +42,9 @@ class AudioEngine():
         self.octave = 0
         self.pitch_offset_1 = 0
         self.pitch_offset_2 = 0
-        self.detune = 0.0
+        self.pitch_offset_3 = 0
+        self.detune_2 = 0.0
+        self.detune_3 = 0.0
         self.midi_in_queue = queue.SimpleQueue()
         self.frame_times = queue.SimpleQueue()
         self.pending_event = None
@@ -149,15 +152,27 @@ class AudioEngine():
 
     def update_pitch_2(self, offset):
         for voice in self.voices:
-            new_pitch = 440.0 * 2**(float(voice.base_note)/12.0 + offset) + self.detune*voice.detune_offset
+            new_pitch = 440.0 * 2**(float(voice.base_note)/12.0 + offset) + self.detune_2*voice.detune_offset_2
             voice.osc2.update_pitch(new_pitch)
             self.pitch_offset_2 = offset
 
-    def update_detune(self, detune):
+    def update_pitch_3(self, offset):
         for voice in self.voices:
-            new_pitch = 440.0 * 2**(float(voice.base_note)/12.0 + self.pitch_offset_2) + detune*voice.detune_offset
+            new_pitch = 440.0 * 2**(float(voice.base_note)/12.0 + offset) + self.detune_3*voice.detune_offset_3
+            voice.osc3.update_pitch(new_pitch)
+            self.pitch_offset_3 = offset
+
+    def update_detune_2(self, detune):
+        for voice in self.voices:
+            new_pitch = 440.0 * 2**(float(voice.base_note)/12.0 + self.pitch_offset_2) + detune*voice.detune_offset_2
             voice.osc2.update_pitch(new_pitch)
-        self.detune = detune
+        self.detune_2 = detune
+
+    def update_detune_3(self, detune):
+        for voice in self.voices:
+            new_pitch = 440.0 * 2**(float(voice.base_note)/12.0 + self.pitch_offset_3) + detune*voice.detune_offset_3
+            voice.osc3.update_pitch(new_pitch)
+        self.detune_3 = detune
 
     def update_amplitude_1(self, newAmp):
         for voice in self.voices:
@@ -167,6 +182,10 @@ class AudioEngine():
         for voice in self.voices:
             voice.osc2.update_amplitude(newAmp)
 
+    def update_amplitude_3(self, newAmp):
+        for voice in self.voices:
+            voice.osc3.update_amplitude(newAmp)
+
     def update_width_1(self, newWidth):
         for voice in self.voices:
             voice.osc.update_width(newWidth)
@@ -174,6 +193,10 @@ class AudioEngine():
     def update_width_2(self, newWidth):
         for voice in self.voices:
             voice.osc2.update_width(newWidth)
+
+    def update_width_3(self, newWidth):
+        for voice in self.voices:
+            voice.osc3.update_width(newWidth)
     
     def update_algorithm(self, newAlg, osc):
         for voice in self.voices:
@@ -181,6 +204,8 @@ class AudioEngine():
                 voice.osc.update_algorithm(newAlg)
             elif (osc == 2):
                 voice.osc2.update_algorithm(newAlg)
+            elif (osc == 3):
+                voice.osc3.update_algorithm(newAlg)
     
     def update_cutoff(self, newFreq):
         for voice in self.voices:
@@ -281,7 +306,24 @@ class AudioEngine():
 
     def cc_change_detune_2(self, value):
         new_detune = (float(value)/127.0)*20.0 - 10
-        self.update_detune(new_detune)
+        self.update_detune_2(new_detune)
+
+    #osc 3
+    def cc_change_pitch_3(self, value):
+        new_pitch = (float(value)/127.0)*10.0 - 5
+        self.update_pitch_3(new_pitch)
+
+    def cc_change_level_3(self, value):
+        new_level = float(value)/127.0
+        self.update_amplitude_3(new_level)
+
+    def cc_change_width_3(self, value):
+        new_width = float(value)/127.0
+        self.update_width_3(new_width)
+
+    def cc_change_detune_3(self, value):
+        new_detune = (float(value)/127.0)*20.0 - 10
+        self.update_detune_3(new_detune)
 
     #filt
     def cc_change_cutoff(self, value):
@@ -343,11 +385,13 @@ class Voice():
     def __init__(self):
         self.osc_out = np.zeros((2048, 2), dtype=np.float32)
         self.osc2_out = np.zeros((2048, 2), dtype=np.float32)
+        self.osc3_out = np.zeros((2048, 2), dtype=np.float32)
         self.filt_out = np.zeros((2048, 2), dtype=np.float32)
         self.fenv_in = np.ones((2048, 2), dtype=np.float32)
         self.fenv_out = np.zeros((2048, 2), dtype=np.float32)
         self.osc = WrappedOsc(2, 0.5, 55, fs, .5)
         self.osc2 = WrappedOsc(2, 0.5, 55, fs, .5)
+        self.osc3 = WrappedOsc(2, 0.5, 55, fs, .5)
         self.filt = HalSVF(0.0, 3520, 10, 1.0)
         self.env = ADSR(.01, 1.0, 0.5, 1.0)
         self.fenv = ADSR(.01, .5, .5, .5)
@@ -355,14 +399,18 @@ class Voice():
         self.velocity = 0.0
         self.status = 0
         self.index = 0
-        self.detune_offset = 0.0
+        self.detune_offset_2 = 0.0
+        self.detune_offset_3 = 0.0
 
     def callback(self, output, note_to_voice, stopped_voices, released_voices, frames):
             self.osc.process_block(self.osc_out[:frames])
-            self.osc_out *= 0.5
+            self.osc_out *= 0.33
             self.osc2.process_block(self.osc2_out[:frames])
-            self.osc2_out *= 0.5
+            self.osc2_out *= 0.33
+            self.osc3.process_block(self.osc3_out[:frames])
+            self.osc3_out *= 0.33
             self.osc_out += self.osc2_out
+            self.osc_out += self.osc3_out
             self.fenv.process_block(self.fenv_in[:frames], self.fenv_out[:frames])
             self.filt.process_block(self.osc_out[:frames], self.filt_out[:frames], self.fenv_out[:frames])
             self.env.process_block(self.filt_out[:frames], output)
