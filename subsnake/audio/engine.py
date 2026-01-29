@@ -128,6 +128,9 @@ class AudioEngine():
         self.midi_in_queue.put(stamped_message)
 
     #recorder slots
+    def update_delete(self):
+        self.recorder.delete()
+
     def update_record(self, state):
         self.recorder.set_record(state)
 
