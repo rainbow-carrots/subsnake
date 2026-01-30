@@ -171,6 +171,10 @@ QGroupBox#filt_group, QGroupBox#osc_group, QGroupBox#osc2_group, QGroupBox#osc3_
     max-height: 200px;
 }
 
+QGroupBox#mod_subgroup {
+    height: 180px;
+}
+
 QGroupBox#filt_group {
     background-color: #a8edba;
 }
@@ -367,4 +371,12 @@ QPushButton#record_button:checked, QPushButton#loop_button:checked, QPushButton#
 
 QPushButton#delete_button:disabled {
     background-color: #8534cea5;
+}
+
+QPushButton#mod_button {
+    width: 48px;
+    height: 16px;
+    color: #000000;
+    border: 1px solid white;
+    border-radius: 6px;
 }
