@@ -11,6 +11,7 @@ from subsnake.gui.gui_timer import UpdateGUI
 from subsnake.gui.delay_gui import DelayGUI
 from subsnake.gui.patch import PatchManager
 from subsnake.gui.record import RecorderGUI
+from subsnake.gui.mod_gui import ModulatorGUI
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
     QMainWindow, QGridLayout,
@@ -84,6 +85,7 @@ class MainWindow(QMainWindow):
         self.env_group = EnvelopeGUI()
         self.fenv_group = FilterEnvGUI()
         self.del_group = DelayGUI()
+        self.mod_group = ModulatorGUI()
 
         #init slider & button group dictionaries
         self.init_sliders_dict()
@@ -125,6 +127,7 @@ class MainWindow(QMainWindow):
         self.window_grid.addWidget(self.del_group, 2, 5)
 
         self.window_grid.addWidget(self.osc3_group, 3, 1)
+        self.window_grid.addWidget(self.mod_group, 3, 3)
         
         self.window_grid.addWidget(self.midi_group, 4, 1)
         self.window_grid.addWidget(self.synth_group, 4, 3)
