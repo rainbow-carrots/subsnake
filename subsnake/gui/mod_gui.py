@@ -138,6 +138,108 @@ class ModulatorGUI(QGroupBox):
         lfo_layout_2.addWidget(self.lfo_freq_display_2, 0, 2)
         lfo_layout_2.addWidget(self.lfo_phase_display_2, 1, 2)
 
+        #envelope 1 module
+        #   labels
+        attack_label_1 = QLabel("attack:")
+        release_label_1 = QLabel("release:")
+        mode_label_1 = QLabel("mode:")
+
+        #   sliders
+        self.menv_att_slider_1 = QSlider(Qt.Horizontal)
+        self.menv_rel_slider_1 = QSlider(Qt.Horizontal)
+        self.menv_att_slider_1.setRange(1, 1000)
+        self.menv_rel_slider_1.setRange(1, 1000)
+        self.menv_att_slider_1.setSingleStep(1)
+        self.menv_rel_slider_1.setSingleStep(1)
+
+        #   buttons
+        self.menv_mode_buttons_1 = QButtonGroup()
+        self.menv_mode_layout_1 = QHBoxLayout()
+        self.menv_ar_button_1 = QRadioButton("AR")
+        self.menv_ahr_button_1 = QRadioButton("AHR")
+        self.menv_loop_button_1 = QRadioButton("loop")
+        self.menv_mode_buttons_1.addButton(self.menv_ar_button_1)
+        self.menv_mode_buttons_1.addButton(self.menv_ahr_button_1)
+        self.menv_mode_buttons_1.addButton(self.menv_loop_button_1)
+
+        self.menv_mode_layout_1.addStretch()
+        self.menv_mode_layout_1.addWidget(self.menv_ar_button_1)
+        self.menv_mode_layout_1.addStretch()
+        self.menv_mode_layout_1.addWidget(self.menv_ahr_button_1)
+        self.menv_mode_layout_1.addStretch()
+        self.menv_mode_layout_1.addWidget(self.menv_loop_button_1)
+        self.menv_mode_layout_1.addStretch()
+
+        #   displays
+        self.menv_att_display_1 = self.configure_display(ClickLCD(), 3, QLCDNumber.Dec, QLCDNumber.Flat, True)
+        self.menv_rel_display_1 = self.configure_display(ClickLCD(), 3, QLCDNumber.Dec, QLCDNumber.Flat, True)
+
+        self.set_palette(self.menv_att_display_1)
+        self.set_palette(self.menv_rel_display_1)
+
+        #   layout config
+        menv_layout_1.addWidget(attack_label_1, 0, 0)
+        menv_layout_1.addWidget(release_label_1, 1, 0)
+        menv_layout_1.addWidget(mode_label_1, 2, 0)
+
+        menv_layout_1.addWidget(self.menv_att_slider_1, 0, 1)
+        menv_layout_1.addWidget(self.menv_rel_slider_1, 1, 1)
+        menv_layout_1.addLayout(self.menv_mode_layout_1, 2, 1)
+
+        menv_layout_1.addWidget(self.menv_att_display_1, 0, 2)
+        menv_layout_1.addWidget(self.menv_rel_display_1, 1, 2)
+
+        #envelope 2 module
+        #   labels
+        attack_label_2 = QLabel("attack:")
+        release_label_2 = QLabel("release:")
+        mode_label_2 = QLabel("mode:")
+
+        #   sliders
+        self.menv_att_slider_2 = QSlider(Qt.Horizontal)
+        self.menv_rel_slider_2 = QSlider(Qt.Horizontal)
+        self.menv_att_slider_2.setRange(1, 1000)
+        self.menv_rel_slider_2.setRange(1, 1000)
+        self.menv_att_slider_2.setSingleStep(1)
+        self.menv_rel_slider_2.setSingleStep(1)
+
+        #   buttons
+        self.menv_mode_buttons_2 = QButtonGroup()
+        self.menv_mode_layout_2 = QHBoxLayout()
+        self.menv_ar_button_2 = QRadioButton("AR")
+        self.menv_ahr_button_2 = QRadioButton("AHR")
+        self.menv_loop_button_2 = QRadioButton("loop")
+        self.menv_mode_buttons_2.addButton(self.menv_ar_button_2)
+        self.menv_mode_buttons_2.addButton(self.menv_ahr_button_2)
+        self.menv_mode_buttons_2.addButton(self.menv_loop_button_2)
+
+        self.menv_mode_layout_2.addStretch()
+        self.menv_mode_layout_2.addWidget(self.menv_ar_button_2)
+        self.menv_mode_layout_2.addStretch()
+        self.menv_mode_layout_2.addWidget(self.menv_ahr_button_2)
+        self.menv_mode_layout_2.addStretch()
+        self.menv_mode_layout_2.addWidget(self.menv_loop_button_2)
+        self.menv_mode_layout_2.addStretch()
+
+        #   displays
+        self.menv_att_display_2 = self.configure_display(ClickLCD(), 3, QLCDNumber.Dec, QLCDNumber.Flat, True)
+        self.menv_rel_display_2 = self.configure_display(ClickLCD(), 3, QLCDNumber.Dec, QLCDNumber.Flat, True)
+
+        self.set_palette(self.menv_att_display_2)
+        self.set_palette(self.menv_rel_display_2)
+
+        #   layout config
+        menv_layout_2.addWidget(attack_label_2, 0, 0)
+        menv_layout_2.addWidget(release_label_2, 1, 0)
+        menv_layout_2.addWidget(mode_label_2, 2, 0)
+
+        menv_layout_2.addWidget(self.menv_att_slider_2, 0, 1)
+        menv_layout_2.addWidget(self.menv_rel_slider_2, 1, 1)
+        menv_layout_2.addLayout(self.menv_mode_layout_2, 2, 1)
+
+        menv_layout_2.addWidget(self.menv_att_display_2, 0, 2)
+        menv_layout_2.addWidget(self.menv_rel_display_2, 1, 2)
+
         #module select buttons
         self.lfo_button_1 = QPushButton("lfo 1")
         self.lfo_button_2 = QPushButton("lfo 2")
