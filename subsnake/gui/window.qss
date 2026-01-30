@@ -166,7 +166,7 @@ QGroupBox::title {
     color: black;
 }
 
-QGroupBox#filt_group, QGroupBox#osc_group, QGroupBox#osc2_group, QGroupBox#osc3_group, QGroupBox#env_group, QGroupBox#fenv_group, QGroupBox#del_group {
+QGroupBox#filt_group, QGroupBox#osc_group, QGroupBox#osc2_group, QGroupBox#osc3_group, QGroupBox#env_group, QGroupBox#fenv_group, QGroupBox#del_group, QGroupBox#mod_group {
     min-height: 200px;
     max-height: 200px;
 }
@@ -343,6 +343,11 @@ QFrame#record_spacer {
 QPushButton#record_button, QPushButton#play_button, QPushButton#stop_button, QPushButton#delete_button {
     background-color: #34cea5;
     padding-top: -4px;
+}
+
+QPushButton#delete_button {
+    background-color: #34cea5;
+    padding-top: 4px;
 }
 
 QPushButton#loop_button {
