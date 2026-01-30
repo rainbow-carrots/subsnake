@@ -19,11 +19,14 @@ class RecorderGUI(QWidget):
         slash_label = QLabel("/")
         self.end_time_label = QLabel(("01:23"))
 
-        self.delete_button = QPushButton("␡")
+        self.delete_button = QPushButton("⮾")
         self.record_button = QPushButton("●︎")
         self.play_button = QPushButton("▶")
         self.stop_button = QPushButton("■")
         self.loop_button = QPushButton("⟳")
+
+        self.delete_button.setToolTip("clear record buffer")
+        self.loop_button.setToolTip("loop on/off")
 
         self.record_button.setCheckable(True)
         self.loop_button.setCheckable(True)
