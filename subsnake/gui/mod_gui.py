@@ -47,6 +47,7 @@ class ModulatorGUI(QGroupBox):
         self.lfo_shape_buttons_1 = QButtonGroup()
         self.lfo_shape_layout_1 = QHBoxLayout()
         self.lfo_sin_button_1 = QRadioButton("sine")
+        self.lfo_sin_button_1.setChecked(True)
         self.lfo_tri_button_1 = QRadioButton("triangle")
         self.lfo_saw_button_1 = QRadioButton("sawtooth")
         self.lfo_sqr_button_1 = QRadioButton("square")
@@ -84,6 +85,8 @@ class ModulatorGUI(QGroupBox):
         lfo_layout_1.addWidget(self.lfo_freq_display_1, 0, 2)
         lfo_layout_1.addWidget(self.lfo_phase_display_1, 1, 2)
 
+        self.lfo_group_1.setObjectName("lfo1_group")
+
         #lfo 2 module
         freq_label_2 = QLabel("speed:")
         phase_label_2 = QLabel("phase:")
@@ -101,6 +104,7 @@ class ModulatorGUI(QGroupBox):
         self.lfo_shape_buttons_2 = QButtonGroup()
         self.lfo_shape_layout_2 = QHBoxLayout()
         self.lfo_sin_button_2 = QRadioButton("sine")
+        self.lfo_sin_button_2.setChecked(True)
         self.lfo_tri_button_2 = QRadioButton("triangle")
         self.lfo_saw_button_2 = QRadioButton("sawtooth")
         self.lfo_sqr_button_2 = QRadioButton("square")
@@ -138,6 +142,8 @@ class ModulatorGUI(QGroupBox):
         lfo_layout_2.addWidget(self.lfo_freq_display_2, 0, 2)
         lfo_layout_2.addWidget(self.lfo_phase_display_2, 1, 2)
 
+        self.lfo_group_2.setObjectName("lfo2_group")
+
         #envelope 1 module
         #   labels
         attack_label_1 = QLabel("attack:")
@@ -156,6 +162,7 @@ class ModulatorGUI(QGroupBox):
         self.menv_mode_buttons_1 = QButtonGroup()
         self.menv_mode_layout_1 = QHBoxLayout()
         self.menv_ar_button_1 = QRadioButton("AR")
+        self.menv_ar_button_1.setChecked(True)
         self.menv_ahr_button_1 = QRadioButton("AHR")
         self.menv_loop_button_1 = QRadioButton("loop")
         self.menv_mode_buttons_1.addButton(self.menv_ar_button_1)
@@ -189,6 +196,8 @@ class ModulatorGUI(QGroupBox):
         menv_layout_1.addWidget(self.menv_att_display_1, 0, 2)
         menv_layout_1.addWidget(self.menv_rel_display_1, 1, 2)
 
+        self.menv_group_1.setObjectName("menv1_group")
+
         #envelope 2 module
         #   labels
         attack_label_2 = QLabel("attack:")
@@ -207,6 +216,7 @@ class ModulatorGUI(QGroupBox):
         self.menv_mode_buttons_2 = QButtonGroup()
         self.menv_mode_layout_2 = QHBoxLayout()
         self.menv_ar_button_2 = QRadioButton("AR")
+        self.menv_ar_button_2.setChecked(True)
         self.menv_ahr_button_2 = QRadioButton("AHR")
         self.menv_loop_button_2 = QRadioButton("loop")
         self.menv_mode_buttons_2.addButton(self.menv_ar_button_2)
@@ -239,6 +249,8 @@ class ModulatorGUI(QGroupBox):
 
         menv_layout_2.addWidget(self.menv_att_display_2, 0, 2)
         menv_layout_2.addWidget(self.menv_rel_display_2, 1, 2)
+
+        self.menv_group_2.setObjectName("menv2_group")
 
         #module select buttons
         self.lfo_button_1 = QPushButton("lfo 1")
@@ -290,10 +302,10 @@ class ModulatorGUI(QGroupBox):
         self.setLayout(layout)
         self.setObjectName("mod_group")
         self.mod_widget.setObjectName("mod_subgroup")
-        self.lfo_button_1.setObjectName("mod_button")
-        self.lfo_button_2.setObjectName("mod_button")
-        self.menv_button_1.setObjectName("mod_button")
-        self.menv_button_2.setObjectName("mod_button")
+        self.lfo_button_1.setObjectName("lfo1_button")
+        self.lfo_button_2.setObjectName("lfo2_button")
+        self.menv_button_1.setObjectName("menv1_button")
+        self.menv_button_2.setObjectName("menv2_button")
         self.setTitle("modulators")
 
         self.mod_buttons_group.buttonClicked.connect(self.setModule)
