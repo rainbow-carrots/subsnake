@@ -10,6 +10,7 @@ from .filters import HalSVF
 from .envelopes import ADSR
 from .workers import KeyEventWorker
 from .effects import StereoDelay, AudioRecorder
+from .modulators import LFO
 
 fs = 44100
 twopi = 2*np.pi
@@ -398,6 +399,7 @@ class Voice():
         self.filt = HalSVF(0.0, 3520, 10, 1.0)
         self.env = ADSR(.01, 1.0, 0.5, 1.0)
         self.fenv = ADSR(.01, .5, .5, .5)
+        self.lfo1 = LFO(fs, 5, 0, 0)
         self.base_note = 0
         self.velocity = 0.0
         self.status = 0
@@ -406,23 +408,24 @@ class Voice():
         self.detune_offset_3 = 0.0
 
     def callback(self, output, note_to_voice, stopped_voices, released_voices, frames):
-            self.osc.process_block(self.osc_out[:frames])
-            self.osc_out *= 0.33
-            self.osc2.process_block(self.osc2_out[:frames])
-            self.osc2_out *= 0.33
-            self.osc3.process_block(self.osc3_out[:frames])
-            self.osc3_out *= 0.33
-            self.osc_out += self.osc2_out
-            self.osc_out += self.osc3_out
-            self.fenv.process_block(self.fenv_in[:frames], self.fenv_out[:frames])
-            self.filt.process_block(self.osc_out[:frames], self.filt_out[:frames], self.fenv_out[:frames])
-            self.env.process_block(self.filt_out[:frames], output)
-            output *= self.velocity
-            if (self.env.state[0] == 0.0) and (self.status > 0):
-                if self.base_note in note_to_voice:
-                    old_voice = note_to_voice.pop(self.base_note)
-                    if old_voice in released_voices:
-                        old_index = released_voices.index(old_voice)
-                        released_voices.pop(old_index)
-                stopped_voices.append(self.index)    
-                self.status = 0
+        self.lfo1.process_block(frames)
+        self.osc.process_block(self.osc_out[:frames])
+        self.osc_out *= 0.33
+        self.osc2.process_block(self.osc2_out[:frames])
+        self.osc2_out *= 0.33
+        self.osc3.process_block(self.osc3_out[:frames])
+        self.osc3_out *= 0.33
+        self.osc_out += self.osc2_out
+        self.osc_out += self.osc3_out
+        self.fenv.process_block(self.fenv_in[:frames], self.fenv_out[:frames])
+        self.filt.process_block(self.osc_out[:frames], self.filt_out[:frames], self.fenv_out[:frames])
+        self.env.process_block(self.filt_out[:frames], output)
+        output *= self.velocity
+        if (self.env.state[0] == 0.0) and (self.status > 0):
+            if self.base_note in note_to_voice:
+                old_voice = note_to_voice.pop(self.base_note)
+                if old_voice in released_voices:
+                    old_index = released_voices.index(old_voice)
+                    released_voices.pop(old_index)
+            stopped_voices.append(self.index)    
+            self.status = 0
