@@ -1,11 +1,11 @@
-from PySide6.QtCore import Qt, Signal
-from PySide6.QtGui import QColor, QPalette
+from PySide6.QtCore import Qt, Signal, QLineF
+from PySide6.QtGui import QColor, QPalette, QPainter
 from PySide6.QtWidgets import (
     QGroupBox, QGridLayout, QSlider,
     QStackedLayout, QPushButton,
     QRadioButton, QButtonGroup,
     QWidget, QLabel, QHBoxLayout,
-    QLCDNumber
+    QLCDNumber, QDial
 )
 from subsnake.gui.lcd import ClickLCD
 
@@ -336,3 +336,33 @@ class ModulatorGUI(QGroupBox):
         display_palette.setColor(QPalette.ColorRole.WindowText, text_color)
         display.setAutoFillBackground(True)
         display.setPalette(display_palette)
+
+class CoolDial(QDial):
+    def __init__(self, step, min, max):
+        super().__init__()
+        self.mode = 0
+        self.max = max
+        self.setSingleStep(step)
+        self.setRange(min, max)
+        self.setValue((min+max)/2)
+
+    def paintEvent(self, e):
+        painter = QPainter(self)
+        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+
+        bg_color = self.palette().color(QPalette.ColorRole.Window)
+        painter.setBrush(bg_color)
+        painter.setPen(QColor("white"))
+
+        painter.drawEllipse(self.rect())
+
+        center = self.rect().center()
+        painter.translate(center)
+        rotation_deg = 120.0*(self.value()/self.max)
+        painter.rotate(rotation_deg)
+        radius = min(self.rect().width(), self.rect().height())/2.0
+        notch = QLineF(0, 0, 0, -radius)
+        painter.drawLine(notch)
+
+        painter.end()
+
