@@ -1,5 +1,5 @@
 from PySide6.QtCore import Qt, Signal, QLineF
-from PySide6.QtGui import QColor, QPalette, QPainter
+from PySide6.QtGui import QColor, QPalette, QPainter, QPen
 from PySide6.QtWidgets import (
     QGroupBox, QGridLayout, QSlider,
     QStackedLayout, QPushButton,
@@ -342,6 +342,8 @@ class CoolDial(QDial):
         super().__init__()
         self.mode = 0
         self.max = max
+        self.min = min
+        self.cursor_y_pos = 0
         self.setSingleStep(step)
         self.setRange(min, max)
         self.setValue((min+max)/2)
@@ -361,8 +363,33 @@ class CoolDial(QDial):
         rotation_deg = 120.0*(self.value()/self.max)
         painter.rotate(rotation_deg)
         radius = min(self.rect().width(), self.rect().height())/2.0
+
+        notch_pen = QPen(QColor("black"))
+        notch_pen.setWidth(1.2)
+        #notch_pen.setCapStyle(Qt.PenCapStyle.RoundCap)
+        painter.setPen(notch_pen)
+
         notch = QLineF(0, 0, 0, -radius)
         painter.drawLine(notch)
 
         painter.end()
+
+    #get cursor y pos
+    def mousePressEvent(self, event):
+        self.cursor_y_pos = event.position().y()
+        event.accept()
+
+    #disable set value on release
+    def mouseReleaseEvent(self, event):
+        event.accept()
+    
+    #single-axis knob movement (y, 1:1)
+    def mouseMoveEvent(self, event):
+        delta_y = self.cursor_y_pos - event.position().y()
+        self.cursor_y_pos = event.position().y()
+        new_value = self.value() + int(delta_y)
+        self.setValue(new_value)
+        event.accept()
+
+        
 
