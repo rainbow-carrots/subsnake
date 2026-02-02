@@ -105,3 +105,118 @@ class LFO():
             if phase[0] >= twopi:
                 phase[0] -= twopi
                 held_value[0] = 2*np.random.random() - 1.0
+
+class ModEnv():
+    def __init__(self, fs, attack=0.5, release=0.5, mode=0):
+        self.output = np.zeros((2048), dtype=np.float32)
+        self.value = np.zeros((1), dtype=np.float32)
+        self.state = np.zeros((1), dtype=np.int32)
+        self.run = np.zeros((1), dtype=np.int32)
+        self.gate = False
+        self.prev_gate = [False]
+        self.attack = attack
+        self.release = release
+        self.mode = mode
+        self.fs = fs
+
+    def process_block(self, frames):
+        attack_time = self.attack*self.fs
+        release_time = self.release*self.fs
+        attack_c = 1.0 - math.exp(-1/attack_time)
+        release_c = 1.0 - math.exp(-1/release_time)
+        if self.mode == 0:
+            self.gen_AR_oneshot(self.value, self.state, self.gate, self.run, attack_c, release_c, .001, self.output[:frames])
+        elif self.mode == 1:
+            self.gen_AHR(self.value, self.state, self.gate, attack_c, release_c, .001, self.output[:frames])
+        elif self.mode == 2:
+            self.gen_AR_loop(self.value, self.state, self.gate, attack_c, release_c, .001, self.output[:frames])
+
+    @staticmethod
+    @njit(nogil=True, fastmath=True)
+    def gen_AR_oneshot(value, state, gate, run, attack_c, release_c, threshold, output):
+        frames = len(output)
+        top_threshold =  1.0 - threshold
+        for n in range(0, frames):
+            if not gate:
+                state[0] = 0                        
+                if run[0]:                          #clear run flag if set
+                    run[0] = 0
+                if value[0] > threshold:            #finish release
+                    value[0] += release_c*(0.0 - value[0])
+                else:                               #stop
+                    value[0] = 0.0
+            else:
+                if not run[0]:
+                    if state[0] == 0:               #start
+                        state[0] = 1
+                    elif state[0] == 1:             #attack
+                        if value[0] < top_threshold:
+                            value[0] += attack_c*(1.0 - value[0])
+                        else:
+                            value[0] = 1.0
+                            state[0] = 2
+                    elif state[0] == 2:             #release
+                        if value[0] > threshold:
+                            value[0] += release_c*(0.0 - value[0])
+                        else:
+                            value[0] = 0.0
+                            state[0] = 0            #stop
+                            run[0] = 1
+            output[n] = value[0]
+
+    @staticmethod
+    @njit(nogil=True, fastmath=True)
+    def gen_AR_loop(value, state, gate, attack_c, release_c, threshold, output):
+        frames = len(output)
+        top_threshold =  1.0 - threshold
+        for n in range(0, frames):
+            if not gate:
+                state[0] = 0                        
+                if value[0] > threshold:        #finish release
+                    value[0] += release_c*(0.0 - value[0])
+                else:                           #stop
+                    value[0] = 0.0
+            else:
+                if state[0] == 0:               #start
+                    state[0] = 1
+                elif state[0] == 1:             #attack
+                    if value[0] < top_threshold:
+                        value[0] += attack_c*(1.0 - value[0])
+                    else:
+                        value[0] = 1.0
+                        state[0] = 2
+                elif state[0] == 2:             #release
+                    if value[0] > threshold:
+                        value[0] += release_c*(0.0 - value[0])
+                    else:
+                        value[0] = 0.0
+                        state[0] = 0            #stop
+            output[n] = value[0]
+
+    @staticmethod
+    @njit(nogil=True, fastmath=True)
+    def gen_AHR(value, state, gate, attack_c, release_c, threshold, output):
+        frames = len(output)
+        top_threshold =  1.0 - threshold
+        for n in range(0, frames):
+            if not gate:
+                state[0] = 0                        
+                if value[0] > threshold:        #finish release
+                    value[0] += release_c*(0.0 - value[0])
+                else:                           #stop
+                    value[0] = 0.0
+            else:
+                if state[0] == 0:               #start
+                    state[0] = 1
+                elif state[0] == 1:             #attack
+                    if value[0] < top_threshold:
+                        value[0] += attack_c*(1.0 - value[0])
+                    else:
+                        value[0] = 1.0
+                        state[0] = 2
+                elif state[0] == 2:             #hold
+                    if value[0] < top_threshold:
+                        value[0] += attack_c*(1.0 - value[0])
+                    else:
+                        value[0] = 1.0
+            output[n] = value[0]
