@@ -14,4 +14,4 @@ from .lcd import ClickLCD
 from .patch import PatchManager
 from .record import RecorderGUI
 from .settings import SynthSettings
-from .mod_gui import ModulatorGUI
+from .mod_gui import ModulatorGUI, CoolDial
