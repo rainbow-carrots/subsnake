@@ -4,5 +4,5 @@ from .envelopes import ADSR
 from .engine import AudioEngine
 from .workers import KeyEventWorker
 from .effects import StereoDelay, AudioRecorder
-from .modulators import LFO
+from .modulators import LFO, ModEnv
 
