@@ -8,6 +8,12 @@ QLCDNumber {
     height: 24px;
 }
 
+CoolDial {
+    max-width: 24px;
+    max-height: 24px;
+    background-color: gray;
+}
+
 QGroupBox QLabel {
     color: #000000;
     margin-top: -4.5px;
