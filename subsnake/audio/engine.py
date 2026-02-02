@@ -10,7 +10,7 @@ from .filters import HalSVF
 from .envelopes import ADSR
 from .workers import KeyEventWorker
 from .effects import StereoDelay, AudioRecorder
-from .modulators import LFO
+from .modulators import LFO, ModEnv
 
 fs = 44100
 twopi = 2*np.pi
@@ -400,6 +400,9 @@ class Voice():
         self.env = ADSR(.01, 1.0, 0.5, 1.0)
         self.fenv = ADSR(.01, .5, .5, .5)
         self.lfo1 = LFO(fs, 5, 0, 0)
+        self.lfo2 = LFO(fs, 5, 0, 1)
+        self.menv1 = ModEnv(fs, 0.5, 0.5, 0)
+        self.menv2 = ModEnv(fs, 0.5, 0.5, 1)
         self.base_note = 0
         self.velocity = 0.0
         self.status = 0
@@ -409,6 +412,9 @@ class Voice():
 
     def callback(self, output, note_to_voice, stopped_voices, released_voices, frames):
         self.lfo1.process_block(frames)
+        self.lfo2.process_block(frames)
+        self.menv1.process_block(frames)
+        self.menv2.process_block(frames)
         self.osc.process_block(self.osc_out[:frames])
         self.osc_out *= 0.33
         self.osc2.process_block(self.osc2_out[:frames])
