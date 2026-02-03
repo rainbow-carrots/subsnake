@@ -339,19 +339,31 @@ class ModulatorGUI(QGroupBox):
         display.setPalette(display_palette)
 
 class CoolDial(QDial):
-    def __init__(self, step, min, max):
+    mode_changed = Signal(str, int)
+    value_changed = Signal(str, float)
+
+    def __init__(self, step, min, max, name):
         super().__init__()
         self.mode = 0
         self.mode_colors = ["#BBBBBB", "#9ba4fa", "#a19bfa", "#ae9bfa", "#b69bfa"]
         self.max = max
         self.min = min
+        self.name = name
         self.cursor_y_pos = 0
         self.cursor_y_pos_click = 0
+        self.last_pressed = None
         self.setSingleStep(step)
         self.setRange(min, max)
         self.setValue((min+max)/2)
+        self.valueChanged.connect(self.change_value)
 
-    def paintEvent(self, e):
+    #normalize value to range (-1.0, 1.0) & emit
+    def change_value(self, value):
+        norm_value = float(value)/float(self.max)
+        self.value_changed.emit(self.name, norm_value)
+
+    #redraw QDial - circle w/ border & notch
+    def paintEvent(self, event):
         painter = QPainter(self)
         painter.setRenderHint(QPainter.RenderHint.Antialiasing)
 
@@ -380,26 +392,30 @@ class CoolDial(QDial):
 
     #get cursor y pos
     def mousePressEvent(self, event):
-        self.cursor_y_pos = event.position().y()
-        self.cursor_y_pos_click = self.cursor_y_pos
+        if (event.button() == Qt.MouseButton.LeftButton):
+            self.cursor_y_pos = event.position().y()
+            self.cursor_y_pos_click = self.cursor_y_pos
+        self.last_pressed = event.button()
         event.accept()
 
-    #disable set value on release
+    #cycle modes (wrap)
     def mouseReleaseEvent(self, event):
-        if (event.position().y() == self.cursor_y_pos_click) and (event.button() == Qt.MouseButton.RightButton):
+        if (event.button() == Qt.MouseButton.RightButton):
             if self.mode < 4:
                 self.mode += 1
             else:
                 self.mode = 0
             self.setStyleSheet("background-color:" + self.mode_colors[self.mode])
+            self.mode_changed.emit(self.name, self.mode)
         event.accept()
     
     #single-axis knob movement (y, 1:1)
     def mouseMoveEvent(self, event):
-        delta_y = self.cursor_y_pos - event.position().y()
-        self.cursor_y_pos = event.position().y()
-        new_value = self.value() + int(delta_y)
-        self.setValue(new_value)
+        if (self.last_pressed == Qt.MouseButton.LeftButton):
+            delta_y = self.cursor_y_pos - event.position().y()
+            self.cursor_y_pos = event.position().y()
+            new_value = self.value() + int(delta_y)
+            self.setValue(new_value)
         event.accept()
 
     def mouseDoubleClickEvent(self, event):
