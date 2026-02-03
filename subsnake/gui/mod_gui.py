@@ -1,4 +1,4 @@
-from PySide6.QtCore import Qt, Signal, QLineF
+from PySide6.QtCore import Qt, Signal, QLineF, QRectF
 from PySide6.QtGui import QColor, QPalette, QPainter, QPen
 from PySide6.QtWidgets import (
     QGroupBox, QGridLayout, QSlider,
@@ -10,8 +10,9 @@ from PySide6.QtWidgets import (
 from subsnake.gui.lcd import ClickLCD
 
 class ModulatorGUI(QGroupBox):
-    def __init__(self):
+    def __init__(self, display_color=QColor("black")):
         super().__init__()
+        self.display_color = display_color
 
         #main layout & groups
         layout = QGridLayout()
@@ -331,7 +332,7 @@ class ModulatorGUI(QGroupBox):
         return display
     
     def set_palette(self, display):
-        text_color = QColor("black")
+        text_color = self.display_color
         display_palette = display.palette()
         display_palette.setColor(QPalette.ColorRole.WindowText, text_color)
         display.setAutoFillBackground(True)
@@ -341,9 +342,11 @@ class CoolDial(QDial):
     def __init__(self, step, min, max):
         super().__init__()
         self.mode = 0
+        self.mode_colors = ["#BBBBBB", "#9ba4fa", "#a19bfa", "#ae9bfa", "#b69bfa"]
         self.max = max
         self.min = min
         self.cursor_y_pos = 0
+        self.cursor_y_pos_click = 0
         self.setSingleStep(step)
         self.setRange(min, max)
         self.setValue((min+max)/2)
@@ -356,14 +359,15 @@ class CoolDial(QDial):
         painter.setBrush(bg_color)
         painter.setPen(QColor("white"))
 
-        painter.drawEllipse(self.rect())
+        f_rect = QRectF(self.rect())
+        e_rect = f_rect.adjusted(1, 1, -1, -1)
+        painter.drawEllipse(e_rect)
 
-        center = self.rect().center()
+        center = e_rect.center()
         painter.translate(center)
         rotation_deg = 120.0*(self.value()/self.max)
         painter.rotate(rotation_deg)
-        radius = min(self.rect().width(), self.rect().height())/2.0
-
+        radius = min(e_rect.width(), e_rect.height())/2.0 - 1
         notch_pen = QPen(QColor("black"))
         notch_pen.setWidth(1.2)
         #notch_pen.setCapStyle(Qt.PenCapStyle.RoundCap)
@@ -377,10 +381,17 @@ class CoolDial(QDial):
     #get cursor y pos
     def mousePressEvent(self, event):
         self.cursor_y_pos = event.position().y()
+        self.cursor_y_pos_click = self.cursor_y_pos
         event.accept()
 
     #disable set value on release
     def mouseReleaseEvent(self, event):
+        if (event.position().y() == self.cursor_y_pos_click) and (event.button() == Qt.MouseButton.RightButton):
+            if self.mode < 4:
+                self.mode += 1
+            else:
+                self.mode = 0
+            self.setStyleSheet("background-color:" + self.mode_colors[self.mode])
         event.accept()
     
     #single-axis knob movement (y, 1:1)
@@ -389,6 +400,10 @@ class CoolDial(QDial):
         self.cursor_y_pos = event.position().y()
         new_value = self.value() + int(delta_y)
         self.setValue(new_value)
+        event.accept()
+
+    def mouseDoubleClickEvent(self, event):
+        self.setValue(0)
         event.accept()
 
         
