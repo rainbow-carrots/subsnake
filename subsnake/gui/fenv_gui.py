@@ -26,11 +26,11 @@ class FilterEnvGUI(QGroupBox):
         fenv_layout = QGridLayout()
 
         #dials
-        self.fenv_att_mod_dial = CoolDial(1, -500, 500)
-        self.fenv_dec_mod_dial = CoolDial(1, -500, 500)
-        self.fenv_sus_mod_dial = CoolDial(1, -500, 500)
-        self.fenv_rel_mod_dial = CoolDial(1, -500, 500)
-        self.fenv_amt_mod_dial = CoolDial(1, -500, 500)
+        self.fenv_att_mod_dial = CoolDial(1, -500, 500, "fenv_att")
+        self.fenv_dec_mod_dial = CoolDial(1, -500, 500, "fenv_dec")
+        self.fenv_sus_mod_dial = CoolDial(1, -500, 500, "fenv_sus")
+        self.fenv_rel_mod_dial = CoolDial(1, -500, 500, "fenv_rel")
+        self.fenv_amt_mod_dial = CoolDial(1, -500, 500, "fenv_amt")
 
         #labels
         fenv_att_label = QLabel("attack:")

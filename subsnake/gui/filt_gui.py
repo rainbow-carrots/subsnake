@@ -28,10 +28,10 @@ class FilterGUI(QGroupBox):
         filt_buttons = QHBoxLayout()
 
         #dials
-        self.filt_freq_mod_dial = CoolDial(1, -500, 500)
-        self.filt_res_mod_dial = CoolDial(1, -500, 500)
-        self.filt_drive_mod_dial = CoolDial(1, -500, 500)
-        self.filt_sat_mod_dial = CoolDial(1, -500, 500)
+        self.filt_freq_mod_dial = CoolDial(1, -500, 500, "filt_freq")
+        self.filt_res_mod_dial = CoolDial(1, -500, 500, "filt_res")
+        self.filt_drive_mod_dial = CoolDial(1, -500, 500, "filt_drive")
+        self.filt_sat_mod_dial = CoolDial(1, -500, 500, "filt_sat")
 
         #labels
         filt_freq_label = QLabel("cutoff:")

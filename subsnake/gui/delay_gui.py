@@ -24,9 +24,9 @@ class DelayGUI(QGroupBox):
         del_layout = QGridLayout()
 
         #dials
-        self.del_time_mod_dial = CoolDial(1, -500, 500)
-        self.del_feedback_mod_dial = CoolDial(1, -500, 500)
-        self.del_mix_mod_dial = CoolDial(1, -500, 500)
+        self.del_time_mod_dial = CoolDial(1, -500, 500, "del_time")
+        self.del_feedback_mod_dial = CoolDial(1, -500, 500, "del_feedback")
+        self.del_mix_mod_dial = CoolDial(1, -500, 500, "del_mix")
 
         #labels
         del_time_label = QLabel("time:")

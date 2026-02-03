@@ -28,10 +28,10 @@ class Oscillator2GUI(QGroupBox):
         osc2_buttons = QHBoxLayout()
 
         #dials
-        self.osc2_freq_mod_dial = CoolDial(1, -500, 500)
-        self.osc2_det_mod_dial = CoolDial(1, -500, 500)
-        self.osc2_amp_mod_dial = CoolDial(1, -500, 500)
-        self.osc2_width_mod_dial = CoolDial(1, -500, 500)
+        self.osc2_freq_mod_dial = CoolDial(1, -500, 500, "osc2_freq")
+        self.osc2_det_mod_dial = CoolDial(1, -500, 500, "osc2_det")
+        self.osc2_amp_mod_dial = CoolDial(1, -500, 500, "osc2_amp")
+        self.osc2_width_mod_dial = CoolDial(1, -500, 500, "osc2_width")
 
         #labels
         osc2_freq_label = QLabel("pitch:")

@@ -27,10 +27,10 @@ class EnvelopeGUI(QGroupBox):
         env_layout = QGridLayout()
 
         #dials
-        self.env_att_mod_dial = CoolDial(1, -500, 500)
-        self.env_dec_mod_dial = CoolDial(1, -500, 500)
-        self.env_sus_mod_dial = CoolDial(1, -500, 500)
-        self.env_rel_mod_dial = CoolDial(1, -500, 500)
+        self.env_att_mod_dial = CoolDial(1, -500, 500, "env_att")
+        self.env_dec_mod_dial = CoolDial(1, -500, 500, "env_dec")
+        self.env_sus_mod_dial = CoolDial(1, -500, 500, "env_sus")
+        self.env_rel_mod_dial = CoolDial(1, -500, 500, "env_rel")
 
         #labels
         adsr_att_label = QLabel("attack:")

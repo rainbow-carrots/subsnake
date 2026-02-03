@@ -27,9 +27,9 @@ class OscillatorGUI(QGroupBox):
         osc_buttons = QHBoxLayout()
 
         #dials
-        self.osc_freq_mod_dial = CoolDial(1, -500, 500)
-        self.osc_amp_mod_dial = CoolDial(1, -500, 500)
-        self.osc_width_mod_dial = CoolDial(1, -500, 500)
+        self.osc_freq_mod_dial = CoolDial(1, -500, 500, "osc_freq")
+        self.osc_amp_mod_dial = CoolDial(1, -500, 500, "osc_amp")
+        self.osc_width_mod_dial = CoolDial(1, -500, 500, "osc_width")
 
         #labels
         self.osc_freq_label = QLabel("pitch:")
