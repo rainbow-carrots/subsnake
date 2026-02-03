@@ -1,0 +1,475 @@
+MainWindow#main_window {
+    background-color: #1c0627;
+}
+
+QLCDNumber {
+    border: none;
+    text-align: right;
+    height: 24px;
+}
+
+CoolDial {
+    max-width: 24px;
+    max-height: 24px;
+    background-color: gray;
+}
+
+QGroupBox QLabel {
+    color: #00fbff;
+    margin-top: -4.5px;
+}
+
+QWidget QLabel {
+    color: #6aff00;
+}
+
+MainWindow QGroupBox {
+    margin-top: 18px;
+    margin-bottom: 18px;
+    border: 1px solid white;
+    border-radius: 6px;
+    min-width: 380px;
+    max-width: 480px;
+}
+
+QScrollArea {
+    background-color: #ac9ab8;
+    border: 1px solid white;
+    border-radius: 3px;
+}
+
+QGroupBox#cc_group {
+    background-color: #ac9ab8;
+    min-width: 320px;
+    max-width: 460px;
+    border: 1px solid white;
+    border-radius: 3px;
+}
+
+QRadioButton {
+    color: #000000;
+    font-size: 12px;
+    spacing: 6px;
+}
+
+QToolBar {
+    background-color: #333333;
+    border: 2px groove gray;
+    border-top: none;
+    border-bottom-left-radius: 3px;
+    border-bottom-right-radius: 3px;
+}
+
+QGroupBox QSlider {
+    min-height: 18px;
+}
+
+QFrame#grid_space {
+    min-width: 24px;
+}
+
+QRadioButton::indicator {
+    width: 12px;
+    height: 12px;
+    border-radius: 6.5px;
+    border: 1px solid black;
+    background-color: #bab8b8;
+}
+
+QGroupBox#filt_group QRadioButton::indicator:checked {
+    background-color: #4be372;
+}
+
+QGroupBox#osc_group QRadioButton::indicator:checked {
+    background-color: #479ef5;
+}
+
+QGroupBox#osc2_group QRadioButton::indicator:checked {
+    background-color: #2bd6c5;
+}
+
+QGroupBox#osc3_group QRadioButton::indicator:checked {
+    background-color: #2bd6ae;
+}
+
+QGroupBox#mod_group QGroupBox#lfo1_group QRadioButton::indicator:checked {
+    background-color: #6f7cf7;
+}
+
+QGroupBox#mod_group QGroupBox#lfo2_group QRadioButton::indicator:checked {
+    background-color: #867efc;
+}
+
+QGroupBox#mod_group QGroupBox#menv1_group QRadioButton::indicator:checked {
+    background-color: #957cfc;
+}
+
+QGroupBox#mod_group QGroupBox#menv2_group QRadioButton::indicator:checked {
+    background-color: #9268fc;
+}
+
+QGroupBox QSlider::handle {
+    width: 16px;
+    height: 16px;
+    border-radius: 3px;
+    border: 1px solid white;
+    margin: -4px 0px;
+}
+
+QGroupBox QSlider::groove {
+    height: 8px;
+    background-color: #333333;
+    border: 1px solid white;
+    border-radius: 3px;
+}
+
+QGroupBox#osc_group QSlider::sub-page {
+    background-color: #7ab5f0;
+}
+
+QGroupBox#osc2_group QSlider::sub-page {
+    background-color: #77d9cf;
+}
+
+QGroupBox#osc3_group QSlider::sub-page {
+    background-color: #77d9b2;
+}
+
+QGroupBox#filt_group QSlider::sub-page {
+    background-color: #68d985;
+}
+
+QGroupBox#env_group QSlider::sub-page {
+    background-color: #f57fb0;
+}
+
+QGroupBox#fenv_group QSlider::sub-page {
+    background-color: #80e866;
+}
+
+QGroupBox#del_group QSlider::sub-page {
+    background-color: #fab055;
+}
+
+QGroupBox#mod_group QGroupBox#lfo1_group QSlider::sub-page {
+    background-color: #6f7cf7;
+}
+
+QGroupBox#mod_group QGroupBox#lfo2_group QSlider::sub-page {
+    background-color: #867efc;
+}
+
+QGroupBox#mod_group QGroupBox#menv1_group QSlider::sub-page {
+    background-color: #957cfc;
+}
+
+QGroupBox#mod_group QGroupBox#menv2_group QSlider::sub-page {
+    background-color: #9268fc;
+}
+
+QGroupBox#osc_group QSlider::handle {
+    background-color: #479ef5;
+}
+
+QGroupBox#osc2_group QSlider::handle {
+    background-color: #2bd6c5;
+}
+
+QGroupBox#osc3_group QSlider::handle {
+    background-color: #2bd6ae;
+}
+
+QGroupBox#filt_group QSlider::handle {
+    background-color: #4be372;
+}
+
+QGroupBox#env_group QSlider::handle {
+    background-color: #f7599a;
+}
+
+QGroupBox#fenv_group QSlider::handle {
+    background-color: #52e62e;
+}
+
+QGroupBox#del_group QSlider::handle {
+    background-color: #fa9f2f;
+}
+
+QGroupBox#mod_group QGroupBox#lfo1_group QSlider::handle {
+    background-color: #5a67e0;
+}
+
+QGroupBox#mod_group QGroupBox#lfo2_group QSlider::handle {
+    background-color: #7168e8;
+}
+
+QGroupBox#mod_group QGroupBox#menv1_group QSlider::handle {
+    background-color: #836aeb;
+}
+
+QGroupBox#mod_group QGroupBox#menv2_group QSlider::handle {
+    background-color: #8758fc;
+}
+
+QGroupBox::title {
+    subcontrol-origin: margin;
+    subcontrol-position: top center;
+    padding: 1px;
+    color: #11d4c1;
+}
+
+QGroupBox#filt_group, QGroupBox#osc_group, QGroupBox#osc2_group, QGroupBox#osc3_group, QGroupBox#env_group, QGroupBox#fenv_group, QGroupBox#del_group, QGroupBox#mod_group {
+    min-height: 200px;
+    max-height: 200px;
+}
+
+QGroupBox#mod_subgroup {
+    height: 180px;
+    min-width: 200px;
+}
+
+QGroupBox#filt_group {
+    background-color: #0b5a37;
+}
+
+QGroupBox#osc_group {
+    background-color: #032240;
+}
+
+QGroupBox#osc2_group {
+    background-color: #064b45;
+}
+
+QGroupBox#osc3_group {
+    background-color: #03383e;
+}
+
+QGroupBox#env_group {
+    background-color: #42051f;
+}
+
+QGroupBox#fenv_group {
+    background-color: #114404;
+}
+
+QGroupBox#del_group {
+    background-color: #4b2b04;
+}
+
+QGroupBox#mod_group {
+    background-color: #0c1043
+}
+
+QGroupBox#lfo1_group, QPushButton#lfo1_button {
+    background-color: #9ba4fa;
+}
+
+QGroupBox#lfo2_group, QPushButton#lfo2_button {
+    background-color: #a19bfa;
+}
+
+QGroupBox#menv1_group, QPushButton#menv1_button {
+    background-color: #ae9bfa;
+}
+
+QGroupBox#menv2_group, QPushButton#menv2_button {
+    background-color: #b69bfa;
+}
+
+QPushButton#lfo1_button::checked, QPushButton#lfo2_button::checked, QPushButton#menv1_button::checked, QPushButton#menv2_button::checked {
+    border-color: black;
+}
+
+QPushButton#lfo1_button::hover {
+    background-color: #929dfd;
+}
+
+QPushButton#lfo2_button::hover {
+    background-color: #9a93ff;
+}
+
+QPushButton#menv1_button::hover {
+    background-color: #a691fa;
+}
+
+QPushButton#menv2_button::hover {
+    background-color: #b093f9;
+}
+
+QGroupBox#midi_group, QGroupBox#synth_group {
+    min-height: 200px;
+    max-height: 280px;
+}
+
+QGroupBox#midi_group {
+    background-color: #ab8ebe;
+}
+
+QGroupBox#synth_group QLabel {
+    max-width: 60px;
+}
+
+QGroupBox#synth_group {
+    background-color: #8eb2be;
+}
+
+QGroupBox#mod_group QPushButton {
+    width: 48px;
+    height: 16px;
+    color: #000000;
+    border: 1px solid white;
+    border-radius: 6px;
+}
+
+QPushButton#env_gate {
+    color: #000000;
+    background-color: #bd91a4;
+    border: 1px solid white;
+    border-radius: 6px;
+    height: 24px;
+    text-align: center;
+}
+
+QPushButton#env_gate:hover {
+    background-color: #d19fb4;
+}
+
+QPushButton#env_gate:checked {
+    color: #000000;
+    background-color: #eeb6ce;
+}
+
+QPushButton#midi_refresh, QGroupBox#cc_group QPushButton {
+    color: #000000;
+    font-size: 18px;
+    font-style: bold;
+    max-width: 28px;
+    max-height: 28px;
+}
+
+QPushButton#midi_refresh {
+    background-color: #ab8ebe;
+}
+
+QPushButton#cc_add {
+    background-color: #9fc983;
+}
+
+QPushButton#cc_delete {
+    background-color: #c77581;
+}
+
+QPushButton#toggle_midi, QPushButton#toggle_synth, QPushButton#toggle_record {
+    max-width: 100px;
+    min-width: 100px;
+    height:36px;
+    color: #000000;
+    border: 1px solid white;
+    border-radius: 6px;
+}
+
+QPushButton#toggle_midi {
+    background-color: #857093;
+}
+
+QPushButton#toggle_midi:hover {
+    background-color: #a086b1;
+}
+
+QPushButton#toggle_midi:checked {
+    background-color: #c1a1d6;
+}
+
+QPushButton#toggle_synth {
+    background-color: #708b93;
+}
+
+QPushButton#toggle_synth:hover {
+    background-color: #87a5ad;
+}
+
+QPushButton#toggle_synth:checked {
+    background-color: #a3c7d1;
+}
+
+PatchManager#patch_manager {
+    background-color: #f2999f;
+    border: 1px solid white;
+    border-radius: 6px;
+    min-width: 360px;
+    max-height: 40px;
+}
+
+PatchManager QPushButton {
+    background-color: #e86f77;
+    width: 60px;
+    height: 20px;
+    color: #000000;
+    border: 1px solid white;
+    border-radius: 6px;
+}
+
+PatchManager QPushButton:hover {
+    background-color: #b55056;
+}
+
+
+RecorderGUI#recorder {
+    background-color: #99f2da;
+    border: 1px solid white;
+    border-radius: 6px;
+    min-width: 360px;
+    max-height: 40px;
+}
+
+RecorderGUI QPushButton {
+    max-width: 30px;
+    min-width: 30px;
+    height: 30px;
+    color: #000000;
+    border: 1px solid white;
+    border-radius: 6px;
+}
+
+QWidget#settings_group {
+    min-width:360px;
+    max-height: 40px;
+}
+
+QWidget#toolbar_widget {
+    max-height: 60px;
+}
+
+QFrame#record_spacer {
+    min-width:12px;
+    max-width:12px;
+}
+
+QPushButton#record_button, QPushButton#play_button, QPushButton#stop_button, QPushButton#delete_button {
+    background-color: #34cea5;
+    padding-top: -4px;
+}
+
+QPushButton#delete_button {
+    background-color: #34cea5;
+    padding-top: 4px;
+}
+
+QPushButton#loop_button {
+    background-color: #34cea5;
+    font-style: bold;
+    font-size: 21px;
+}
+
+QPushButton#record_button:hover, QPushButton#play_button:hover, QPushButton#stop_button:hover, QPushButton#loop_button:hover, QPushButton#delete_button:hover {
+    background-color: #1cb68d;
+}
+
+QPushButton#record_button:checked, QPushButton#loop_button:checked, QPushButton#play_button:checked {
+    color: #e6e6e6;
+    background-color: #158668;
+}
+
+QPushButton#delete_button:disabled {
+    background-color: #8534cea5;
+}
