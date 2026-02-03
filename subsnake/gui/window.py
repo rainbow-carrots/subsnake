@@ -13,6 +13,7 @@ from subsnake.gui.patch import PatchManager
 from subsnake.gui.record import RecorderGUI
 from subsnake.gui.mod_gui import ModulatorGUI
 from PySide6.QtCore import Qt
+from PySide6.QtGui import QColor
 from PySide6.QtWidgets import (
     QMainWindow, QGridLayout,
     QFrame, QWidget,
@@ -35,6 +36,7 @@ class MainWindow(QMainWindow):
         self.midi_cc_displays = {}
         self.cc_rows = 0
         self.engine = engine
+        self.display_color = QColor("black")
 
         #toolbar
         self.patch_manager = PatchManager(self.param_sliders, self.param_button_groups)
@@ -78,14 +80,14 @@ class MainWindow(QMainWindow):
         self.synth_group.hide()
 
         #module GUIs
-        self.filt_group = FilterGUI()
-        self.osc_group = OscillatorGUI()
-        self.osc2_group = Oscillator2GUI()
-        self.osc3_group = Oscillator3GUI()
-        self.env_group = EnvelopeGUI()
-        self.fenv_group = FilterEnvGUI()
-        self.del_group = DelayGUI()
-        self.mod_group = ModulatorGUI()
+        self.filt_group = FilterGUI(self.display_color)
+        self.osc_group = OscillatorGUI(self.display_color)
+        self.osc2_group = Oscillator2GUI(self.display_color)
+        self.osc3_group = Oscillator3GUI(self.display_color)
+        self.env_group = EnvelopeGUI(self.display_color)
+        self.fenv_group = FilterEnvGUI(self.display_color)
+        self.del_group = DelayGUI(self.display_color)
+        self.mod_group = ModulatorGUI(self.display_color)
 
         #init slider & button group dictionaries
         self.init_sliders_dict()
