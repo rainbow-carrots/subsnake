@@ -142,6 +142,7 @@ class MainWindow(QMainWindow):
         window_widget.setLayout(self.window_grid)
 
         #connect signals
+        # recorder
         self.recorder.delete.connect(self.update_rec_delete)
         self.recorder.record.connect(self.update_rec_record)
         self.recorder.play.connect(self.update_rec_play)
@@ -149,6 +150,7 @@ class MainWindow(QMainWindow):
         self.recorder.stop.connect(self.update_rec_stop)
         self.recorder.loop.connect(self.update_rec_loop)
 
+        # midi
         self.midi_group.input_changed.connect(self.update_midi_in)
         self.midi_group.channel_changed.connect(self.update_midi_ch)
         self.midi_group.inputs_refreshed.connect(self.refresh_midi_ins)
@@ -156,48 +158,130 @@ class MainWindow(QMainWindow):
         self.midi_group.cc_changed.connect(self.update_cc)
         self.midi_group.cc_param_changed.connect(self.update_param)
         self.midi_group.cc_deleted.connect(self.delete_cc)
+
+        # settings
         self.toggle_midi.toggled.connect(self.toggle_midi_box)
         self.toggle_synth.toggled.connect(self.toggle_synth_box)
 
+        # filter
         self.filt_group.freq_changed.connect(self.update_filt_freq)
         self.filt_group.res_changed.connect(self.update_filt_res)
         self.filt_group.drive_changed.connect(self.update_filt_drive)
         self.filt_group.sat_changed.connect(self.update_filt_sat)
         self.filt_group.alg_changed.connect(self.update_filt_alg)
 
+        # oscillators
+        #  1
         self.osc_group.pitch_changed.connect(self.update_osc_freq)
         self.osc_group.level_changed.connect(self.update_osc_amp)
         self.osc_group.width_changed.connect(self.update_osc_width)
         self.osc_group.alg_changed.connect(self.update_osc_alg)
-
+        #  2
         self.osc2_group.pitch_changed.connect(self.update_osc2_freq)
         self.osc2_group.detune_changed.connect(self.update_osc2_det)
         self.osc2_group.level_changed.connect(self.update_osc2_amp)
         self.osc2_group.width_changed.connect(self.update_osc2_width)
         self.osc2_group.alg_changed.connect(self.update_osc2_alg)
-
+        #  3
         self.osc3_group.pitch_changed.connect(self.update_osc3_freq)
         self.osc3_group.detune_changed.connect(self.update_osc3_det)
         self.osc3_group.level_changed.connect(self.update_osc3_amp)
         self.osc3_group.width_changed.connect(self.update_osc3_width)
         self.osc3_group.alg_changed.connect(self.update_osc3_alg)
 
+        # envelope
         self.env_group.attack_changed.connect(self.update_env_attack)
         self.env_group.decay_changed.connect(self.update_env_decay)
         self.env_group.sustain_changed.connect(self.update_env_sustain)
         self.env_group.release_changed.connect(self.update_env_release)
         self.env_group.gate_changed.connect(self.update_env_gate)
 
+        # filter envelope
         self.fenv_group.attack_changed.connect(self.update_fenv_attack)
         self.fenv_group.decay_changed.connect(self.update_fenv_decay)
         self.fenv_group.sustain_changed.connect(self.update_fenv_sustain)
         self.fenv_group.release_changed.connect(self.update_fenv_release)
         self.fenv_group.amount_changed.connect(self.update_fenv_amount)
 
+        # delay
         self.del_group.time_changed.connect(self.update_del_time)
         self.del_group.feedback_changed.connect(self.update_del_feedback)
         self.del_group.mix_changed.connect(self.update_del_mix)
 
+        # modulators
+        #  values
+        #   oscillator 1
+        self.osc_group.osc_freq_mod_dial.value_changed.connect(self.update_mod_dial_value)
+        self.osc_group.osc_amp_mod_dial.value_changed.connect(self.update_mod_dial_value)
+        self.osc_group.osc_width_mod_dial.value_changed.connect(self.update_mod_dial_value)
+        #   oscillator 2
+        self.osc2_group.osc2_freq_mod_dial.value_changed.connect(self.update_mod_dial_value)
+        self.osc2_group.osc2_det_mod_dial.value_changed.connect(self.update_mod_dial_value)
+        self.osc2_group.osc2_amp_mod_dial.value_changed.connect(self.update_mod_dial_value)
+        self.osc2_group.osc2_width_mod_dial.value_changed.connect(self.update_mod_dial_value)
+        #   oscillator 3
+        self.osc3_group.osc3_freq_mod_dial.value_changed.connect(self.update_mod_dial_value)
+        self.osc3_group.osc3_det_mod_dial.value_changed.connect(self.update_mod_dial_value)
+        self.osc3_group.osc3_amp_mod_dial.value_changed.connect(self.update_mod_dial_value)
+        self.osc3_group.osc3_width_mod_dial.value_changed.connect(self.update_mod_dial_value)
+        #   filter
+        self.filt_group.filt_freq_mod_dial.value_changed.connect(self.update_mod_dial_value)
+        self.filt_group.filt_res_mod_dial.value_changed.connect(self.update_mod_dial_value)
+        self.filt_group.filt_drive_mod_dial.value_changed.connect(self.update_mod_dial_value)
+        self.filt_group.filt_sat_mod_dial.value_changed.connect(self.update_mod_dial_value)
+        #   filter envelope
+        self.fenv_group.fenv_att_mod_dial.value_changed.connect(self.update_mod_dial_value)
+        self.fenv_group.fenv_dec_mod_dial.value_changed.connect(self.update_mod_dial_value)
+        self.fenv_group.fenv_sus_mod_dial.value_changed.connect(self.update_mod_dial_value)
+        self.fenv_group.fenv_rel_mod_dial.value_changed.connect(self.update_mod_dial_value)
+        self.fenv_group.fenv_amt_mod_dial.value_changed.connect(self.update_mod_dial_value)
+        #   envelope
+        self.env_group.env_att_mod_dial.value_changed.connect(self.update_mod_dial_value)
+        self.env_group.env_dec_mod_dial.value_changed.connect(self.update_mod_dial_value)
+        self.env_group.env_sus_mod_dial.value_changed.connect(self.update_mod_dial_value)
+        self.env_group.env_rel_mod_dial.value_changed.connect(self.update_mod_dial_value)
+        #   delay
+        self.del_group.del_time_mod_dial.value_changed.connect(self.update_mod_dial_value)
+        self.del_group.del_feedback_mod_dial.value_changed.connect(self.update_mod_dial_value)
+        self.del_group.del_mix_mod_dial.value_changed.connect(self.update_mod_dial_value)
+
+        #  modes
+        #   oscillator 1
+        self.osc_group.osc_freq_mod_dial.mode_changed.connect(self.update_mod_dial_mode)
+        self.osc_group.osc_amp_mod_dial.mode_changed.connect(self.update_mod_dial_mode)
+        self.osc_group.osc_width_mod_dial.mode_changed.connect(self.update_mod_dial_mode)
+        #   oscillator 2
+        self.osc2_group.osc2_freq_mod_dial.mode_changed.connect(self.update_mod_dial_mode)
+        self.osc2_group.osc2_det_mod_dial.mode_changed.connect(self.update_mod_dial_mode)
+        self.osc2_group.osc2_amp_mod_dial.mode_changed.connect(self.update_mod_dial_mode)
+        self.osc2_group.osc2_width_mod_dial.mode_changed.connect(self.update_mod_dial_mode)
+        #   oscillator 3
+        self.osc3_group.osc3_freq_mod_dial.mode_changed.connect(self.update_mod_dial_mode)
+        self.osc3_group.osc3_det_mod_dial.mode_changed.connect(self.update_mod_dial_mode)
+        self.osc3_group.osc3_amp_mod_dial.mode_changed.connect(self.update_mod_dial_mode)
+        self.osc3_group.osc3_width_mod_dial.mode_changed.connect(self.update_mod_dial_mode)
+        #   filter
+        self.filt_group.filt_freq_mod_dial.mode_changed.connect(self.update_mod_dial_mode)
+        self.filt_group.filt_res_mod_dial.mode_changed.connect(self.update_mod_dial_mode)
+        self.filt_group.filt_drive_mod_dial.mode_changed.connect(self.update_mod_dial_mode)
+        self.filt_group.filt_sat_mod_dial.mode_changed.connect(self.update_mod_dial_mode)
+        #   filter envelope
+        self.fenv_group.fenv_att_mod_dial.mode_changed.connect(self.update_mod_dial_mode)
+        self.fenv_group.fenv_dec_mod_dial.mode_changed.connect(self.update_mod_dial_mode)
+        self.fenv_group.fenv_sus_mod_dial.mode_changed.connect(self.update_mod_dial_mode)
+        self.fenv_group.fenv_rel_mod_dial.mode_changed.connect(self.update_mod_dial_mode)
+        self.fenv_group.fenv_amt_mod_dial.mode_changed.connect(self.update_mod_dial_mode)
+        #   envelope
+        self.env_group.env_att_mod_dial.mode_changed.connect(self.update_mod_dial_mode)
+        self.env_group.env_dec_mod_dial.mode_changed.connect(self.update_mod_dial_mode)
+        self.env_group.env_sus_mod_dial.mode_changed.connect(self.update_mod_dial_mode)
+        self.env_group.env_rel_mod_dial.mode_changed.connect(self.update_mod_dial_mode)
+        #   delay
+        self.del_group.del_time_mod_dial.mode_changed.connect(self.update_mod_dial_mode)
+        self.del_group.del_feedback_mod_dial.mode_changed.connect(self.update_mod_dial_mode)
+        self.del_group.del_mix_mod_dial.mode_changed.connect(self.update_mod_dial_mode)
+
+        # patch select
         self.patch_manager.patch_loaded.connect(self.load_patch)
 
         self.setCentralWidget(window_widget)
@@ -332,6 +416,13 @@ class MainWindow(QMainWindow):
         return cc_function
 
     #slots
+    # modulator dials
+    def update_mod_dial_value(self, name, value):
+        print(f"DEBUG: mod dial: {name}, value: {value}")
+    
+    def update_mod_dial_mode(self, name, mode):
+        print(f"DEBUG: mod dial: {name}, mode: {mode}")
+
     # midi settings
     def update_midi_in(self, input_name):
         self.engine.set_midi_input(input_name)
