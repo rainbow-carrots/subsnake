@@ -5,6 +5,7 @@ from PySide6.QtWidgets import(
 from PySide6.QtCore import Signal, Qt
 from PySide6.QtGui import QPalette, QColor
 from subsnake.gui.lcd import ClickLCD
+from subsnake.gui.mod_gui import CoolDial
 
 class FilterEnvGUI(QGroupBox):
     #signals
@@ -14,13 +15,22 @@ class FilterEnvGUI(QGroupBox):
     release_changed = Signal(float)
     amount_changed = Signal(float)
 
-    def __init__(self):
+    def __init__(self, display_color=QColor("black")):
         super().__init__()
+        self.display_color = display_color
+
         #set title
         self.setTitle("filter env.")
 
         #layout
         fenv_layout = QGridLayout()
+
+        #dials
+        self.fenv_att_mod_dial = CoolDial(1, -500, 500)
+        self.fenv_dec_mod_dial = CoolDial(1, -500, 500)
+        self.fenv_sus_mod_dial = CoolDial(1, -500, 500)
+        self.fenv_rel_mod_dial = CoolDial(1, -500, 500)
+        self.fenv_amt_mod_dial = CoolDial(1, -500, 500)
 
         #labels
         fenv_att_label = QLabel("attack:")
@@ -65,26 +75,33 @@ class FilterEnvGUI(QGroupBox):
         self.set_palette(self.fenv_rel_display)
         self.set_palette(self.fenv_amt_display)
 
+        #add dials
+        fenv_layout.addWidget(self.fenv_att_mod_dial, 0, 0)
+        fenv_layout.addWidget(self.fenv_dec_mod_dial, 1, 0)
+        fenv_layout.addWidget(self.fenv_sus_mod_dial, 2, 0)
+        fenv_layout.addWidget(self.fenv_rel_mod_dial, 3, 0)
+        fenv_layout.addWidget(self.fenv_amt_mod_dial, 4, 0)
+
         #add labels
-        fenv_layout.addWidget(fenv_att_label, 0, 0)
-        fenv_layout.addWidget(fenv_dec_label, 1, 0)
-        fenv_layout.addWidget(fenv_sus_label, 2, 0)
-        fenv_layout.addWidget(fenv_rel_label, 3, 0)
-        fenv_layout.addWidget(fenv_amt_label, 4, 0)
+        fenv_layout.addWidget(fenv_att_label, 0, 1)
+        fenv_layout.addWidget(fenv_dec_label, 1, 1)
+        fenv_layout.addWidget(fenv_sus_label, 2, 1)
+        fenv_layout.addWidget(fenv_rel_label, 3, 1)
+        fenv_layout.addWidget(fenv_amt_label, 4, 1)
 
         #add sliders
-        fenv_layout.addWidget(self.fenv_att_slider, 0, 1)
-        fenv_layout.addWidget(self.fenv_dec_slider, 1, 1)
-        fenv_layout.addWidget(self.fenv_sus_slider, 2, 1)
-        fenv_layout.addWidget(self.fenv_rel_slider, 3, 1)
-        fenv_layout.addWidget(self.fenv_amt_slider, 4, 1)
+        fenv_layout.addWidget(self.fenv_att_slider, 0, 2)
+        fenv_layout.addWidget(self.fenv_dec_slider, 1, 2)
+        fenv_layout.addWidget(self.fenv_sus_slider, 2, 2)
+        fenv_layout.addWidget(self.fenv_rel_slider, 3, 2)
+        fenv_layout.addWidget(self.fenv_amt_slider, 4, 2)
 
         #add displays
-        fenv_layout.addWidget(self.fenv_att_display, 0, 2)
-        fenv_layout.addWidget(self.fenv_dec_display, 1, 2)
-        fenv_layout.addWidget(self.fenv_sus_display, 2, 2)
-        fenv_layout.addWidget(self.fenv_rel_display, 3, 2)
-        fenv_layout.addWidget(self.fenv_amt_display, 4, 2)
+        fenv_layout.addWidget(self.fenv_att_display, 0, 3)
+        fenv_layout.addWidget(self.fenv_dec_display, 1, 3)
+        fenv_layout.addWidget(self.fenv_sus_display, 2, 3)
+        fenv_layout.addWidget(self.fenv_rel_display, 3, 3)
+        fenv_layout.addWidget(self.fenv_amt_display, 4, 3)
 
         #connect signals
         self.fenv_att_slider.valueChanged.connect(self.change_attack)
@@ -114,7 +131,7 @@ class FilterEnvGUI(QGroupBox):
         return display
     
     def set_palette(self, display):
-        text_color = QColor("black")
+        text_color = self.display_color
         display_palette = display.palette()
         display_palette.setColor(QPalette.ColorRole.WindowText, text_color)
         display.setAutoFillBackground(True)

@@ -6,6 +6,7 @@ from PySide6.QtWidgets import(
 from PySide6.QtCore import Signal, Qt
 from PySide6.QtGui import QPalette, QColor
 from subsnake.gui.lcd import ClickLCD
+from subsnake.gui.mod_gui import CoolDial
 
 class FilterGUI(QGroupBox):
     #signals
@@ -15,14 +16,22 @@ class FilterGUI(QGroupBox):
     sat_changed = Signal(float)
     alg_changed = Signal(str)
 
-    def __init__(self):
+    def __init__(self, display_color=QColor("black")):
         super().__init__()
+        self.display_color = display_color
+
         #set title
         self.setTitle("filter")
 
         #layouts
         filt_layout = QGridLayout()
         filt_buttons = QHBoxLayout()
+
+        #dials
+        self.filt_freq_mod_dial = CoolDial(1, -500, 500)
+        self.filt_res_mod_dial = CoolDial(1, -500, 500)
+        self.filt_drive_mod_dial = CoolDial(1, -500, 500)
+        self.filt_sat_mod_dial = CoolDial(1, -500, 500)
 
         #labels
         filt_freq_label = QLabel("cutoff:")
@@ -75,24 +84,30 @@ class FilterGUI(QGroupBox):
         self.filt_alg_group.addButton(self.filt_alg_band)
         self.filt_alg_group.addButton(self.filt_alg_notch)
 
+        #add dials
+        filt_layout.addWidget(self.filt_freq_mod_dial, 0, 0)
+        filt_layout.addWidget(self.filt_res_mod_dial, 1, 0)
+        filt_layout.addWidget(self.filt_drive_mod_dial, 2, 0)
+        filt_layout.addWidget(self.filt_sat_mod_dial, 3, 0)
+
         #add labels to layout
-        filt_layout.addWidget(filt_freq_label, 0, 0)
-        filt_layout.addWidget(filt_res_label, 1, 0)
-        filt_layout.addWidget(filt_drive_label, 2, 0)
-        filt_layout.addWidget(filt_sat_label, 3, 0)
-        filt_layout.addWidget(filt_alg_label, 4, 0)
+        filt_layout.addWidget(filt_freq_label, 0, 1)
+        filt_layout.addWidget(filt_res_label, 1, 1)
+        filt_layout.addWidget(filt_drive_label, 2, 1)
+        filt_layout.addWidget(filt_sat_label, 3, 1)
+        filt_layout.addWidget(filt_alg_label, 4, 1)
 
         #add sliders to layout
-        filt_layout.addWidget(self.filt_freq_slider, 0, 1)
-        filt_layout.addWidget(self.filt_res_slider, 1, 1)
-        filt_layout.addWidget(self.filt_drive_slider, 2, 1)
-        filt_layout.addWidget(self.filt_sat_slider, 3, 1)
+        filt_layout.addWidget(self.filt_freq_slider, 0, 2)
+        filt_layout.addWidget(self.filt_res_slider, 1, 2)
+        filt_layout.addWidget(self.filt_drive_slider, 2, 2)
+        filt_layout.addWidget(self.filt_sat_slider, 3, 2)
 
         #add displays to layout
-        filt_layout.addWidget(self.filt_freq_display, 0, 2)
-        filt_layout.addWidget(self.filt_fback_display, 1, 2)
-        filt_layout.addWidget(self.filt_drive_display, 2, 2)
-        filt_layout.addWidget(self.filt_sat_display, 3, 2)
+        filt_layout.addWidget(self.filt_freq_display, 0, 3)
+        filt_layout.addWidget(self.filt_fback_display, 1, 3)
+        filt_layout.addWidget(self.filt_drive_display, 2, 3)
+        filt_layout.addWidget(self.filt_sat_display, 3, 3)
 
         #add radio buttons to layout
         filt_buttons.addStretch()
@@ -104,7 +119,7 @@ class FilterGUI(QGroupBox):
         filt_buttons.addStretch()
         filt_buttons.addWidget(self.filt_alg_notch)
         filt_buttons.addStretch()
-        filt_layout.addLayout(filt_buttons, 4, 1)
+        filt_layout.addLayout(filt_buttons, 4, 2)
 
         #connect signals
         self.filt_freq_slider.valueChanged.connect(self.change_freq)
@@ -133,7 +148,7 @@ class FilterGUI(QGroupBox):
         return display
     
     def set_palette(self, display):
-        text_color = QColor("black")
+        text_color = self.display_color
         display_palette = display.palette()
         display_palette.setColor(QPalette.ColorRole.WindowText, text_color)
         display.setAutoFillBackground(True)

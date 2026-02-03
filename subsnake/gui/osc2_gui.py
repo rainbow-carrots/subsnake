@@ -6,6 +6,7 @@ from PySide6.QtWidgets import(
 from PySide6.QtCore import Signal, Qt
 from PySide6.QtGui import QPalette, QColor
 from subsnake.gui.lcd import ClickLCD
+from subsnake.gui.mod_gui import CoolDial
 
 class Oscillator2GUI(QGroupBox):
     #signals
@@ -15,14 +16,22 @@ class Oscillator2GUI(QGroupBox):
     width_changed = Signal(float)
     alg_changed = Signal(str)
 
-    def __init__(self):
+    def __init__(self, display_color=QColor("black")):
         super().__init__()
+        self.display_color = display_color
+
         #set title
         self.setTitle("oscillator 2")
 
         #layouts
         osc2_layout = QGridLayout()
         osc2_buttons = QHBoxLayout()
+
+        #dials
+        self.osc2_freq_mod_dial = CoolDial(1, -500, 500)
+        self.osc2_det_mod_dial = CoolDial(1, -500, 500)
+        self.osc2_amp_mod_dial = CoolDial(1, -500, 500)
+        self.osc2_width_mod_dial = CoolDial(1, -500, 500)
 
         #labels
         osc2_freq_label = QLabel("pitch:")
@@ -74,24 +83,30 @@ class Oscillator2GUI(QGroupBox):
         self.osc2_alg_group.addButton(self.osc2_alg_saw)
         self.osc2_alg_group.addButton(self.osc2_alg_pulse)
 
+        #add dials
+        osc2_layout.addWidget(self.osc2_freq_mod_dial, 0, 0)
+        osc2_layout.addWidget(self.osc2_det_mod_dial, 1, 0)
+        osc2_layout.addWidget(self.osc2_amp_mod_dial, 2, 0)
+        osc2_layout.addWidget(self.osc2_width_mod_dial, 3, 0)
+
         #add labels
-        osc2_layout.addWidget(osc2_freq_label, 0, 0)
-        osc2_layout.addWidget(osc2_det_label, 1, 0)
-        osc2_layout.addWidget(osc2_amp_label, 2, 0)
-        osc2_layout.addWidget(osc2_width_label, 3, 0)
-        osc2_layout.addWidget(osc2_alg_label, 4, 0)
+        osc2_layout.addWidget(osc2_freq_label, 0, 1)
+        osc2_layout.addWidget(osc2_det_label, 1, 1)
+        osc2_layout.addWidget(osc2_amp_label, 2, 1)
+        osc2_layout.addWidget(osc2_width_label, 3, 1)
+        osc2_layout.addWidget(osc2_alg_label, 4, 1)
 
         #add sliders
-        osc2_layout.addWidget(self.osc2_freq_slider, 0, 1)
-        osc2_layout.addWidget(self.osc2_det_slider, 1, 1)
-        osc2_layout.addWidget(self.osc2_amp_slider, 2, 1)
-        osc2_layout.addWidget(self.osc2_width_slider, 3, 1)
+        osc2_layout.addWidget(self.osc2_freq_slider, 0, 2)
+        osc2_layout.addWidget(self.osc2_det_slider, 1, 2)
+        osc2_layout.addWidget(self.osc2_amp_slider, 2, 2)
+        osc2_layout.addWidget(self.osc2_width_slider, 3, 2)
 
         #add displays
-        osc2_layout.addWidget(self.osc2_freq_display, 0, 2)
-        osc2_layout.addWidget(self.osc2_det_display, 1, 2)
-        osc2_layout.addWidget(self.osc2_amp_display, 2, 2)
-        osc2_layout.addWidget(self.osc2_width_display, 3, 2)
+        osc2_layout.addWidget(self.osc2_freq_display, 0, 3)
+        osc2_layout.addWidget(self.osc2_det_display, 1, 3)
+        osc2_layout.addWidget(self.osc2_amp_display, 2, 3)
+        osc2_layout.addWidget(self.osc2_width_display, 3, 3)
 
         #add radio buttons
         osc2_buttons.addStretch()
@@ -101,7 +116,7 @@ class Oscillator2GUI(QGroupBox):
         osc2_buttons.addStretch()
         osc2_buttons.addWidget(self.osc2_alg_pulse)
         osc2_buttons.addStretch()
-        osc2_layout.addLayout(osc2_buttons, 4, 1)
+        osc2_layout.addLayout(osc2_buttons, 4, 2)
 
         #connect signals
         self.osc2_freq_slider.valueChanged.connect(self.change_pitch)
@@ -130,7 +145,7 @@ class Oscillator2GUI(QGroupBox):
         return display
     
     def set_palette(self, display):
-        text_color = QColor("black")
+        text_color = self.display_color
         display_palette = display.palette()
         display_palette.setColor(QPalette.ColorRole.WindowText, text_color)
         display.setAutoFillBackground(True)
