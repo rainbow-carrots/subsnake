@@ -9,7 +9,7 @@ oneovertwopi = 1.0/twopi
 
 class LFO():
     def __init__(self, fs, freq=10.0, offset=0.0, shape=0):
-        self.fs = fs
+        self.fs = float(fs)
         self.output = np.zeros((2048), dtype=np.float32)
         self.current_phase = np.zeros((1), dtype=np.float32)
         self.phase_increment = twopi*(freq/float(fs))
@@ -32,6 +32,16 @@ class LFO():
             self.generate_square(self.current_phase, self.phase_offset, self.phase_increment, self.output[:frames], 0.5)
         elif self.shape == 5:
             self.sample_and_hold(self.current_phase, self.phase_increment, self.output, self.held_value)
+
+    def set_frequency(self, new_freq):
+        self.frequency = new_freq
+        self.phase_increment = twopi*(self.frequency/self.fs)
+    
+    def set_offset(self, new_offset):
+        self.phase_offset = twopi*new_offset
+
+    def set_shape(self, new_shape):
+        self.shape = new_shape
     
     @staticmethod
     @njit(nogil=True, fastmath=True)
@@ -117,7 +127,7 @@ class ModEnv():
         self.attack = attack
         self.release = release
         self.mode = mode
-        self.fs = fs
+        self.fs = float(fs)
 
     def process_block(self, frames):
         attack_time = self.attack*self.fs
@@ -130,6 +140,15 @@ class ModEnv():
             self.gen_AHR(self.value, self.state, self.gate, attack_c, release_c, .001, self.output[:frames])
         elif self.mode == 2:
             self.gen_AR_loop(self.value, self.state, self.gate, attack_c, release_c, .001, self.output[:frames])
+
+    def set_attack(self, new_attack):
+        self.attack = new_attack
+    
+    def set_release(self, new_release):
+        self.release = new_release
+
+    def set_mode(self, new_mode):
+        self.mode = new_mode
 
     @staticmethod
     @njit(nogil=True, fastmath=True)
