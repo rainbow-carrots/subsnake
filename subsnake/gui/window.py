@@ -245,7 +245,7 @@ class MainWindow(QMainWindow):
         self.del_group.del_feedback_mod_dial.value_changed.connect(self.update_mod_dial_value)
         self.del_group.del_mix_mod_dial.value_changed.connect(self.update_mod_dial_value)
 
-        #  modes
+        #  modules
         #   oscillator 1
         self.osc_group.osc_freq_mod_dial.mode_changed.connect(self.update_mod_dial_mode)
         self.osc_group.osc_amp_mod_dial.mode_changed.connect(self.update_mod_dial_mode)
@@ -280,6 +280,23 @@ class MainWindow(QMainWindow):
         self.del_group.del_time_mod_dial.mode_changed.connect(self.update_mod_dial_mode)
         self.del_group.del_feedback_mod_dial.mode_changed.connect(self.update_mod_dial_mode)
         self.del_group.del_mix_mod_dial.mode_changed.connect(self.update_mod_dial_mode)
+        #   modulation
+        #    lfo 1
+        self.mod_group.lfo1_freq_changed.connect(self.update_lfo1_freq)
+        self.mod_group.lfo1_offset_changed.connect(self.update_lfo1_offset)
+        self.mod_group.lfo1_shape_changed.connect(self.update_lfo1_shape)
+        #    lfo 2
+        self.mod_group.lfo2_freq_changed.connect(self.update_lfo2_freq)
+        self.mod_group.lfo2_offset_changed.connect(self.update_lfo2_offset)
+        self.mod_group.lfo2_shape_changed.connect(self.update_lfo2_shape)
+        #    menv 1
+        self.mod_group.menv1_att_changed.connect(self.update_menv1_att)
+        self.mod_group.menv1_rel_changed.connect(self.update_menv1_rel)
+        self.mod_group.menv1_mode_changed.connect(self.update_menv1_mode)
+        #    menv 2
+        self.mod_group.menv2_att_changed.connect(self.update_menv2_att)
+        self.mod_group.menv2_rel_changed.connect(self.update_menv2_rel)
+        self.mod_group.menv2_mode_changed.connect(self.update_menv2_mode)
 
         # patch select
         self.patch_manager.patch_loaded.connect(self.load_patch)
@@ -418,10 +435,10 @@ class MainWindow(QMainWindow):
     #slots
     # modulator dials
     def update_mod_dial_value(self, name, value):
-        print(f"DEBUG: mod dial: {name}, value: {value}")
+        self.engine.update_mod_value(name, value)
     
     def update_mod_dial_mode(self, name, mode):
-        print(f"DEBUG: mod dial: {name}, mode: {mode}")
+        self.engine.update_mod_mode(name, mode)
 
     # midi settings
     def update_midi_in(self, input_name):
@@ -638,6 +655,47 @@ class MainWindow(QMainWindow):
     def update_del_mix(self, value):
         self.engine.updat_del_mix(value)
 
+    # lfo 1
+    def update_lfo1_freq(self, value):
+        self.engine.update_lfo1_freq(value)
+    
+    def update_lfo1_offset(self, value):
+        self.engine.update_lfo1_offset(value)
+    
+    def update_lfo1_shape(self, value):
+        self.engine.update_lfo1_shape(value)
+
+    # lfo 2
+    def update_lfo2_freq(self, value):
+        self.engine.update_lfo2_freq(value)
+    
+    def update_lfo2_offset(self, value):
+        self.engine.update_lfo2_offset(value)
+    
+    def update_lfo2_shape(self, value):
+        self.engine.update_lfo2_shape(value)
+
+    # menv 1
+    def update_menv1_att(self, value):
+        self.engine.update_menv1_att(value)
+    
+    def update_menv1_rel(self, value):
+        self.engine.update_menv1_rel(value)
+    
+    def update_menv1_mode(self, value):
+        self.engine.update_menv1_mode(value)
+
+    # menv 2
+    def update_menv2_att(self, value):
+        self.engine.update_menv2_att(value)
+    
+    def update_menv2_rel(self, value):
+        self.engine.update_menv2_rel(value)
+    
+    def update_menv2_mode(self, value):
+        self.engine.update_menv2_mode(value)
+
+    # process pc keyboard press events (chromatic)
     def keyPressEvent(self, event):
         if (event.isAutoRepeat()):
             return
