@@ -22,17 +22,17 @@ class WrappedOsc():
     def process_block(self, buffer, mod_buffers, mod_values):
         #print(f"DEBUG: buffer shape is {buffer.shape}")
         if (self.alg == 0):
-            self.generate_sine(self.state, buffer, mod_buffers[0], mod_buffers[1], mod_buffers[2], mod_values[0], mod_values[1], mod_values[2])
+            self.generate_sine(self.state, buffer, mod_buffers[0], mod_buffers[1], mod_buffers[2], mod_values[0], mod_values[1], mod_values[2], self.amp)
         elif (self.alg == 1.0):
-            self.polyblep_saw(self.state, buffer, mod_buffers[0], mod_buffers[1], mod_buffers[2], mod_values[0], mod_values[1], mod_values[2])
+            self.polyblep_saw(self.state, buffer, mod_buffers[0], mod_buffers[1], mod_buffers[2], mod_values[0], mod_values[1], mod_values[2], self.amp)
         elif (self.alg == 2.0):
             #anti-aliased square wave
             frames = len(buffer)
             self.state2[0] = self.state[0] + self.pulsewidth*twopi
             if (self.state2[0] > twopi):
                 self.state2[0] -= twopi
-            self.polyblep_saw(self.state, buffer, mod_buffers[0], mod_buffers[1], mod_buffers[2], mod_values[0], mod_values[1], mod_values[2])
-            self.polyblep_saw(self.state2, self.hardSyncBuffer, mod_buffers[0], mod_buffers[1], mod_buffers[2], mod_values[0], mod_values[1], mod_values[2])
+            self.polyblep_saw(self.state, buffer, mod_buffers[0], mod_buffers[1], mod_buffers[2], mod_values[0], mod_values[1], mod_values[2], self.amp)
+            self.polyblep_saw(self.state2, self.hardSyncBuffer, mod_buffers[0], mod_buffers[1], mod_buffers[2], mod_values[0], mod_values[1], mod_values[2], self.amp)
             buffer[:] -= self.hardSyncBuffer[:frames]
 
     def update_pitch(self, newPitch):
@@ -56,11 +56,11 @@ class WrappedOsc():
     #phase-wrapped sine wave
     @staticmethod
     @njit(nogil=True, fastmath=True)
-    def generate_sine(state, outdata, pitch_mod, det_mod, amp_mod, pm_amt, dm_amt, am_amt):
+    def generate_sine(state, outdata, pitch_mod, det_mod, amp_mod, pm_amt, dm_amt, am_amt, amp=1.0):
         for n in range(len(outdata)):
             sample = state[1] * math.sin(state[0])
-            outdata[n][0] = sample*(1.0 - amp_mod[n]*am_amt)
-            outdata[n][1] = sample*(1.0 - amp_mod[n]*am_amt)
+            outdata[n][0] = sample*(amp - amp_mod[n]*am_amt)
+            outdata[n][1] = sample*(amp - amp_mod[n]*am_amt)
             state[0] += state[2]
             if (state[0] > twopi):
                 state[0] -= twopi
@@ -68,7 +68,7 @@ class WrappedOsc():
     #anti-aliased sawtooth
     @staticmethod
     @njit(nogil=True, fastmath=True)
-    def polyblep_saw(state, outdata, pitch_mod, det_mod, amp_mod, pm_amt, dm_amt, am_amt):
+    def polyblep_saw(state, outdata, pitch_mod, det_mod, amp_mod, pm_amt, dm_amt, am_amt, amp=1.0):
         frames = len(outdata)
         for n in range(frames):
             #generate naive saw
@@ -89,5 +89,5 @@ class WrappedOsc():
 
             #output
             sample *= state[1]
-            outdata[n, 0] = sample*(1.0 - amp_mod[n]*am_amt)
-            outdata[n, 1] = sample*(1.0 - amp_mod[n]*am_amt)
+            outdata[n, 0] = sample*(amp - amp_mod[n]*am_amt)
+            outdata[n, 1] = sample*(amp - amp_mod[n]*am_amt)
