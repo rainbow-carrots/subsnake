@@ -20,24 +20,6 @@ midi_latency = 0.0029025   #seconds
 
 class AudioEngine():
     def __init__(self):
-        self.voices = [Voice(), Voice(), Voice(), Voice(),
-                       Voice(), Voice(), Voice(), Voice(),
-                       Voice(), Voice(), Voice(), Voice()]
-        self.delay = StereoDelay(fs)
-        self.recorder = AudioRecorder(fs)
-        self.stopped_voice_indeces = []
-        self.released_voice_indeces = []
-        voice_index = 0
-        for voice in self.voices:
-            voice.index = voice_index
-            self.stopped_voice_indeces.append(voice_index)
-            voice.detune_offset_2 = .975 + .050*random.random()
-            voice.detune_offset_3 = .975 + .050*random.random()
-            voice_index += 1
-
-        self.voice_output = np.zeros((2048, 2), dtype=np.float32)
-        self.recorder_output = np.zeros((2048, 2), dtype=np.float32)
-        self.delay_output = np.zeros((2048, 2), dtype=np.float32)
         #mod dial value states (float)
         self.mod_dial_values = {"osc_freq": 0.0, "osc_amp": 0.0, "osc_width": 0.0,
                                 "osc2_freq": 0.0, "osc2_det": 0.0, "osc2_amp": 0.0, "osc2_width": 0.0,
@@ -54,6 +36,24 @@ class AudioEngine():
                                 "fenv_att": 0, "fenv_dec": 0, "fenv_sus": 0, "fenv_rel": 0, "fenv_amt": 0,
                                 "env_att": 0, "env_dec": 0, "env_sus": 0, "env_rel": 0,
                                 "del_time": 0, "del_feedback": 0, "del_mix": 0}
+        self.voices = []
+        for n in range(0, 12):
+            self.voices.append(Voice(self.mod_dial_values, self.mod_dial_modes))
+        self.delay = StereoDelay(fs)
+        self.recorder = AudioRecorder(fs)
+        self.stopped_voice_indeces = []
+        self.released_voice_indeces = []
+        voice_index = 0
+        for voice in self.voices:
+            voice.index = voice_index
+            self.stopped_voice_indeces.append(voice_index)
+            voice.detune_offset_2 = .975 + .050*random.random()
+            voice.detune_offset_3 = .975 + .050*random.random()
+            voice_index += 1
+
+        self.voice_output = np.zeros((2048, 2), dtype=np.float32)
+        self.recorder_output = np.zeros((2048, 2), dtype=np.float32)
+        self.delay_output = np.zeros((2048, 2), dtype=np.float32)
         self.key_to_note = {}
         self.note_to_voice = {}
         self.octave = 0
@@ -463,13 +463,16 @@ class AudioEngine():
 
 
 class Voice():
-    def __init__(self):
+    def __init__(self, mod_dial_values, mod_dial_modes):
+        self.mod_dial_values = mod_dial_values
+        self.mod_dial_modes = mod_dial_modes
         self.osc_out = np.zeros((2048, 2), dtype=np.float32)
         self.osc2_out = np.zeros((2048, 2), dtype=np.float32)
         self.osc3_out = np.zeros((2048, 2), dtype=np.float32)
         self.filt_out = np.zeros((2048, 2), dtype=np.float32)
         self.fenv_in = np.ones((2048, 2), dtype=np.float32)
         self.fenv_out = np.zeros((2048, 2), dtype=np.float32)
+        self.no_mod = np.zeros((2048), dtype=np.float32)
         self.osc = WrappedOsc(2, 0.5, 55, fs, .5)
         self.osc2 = WrappedOsc(2, 0.5, 55, fs, .5)
         self.osc3 = WrappedOsc(2, 0.5, 55, fs, .5)
@@ -488,21 +491,54 @@ class Voice():
         self.detune_offset_3 = 0.0
 
     def callback(self, output, note_to_voice, stopped_voices, released_voices, frames):
+        #modulators
         self.lfo1.process_block(frames)
         self.lfo2.process_block(frames)
         self.menv1.process_block(frames)
         self.menv2.process_block(frames)
-        self.osc.process_block(self.osc_out[:frames])
+
+        #oscillators
+        # 1
+        osc1_mod_buffers = [self.assign_mod_buffer(self.mod_dial_modes["osc_freq"])]
+        osc1_mod_buffers.append(self.no_mod)
+        osc1_mod_buffers.append(self.assign_mod_buffer(self.mod_dial_modes["osc_amp"]))
+        osc1_mod_buffers.append(self.assign_mod_buffer(self.mod_dial_modes["osc_width"]))
+        osc1_mod_values = [self.mod_dial_values["osc_freq"], 0.0,
+                           self.mod_dial_values["osc_amp"], self.mod_dial_values["osc_width"]]
+        self.osc.process_block(self.osc_out[:frames], osc1_mod_buffers, osc1_mod_values)
         self.osc_out *= 0.33
-        self.osc2.process_block(self.osc2_out[:frames])
+        # 2
+        osc2_mod_buffers = [self.assign_mod_buffer(self.mod_dial_modes["osc2_freq"])]
+        osc2_mod_buffers.append(self.assign_mod_buffer(self.mod_dial_modes["osc2_det"]))
+        osc2_mod_buffers.append(self.assign_mod_buffer(self.mod_dial_modes["osc2_amp"]))
+        osc2_mod_buffers.append(self.assign_mod_buffer(self.mod_dial_modes["osc2_width"]))
+        osc2_mod_values = [self.mod_dial_values["osc2_freq"], self.mod_dial_values["osc2_det"],
+                           self.mod_dial_values["osc2_amp"], self.mod_dial_values["osc2_width"]]
+        self.osc2.process_block(self.osc2_out[:frames], osc2_mod_buffers, osc2_mod_values)
         self.osc2_out *= 0.33
-        self.osc3.process_block(self.osc3_out[:frames])
+        # 3
+        osc3_mod_buffers = [self.assign_mod_buffer(self.mod_dial_modes["osc3_freq"])]
+        osc3_mod_buffers.append(self.assign_mod_buffer(self.mod_dial_modes["osc3_det"]))
+        osc3_mod_buffers.append(self.assign_mod_buffer(self.mod_dial_modes["osc3_amp"]))
+        osc3_mod_buffers.append(self.assign_mod_buffer(self.mod_dial_modes["osc3_width"]))
+        osc3_mod_values = [self.mod_dial_values["osc3_freq"], self.mod_dial_values["osc3_det"],
+                           self.mod_dial_values["osc3_amp"], self.mod_dial_values["osc3_width"]]
+        self.osc3.process_block(self.osc3_out[:frames], osc3_mod_buffers, osc3_mod_values)
         self.osc3_out *= 0.33
+        # sum
         self.osc_out += self.osc2_out
         self.osc_out += self.osc3_out
+
+        # filter envelope
         self.fenv.process_block(self.fenv_in[:frames], self.fenv_out[:frames])
+
+        # filter
         self.filt.process_block(self.osc_out[:frames], self.filt_out[:frames], self.fenv_out[:frames])
+
+        # amplitude envelope
         self.env.process_block(self.filt_out[:frames], output)
+
+        # output
         output *= self.velocity
         if (self.env.state[0] == 0.0) and (self.status > 0):
             if self.base_note in note_to_voice:
@@ -512,3 +548,15 @@ class Voice():
                     released_voices.pop(old_index)
             stopped_voices.append(self.index)    
             self.status = 0
+    
+    def assign_mod_buffer(self, mode):
+        if mode == 0:
+            return self.no_mod
+        elif mode == 1:
+            return self.lfo1.output
+        elif mode == 2:
+            return self.lfo2.output
+        elif mode == 3:
+            return self.menv1.output
+        elif mode == 4:
+            return self.menv2.output
