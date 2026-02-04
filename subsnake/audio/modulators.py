@@ -12,9 +12,9 @@ class LFO():
         self.fs = float(fs)
         self.output = np.zeros((2048), dtype=np.float32)
         self.current_phase = np.zeros((1), dtype=np.float32)
-        self.phase_increment = twopi*(freq/float(fs))
+        self.phase_increment = np.float32(twopi*(freq/float(fs)))
         self.frequency = freq
-        self.phase_offset = offset
+        self.phase_offset = np.float32(offset)
         self.shape = shape
         self.held_value = np.zeros((1), dtype=np.float32)
         self.held_value[0] = 2*np.random.random() - 1.0
@@ -34,11 +34,11 @@ class LFO():
             self.sample_and_hold(self.current_phase, self.phase_increment, self.output, self.held_value)
 
     def set_frequency(self, new_freq):
-        self.frequency = new_freq
-        self.phase_increment = twopi*(self.frequency/self.fs)
+        self.frequency = np.float32(new_freq)
+        self.phase_increment = np.float32(twopi*(self.frequency/self.fs))
     
     def set_offset(self, new_offset):
-        self.phase_offset = twopi*new_offset
+        self.phase_offset = np.float32(twopi*new_offset)
 
     def set_shape(self, new_shape):
         self.shape = new_shape
@@ -128,18 +128,19 @@ class ModEnv():
         self.release = release
         self.mode = mode
         self.fs = float(fs)
+        self.threshold = np.float32(.001)
 
     def process_block(self, frames):
         attack_time = self.attack*self.fs
         release_time = self.release*self.fs
-        attack_c = 1.0 - math.exp(-1/attack_time)
-        release_c = 1.0 - math.exp(-1/release_time)
+        attack_c = np.float32(1.0 - math.exp(-1/attack_time))
+        release_c = np.float32(1.0 - math.exp(-1/release_time))
         if self.mode == 0:
-            self.gen_AR_oneshot(self.value, self.state, self.gate, self.run, attack_c, release_c, .001, self.output[:frames])
+            self.gen_AR_oneshot(self.value, self.state, self.gate, self.run, attack_c, release_c, self.threshold, self.output[:frames])
         elif self.mode == 1:
-            self.gen_AHR(self.value, self.state, self.gate, attack_c, release_c, .001, self.output[:frames])
+            self.gen_AHR(self.value, self.state, self.gate, attack_c, release_c, self.threshold, self.output[:frames])
         elif self.mode == 2:
-            self.gen_AR_loop(self.value, self.state, self.gate, attack_c, release_c, .001, self.output[:frames])
+            self.gen_AR_loop(self.value, self.state, self.gate, attack_c, release_c, self.threshold, self.output[:frames])
 
     def set_attack(self, new_attack):
         self.attack = new_attack
