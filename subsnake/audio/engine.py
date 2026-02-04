@@ -38,6 +38,22 @@ class AudioEngine():
         self.voice_output = np.zeros((2048, 2), dtype=np.float32)
         self.recorder_output = np.zeros((2048, 2), dtype=np.float32)
         self.delay_output = np.zeros((2048, 2), dtype=np.float32)
+        #mod dial value states (float)
+        self.mod_dial_values = {"osc_freq": 0.0, "osc_amp": 0.0, "osc_width": 0.0,
+                                "osc2_freq": 0.0, "osc2_det": 0.0, "osc2_amp": 0.0, "osc2_width": 0.0,
+                                "osc3_freq": 0.0, "osc3_det": 0.0, "osc3_amp": 0.0, "osc3_width": 0.0,
+                                "filt_freq": 0.0, "filt_res": 0.0, "filt_drive": 0.0, "filt_sat": 0.0,
+                                "fenv_att": 0.0, "fenv_dec": 0.0, "fenv_sus": 0.0, "fenv_rel": 0.0, "fenv_amt": 0.0,
+                                "env_att": 0.0, "env_dec": 0.0, "env_sus": 0.0, "env_rel": 0.0,
+                                "del_time": 0.0, "del_feedback": 0.0, "del_mix": 0.0}
+        #mod dial mode states (int)
+        self.mod_dial_modes =  {"osc_freq": 0, "osc_amp": 0, "osc_width": 0,
+                                "osc2_freq": 0, "osc2_det": 0, "osc2_amp": 0, "osc2_width": 0,
+                                "osc3_freq": 0, "osc3_det": 0, "osc3_amp": 0, "osc3_width": 0,
+                                "filt_freq": 0, "filt_res": 0, "filt_drive": 0, "filt_sat": 0,
+                                "fenv_att": 0, "fenv_dec": 0, "fenv_sus": 0, "fenv_rel": 0, "fenv_amt": 0,
+                                "env_att": 0, "env_dec": 0, "env_sus": 0, "env_rel": 0,
+                                "del_time": 0, "del_feedback": 0, "del_mix": 0}
         self.key_to_note = {}
         self.note_to_voice = {}
         self.octave = 0
@@ -148,6 +164,7 @@ class AudioEngine():
         self.recorder.set_loop(state)
 
     #voice helper functions
+    # oscillators
     def update_pitch_1(self, offset):
         for voice in self.voices:
             new_pitch = 440.0 * 2**(float(voice.base_note)/12.0 + offset)
@@ -211,6 +228,7 @@ class AudioEngine():
             elif (osc == 3):
                 voice.osc3.update_algorithm(newAlg)
     
+    # filter
     def update_cutoff(self, newFreq):
         for voice in self.voices:
              voice.filt.update_cutoff(newFreq)
@@ -230,7 +248,8 @@ class AudioEngine():
     def update_saturate(self, newSat):
         for voice in self.voices:
               voice.filt.update_saturate(newSat)
-         
+
+    # envelope
     def update_gate(self, newGate):
         for voice in self.voices:
               voice.env.update_gate(newGate)
@@ -251,6 +270,7 @@ class AudioEngine():
          for voice in self.voices:
               voice.env.update_release(newRelease)
 
+    # filter envelope
     def update_fenv_attack(self, newAttack):
         for voice in self.voices:
              voice.fenv.update_attack(newAttack)
@@ -271,6 +291,7 @@ class AudioEngine():
         for voice in self.voices:
             voice.filt.update_env_amount(newAmount)
 
+    # delay
     def update_del_time(self, newTime):
         self.delay.update_time(newTime)
 
@@ -280,6 +301,55 @@ class AudioEngine():
     def updat_del_mix(self, newMix):
         self.delay.update_mix(newMix)
 
+    # modulators
+    #  lfo 1
+    def update_lfo1_freq(self, newFreq):
+        for voice in self.voices:
+            voice.lfo1.set_frequency(newFreq)
+
+    def update_lfo1_offset(self, newPhase):
+        for voice in self.voices:
+            voice.lfo1.set_offset(newPhase)
+
+    def update_lfo1_shape(self, newShape):
+        for voice in self.voices:
+            voice.lfo1.set_shape(newShape)
+    #  lfo 2
+    def update_lfo2_freq(self, newFreq):
+        for voice in self.voices:
+            voice.lfo2.set_frequency(newFreq)
+
+    def update_lfo2_offset(self, newPhase):
+        for voice in self.voices:
+            voice.lfo2.set_offset(newPhase)
+
+    def update_lfo2_shape(self, newShape):
+        for voice in self.voices:
+            voice.lfo2.set_shape(newShape)
+    #  menv 1
+    def update_menv1_att(self, newAtt):
+        for voice in self.voices:
+            voice.menv1.set_attack(newAtt)
+
+    def update_menv1_rel(self, newRel):
+        for voice in self.voices:
+            voice.menv1.set_release(newRel)
+
+    def update_menv1_mode(self, newMode):
+        for voice in self.voices:
+            voice.menv1.set_mode(newMode)
+    #  menv 2
+    def update_menv2_att(self, newAtt):
+        for voice in self.voices:
+            voice.menv2.set_attack(newAtt)
+
+    def update_menv2_rel(self, newRel):
+        for voice in self.voices:
+            voice.menv2.set_release(newRel)
+
+    def update_menv2_mode(self, newMode):
+        for voice in self.voices:
+            voice.menv2.set_mode(newMode)
 
     #cc helpers
     #osc 1
@@ -383,6 +453,13 @@ class AudioEngine():
     def cc_change_env_release(self, value):
         new_release = (float(value)/127.0) + .001
         self.update_release(new_release)
+
+    #mod dial helpers
+    def update_mod_value(self, name, value):
+        self.mod_dial_values.update({name: value})
+
+    def update_mod_mode(self, name, mode):
+        self.mod_dial_modes.update({name: mode})
 
 
 class Voice():
