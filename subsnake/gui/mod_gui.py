@@ -198,7 +198,7 @@ class ModulatorGUI(QGroupBox):
         self.menv_ar_button_1 = QRadioButton("AR")
         self.menv_ar_button_1.setChecked(True)
         self.menv_ahr_button_1 = QRadioButton("AHR")
-        self.menv_loop_button_1 = QRadioButton("loop")
+        self.menv_loop_button_1 = QRadioButton("Loop")
         self.menv_mode_buttons_1.addButton(self.menv_ar_button_1)
         self.menv_mode_buttons_1.addButton(self.menv_ahr_button_1)
         self.menv_mode_buttons_1.addButton(self.menv_loop_button_1)
@@ -252,7 +252,7 @@ class ModulatorGUI(QGroupBox):
         self.menv_ar_button_2 = QRadioButton("AR")
         self.menv_ar_button_2.setChecked(True)
         self.menv_ahr_button_2 = QRadioButton("AHR")
-        self.menv_loop_button_2 = QRadioButton("loop")
+        self.menv_loop_button_2 = QRadioButton("Loop")
         self.menv_mode_buttons_2.addButton(self.menv_ar_button_2)
         self.menv_mode_buttons_2.addButton(self.menv_ahr_button_2)
         self.menv_mode_buttons_2.addButton(self.menv_loop_button_2)
@@ -468,7 +468,7 @@ class ModulatorGUI(QGroupBox):
             new_mode = 0
         elif mode_text == "AHR":
             new_mode = 1
-        elif mode_text == "AR loop":
+        elif mode_text == "Loop":
             new_mode = 2
         self.menv1_mode_changed.emit(new_mode)
 
@@ -495,7 +495,7 @@ class ModulatorGUI(QGroupBox):
             new_mode = 0
         elif mode_text == "AHR":
             new_mode = 1
-        elif mode_text == "AR loop":
+        elif mode_text == "Loop":
             new_mode = 2
         self.menv2_mode_changed.emit(new_mode)
 
