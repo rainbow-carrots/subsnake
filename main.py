@@ -6,6 +6,7 @@ from subsnake.gui import MainWindow
 import subsnake.gui as gui
 from subsnake.audio import WrappedOsc, HalSVF, ADSR, AudioEngine
 from subsnake.audio.effects import AudioRecorder, StereoDelay
+from subsnake.audio.modulators import LFO, ModEnv
 from importlib import resources
 
 fs = 44100
@@ -16,14 +17,20 @@ oneoverpi = 1/np.pi
 osc_test = np.array([0.0, 0.0, 0.0], dtype=np.float32)
 filt_test = np.array([[0.0, 0.0, 1.0, 2.0, 0.0, 1.0, 8.0], [0.0, 0.0, 1.0, 2.0, 0.0, 1.0, 8.0]], dtype=np.float32)
 env_test = np.array([0.0, 0.0, 1.0, 1.0, 0.5, 1.0], dtype=np.float32)
-WrappedOsc.generate_sine(osc_test, np.zeros((16, 2), dtype=np.float32))
-WrappedOsc.polyblep_saw(osc_test, np.zeros((16, 2), dtype=np.float32))
+WrappedOsc.generate_sine(osc_test, np.zeros((16, 2), dtype=np.float32), osc_test, osc_test, osc_test, 0, 0, 0)
+WrappedOsc.polyblep_saw(osc_test, np.zeros((16, 2), dtype=np.float32), osc_test, osc_test, osc_test, 0, 0, 0)
 HalSVF.filter_block(filt_test, np.zeros((16, 2), dtype=np.float32), np.zeros((16, 2), dtype=np.float32), np.ones((16, 2), dtype=np.float32), 0.0, HalSVF.clip_sample, 100)
 ADSR.envelope_block(env_test, False, np.zeros((16, 2), dtype=np.float32), np.zeros((16, 2), dtype=np.float32), 0, 0)
 AudioRecorder.process_samples(np.zeros((32, 2), dtype=np.float32), np.zeros((16, 2), dtype=np.float32), np.zeros((16, 2), dtype=np.float32), 0,
                               [False], [True], [False], False, np.zeros((2), dtype=np.int32), np.zeros((2), dtype=np.int32), [0])
 StereoDelay.delay_block(np.zeros((32, 2), dtype=np.float32), np.zeros((32, 2), dtype=np.float32), np.zeros((32, 2), dtype=np.float32), 0,
                         np.zeros((2), dtype=np.int32), np.zeros((2), dtype=np.int32), 0.5, 0.5)
+LFO.generate_sine(np.zeros((1), dtype=np.float32), 0, 0, np.zeros((16), dtype=np.float32))
+LFO.generate_triangle(np.zeros((1), dtype=np.float32), 0, 0, np.zeros((16), dtype=np.float32))
+LFO.generate_ramp(np.zeros((1), dtype=np.float32), 0, 0, np.zeros((16), dtype=np.float32))
+LFO.generate_sawtooth(np.zeros((1), dtype=np.float32), 0, 0, np.zeros((16), dtype=np.float32))
+LFO.generate_square(np.zeros((1), dtype=np.float32), 0, 0, np.zeros((16), dtype=np.float32), 0.5)
+LFO.sample_and_hold(np.zeros((1), dtype=np.float32), 0, np.zeros((16), dtype=np.float32), np.zeros((1), dtype=np.float32))
 
 
 #get midi inputs & channels
