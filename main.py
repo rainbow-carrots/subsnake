@@ -19,6 +19,11 @@ filt_test = np.array([[0.0, 0.0, 1.0, 2.0, 0.0, 1.0, 8.0], [0.0, 0.0, 1.0, 2.0, 
 env_test = np.array([0.0, 0.0, 1.0, 1.0, 0.5, 1.0], dtype=np.float32)
 phase_test = np.zeros((1), dtype=np.float32)
 test_out = np.zeros((128), dtype=np.float32)
+f32_increment = np.float32(0.1)
+f32_offset = np.float32(0.0)
+f32_attack_c = np.float32(0.1)
+f32_release_c = np.float32(0.1)
+f32_threshold = np.float32(.001)
 WrappedOsc.generate_sine(osc_test, np.zeros((16, 2), dtype=np.float32), osc_test, osc_test, osc_test, 0, 0, 0)
 WrappedOsc.polyblep_saw(osc_test, np.zeros((16, 2), dtype=np.float32), osc_test, osc_test, osc_test, 0, 0, 0)
 HalSVF.filter_block(filt_test, np.zeros((16, 2), dtype=np.float32), np.zeros((16, 2), dtype=np.float32), np.ones((16, 2), dtype=np.float32), 0.0, HalSVF.clip_sample, 100)
@@ -27,16 +32,18 @@ AudioRecorder.process_samples(np.zeros((32, 2), dtype=np.float32), np.zeros((16,
                               [False], [True], [False], False, np.zeros((2), dtype=np.int32), np.zeros((2), dtype=np.int32), [0])
 StereoDelay.delay_block(np.zeros((32, 2), dtype=np.float32), np.zeros((32, 2), dtype=np.float32), np.zeros((32, 2), dtype=np.float32), 0,
                         np.zeros((2), dtype=np.int32), np.zeros((2), dtype=np.int32), 0.5, 0.5)
-LFO.generate_sine(phase_test, 0.1, 0.0, test_out)
-LFO.generate_triangle(phase_test, 0.1, 0.0, test_out)
-LFO.generate_ramp(phase_test, 0.1, 0.0, test_out)
-LFO.generate_sawtooth(phase_test, 0.1, 0.0, test_out)
-LFO.generate_square(phase_test, 0.1, 0.0, test_out, 0.5)
-LFO.sample_and_hold(phase_test, 0.1, test_out, np.zeros((1), dtype=np.float32))
+LFO.generate_sine(phase_test, f32_increment, f32_offset, test_out)
+LFO.generate_triangle(phase_test, f32_increment, f32_offset, test_out)
+LFO.generate_ramp(phase_test, f32_increment, f32_offset, test_out)
+LFO.generate_sawtooth(phase_test, f32_increment, f32_offset, test_out)
+LFO.generate_square(phase_test, f32_increment, f32_offset, test_out, 0.5)
+LFO.sample_and_hold(phase_test, f32_increment, test_out, np.zeros((1), dtype=np.float32))
 ModEnv.gen_AR_oneshot(np.zeros((1), dtype=np.float32), np.zeros((1), dtype=np.float32), True, np.zeros((1), dtype=np.float32),
-                      0.1, 0.1, .001, np.zeros((16), dtype=np.float32))
-ModEnv.gen_AR_loop(np.zeros((1), dtype=np.float32), np.zeros((1), dtype=np.float32), True, 0.1, 0.1, .001, np.zeros((16), dtype=np.float32))
-ModEnv.gen_AHR(np.zeros((1), dtype=np.float32), np.zeros((1), dtype=np.float32), True, 0.1, 0.1, .001, np.zeros((16), dtype=np.float32))
+                      f32_attack_c, f32_release_c, f32_threshold, np.zeros((16), dtype=np.float32))
+ModEnv.gen_AR_loop(np.zeros((1), dtype=np.float32), np.zeros((1), dtype=np.float32), True,
+                   f32_attack_c, f32_release_c, f32_threshold, np.zeros((16), dtype=np.float32))
+ModEnv.gen_AHR(np.zeros((1), dtype=np.float32), np.zeros((1), dtype=np.float32), True,
+               f32_attack_c, f32_release_c, f32_threshold, np.zeros((16), dtype=np.float32))
 
 
 #get midi inputs & channels
