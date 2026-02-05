@@ -26,6 +26,7 @@ f32_release_c = np.float32(0.1)
 f32_threshold = np.float32(.001)
 WrappedOsc.generate_sine(osc_test, np.zeros((16, 2), dtype=np.float32), osc_test, osc_test, osc_test, 0, 0, 0)
 WrappedOsc.polyblep_saw(osc_test, np.zeros((16, 2), dtype=np.float32), osc_test, osc_test, osc_test, 0, 0, 0)
+WrappedOsc.polyblep_pulse(osc_test, np.zeros((16, 2), dtype=np.float32), osc_test, 0.5, osc_test, osc_test, osc_test, osc_test, 0, 0, 0, 0)
 HalSVF.filter_block(filt_test, np.zeros((16, 2), dtype=np.float32), np.zeros((16, 2), dtype=np.float32), np.ones((16, 2), dtype=np.float32), 0.0, HalSVF.clip_sample, 100)
 ADSR.envelope_block(env_test, False, np.zeros((16, 2), dtype=np.float32), np.zeros((16, 2), dtype=np.float32), 0, 0)
 AudioRecorder.process_samples(np.zeros((32, 2), dtype=np.float32), np.zeros((16, 2), dtype=np.float32), np.zeros((16, 2), dtype=np.float32), 0,
