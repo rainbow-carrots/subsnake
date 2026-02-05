@@ -14,6 +14,10 @@ class ADSR():
         self.gate = False
         self.attack_sample = 0
         self.release_sample = 0
+        self.attack = attack
+        self.decay = decay
+        self.sustain = sustain
+        self.release = release
 
         #time constants & sustain
         self.state[2] = 1.0 - math.exp(-1/(fs*attack))
@@ -21,8 +25,10 @@ class ADSR():
         self.state[4] = sustain
         self.state[5] = 1.0 - math.exp(-1/(fs*release))
 
-    def process_block(self, input, output):
-        self.envelope_block(self.state, self.gate, input, output, self.attack_sample, self.release_sample)
+    def process_block(self, input, output, mod_buffers, mod_values):
+        self.envelope_block(self.state, self.gate, input, output, self.attack_sample, self.release_sample,
+                            mod_buffers[0], mod_buffers[1], mod_buffers[2], mod_buffers[3], mod_values[0], mod_values[1], mod_values[2], mod_values[3],
+                            self.attack, self.decay, self.sustain, self.release)
     
     def update_gate(self, newGate):
         self.gate = newGate
@@ -34,25 +40,30 @@ class ADSR():
         self.release_sample = release_sample
 
     def update_attack(self, newAttack):
-        N = fs*newAttack
-        self.state[2] = 1.0 - math.exp(-1/N)
+        self.attack = newAttack
 
     def update_decay(self, newDecay):
-        N = fs*newDecay
-        self.state[3] = 1.0 - math.exp(-1/N)
+        self.decay = newDecay
     
     def update_sustain(self, newSustain):
-        self.state[4] = newSustain
+        self.sustain = newSustain
     
     def update_release(self, newRelease):
-        N = fs*newRelease
-        self.state[5] = 1.0 - math.exp(-1/N)
+        self.release = newRelease
     
     #ADSR envelope (recursive 1-pole LPF)
     @staticmethod
     @njit(nogil=True, fastmath=True)
-    def envelope_block(state, gate, input, output, attack_start, release_start):
+    def envelope_block(state, gate, input, output, attack_start, release_start, att_mod, dec_mod, sus_mod, rel_mod, am_val, dm_val, sm_val, rm_val, att, dec, sus, rel):
         for n in range(len(output)):
+            mod_att = max(1.0, fs*att + fs*att_mod[n]*am_val)
+            mod_dec = max(1.0, fs*dec + fs*dec_mod[n]*dm_val)
+            mod_sus = max(0.0, min(1.0, sus + sus_mod[n]*sm_val))
+            mod_rel = max(1.0, fs*rel + fs*rel_mod[n]*rm_val)
+            state[2] = 1.0 - math.exp(-1/(mod_att))
+            state[3] = 1.0 - math.exp(-1/(mod_dec))
+            state[4] = mod_sus
+            state[5] = 1.0 - math.exp(-1/(mod_rel))
             if gate:
                 if (state[1] == 0.0) and (n >= attack_start):  #start envelope
                     state[1] = 1.0
