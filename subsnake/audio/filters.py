@@ -12,6 +12,8 @@ class HalSVF():
     def __init__(self, type, cutoff, resonance, drive=1.0, saturate=8.0):
         self.cutoff = cutoff
         self.resonance = resonance
+        self.drive = drive
+        self.saturate = saturate
         self.env_amount = 0.0
 
         q = resonance
@@ -20,8 +22,9 @@ class HalSVF():
         #init parameter buffer | lowpass, bandpass, tuning, dampening, type, drive, saturation
         self.state = np.array([[0.0, 0.0, f, q, type, drive, saturate], [0.0, 0.0, f, q, type, drive, saturate]], dtype=np.float32)
     
-    def process_block(self, input, output, fenv):
-        self.filter_block(self.state, input, output, fenv, self.env_amount, HalSVF.clip_sample, self.cutoff)
+    def process_block(self, input, output, fenv, mod_buffer, mod_values):
+        self.filter_block(self.state, input, output, fenv, self.env_amount, HalSVF.clip_sample, self.cutoff,
+                          mod_buffer[0], mod_buffer[1], mod_buffer[2], mod_buffer[3], mod_values[0], mod_values[1], mod_values[2], mod_values[3])
 
     def update_cutoff(self, freq):
         self.cutoff = freq
@@ -47,9 +50,13 @@ class HalSVF():
         
     @staticmethod
     @njit(nogil=True, fastmath=True)
-    def filter_block(state, input, output, fenv, fenv_amount, clip_sample, cutoff):
+    def filter_block(state, input, output, fenv, fenv_amount, clip_sample, cutoff, freq_mod, res_mod, drive_mod, sat_mod, fm_val, rm_val, dm_val, sm_val):
         for c in range (2):
             for n in range(len(output)):
+                freq_mod_amt = freq_mod[n]*fm_val
+                res_mod_amt = res_mod[n]*rm_val
+                drive_mod_amt = drive_mod[n]*dm_val
+                sat_mod_amt = sat_mod[n]*sm_val
                 subsample = 0.0
                 prev_low = state[c, 0]
                 prev_band = state[c, 1]
@@ -57,11 +64,15 @@ class HalSVF():
                     new_cutoff = min(cutoff + cutoff*fenv_amount*fenv[n, c], 7040.0)
                 else:
                     new_cutoff = max(cutoff + cutoff*fenv_amount*fenv[n, c], 0.1)
+                if (fm_val > 0.0):
+                    new_cutoff = min(7040.0, new_cutoff + cutoff*freq_mod_amt)
+                elif (fm_val < 0.0):
+                    new_cutoff = max(0.1, new_cutoff + cutoff*freq_mod_amt)
                 freq_c = 2*math.sin(np.pi*(new_cutoff/(4*fs)))
-                res_c = state[c, 3]
+                res_c = max(.01, min(10.0, state[c, 3] + res_mod_amt))
                 substate = int(state[c, 4])
-                drive = state[c, 5]
-                saturate = state[c, 6]
+                drive = max(.025, min(9.0, state[c, 5] + 4.5*drive_mod_amt))
+                saturate = max(1.0, min(12.0, state[c, 6] + 5.5*sat_mod_amt))
                 oneoverdrive = 1.0/drive
                 for m in range(4):
                     feedback = res_c*(np.tanh(prev_band*drive)*oneoverdrive)
