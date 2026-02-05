@@ -530,13 +530,25 @@ class Voice():
         self.osc_out += self.osc3_out
 
         # filter envelope
-        self.fenv.process_block(self.fenv_in[:frames], self.fenv_out[:frames])
+        fenv_mod_buffers = [self.assign_mod_buffer(self.mod_dial_modes["fenv_att"])]
+        fenv_mod_buffers.append(self.assign_mod_buffer(self.mod_dial_modes["fenv_dec"]))
+        fenv_mod_buffers.append(self.assign_mod_buffer(self.mod_dial_modes["fenv_sus"]))
+        fenv_mod_buffers.append(self.assign_mod_buffer(self.mod_dial_modes["fenv_rel"]))
+        fenv_mod_values = [self.mod_dial_values["fenv_att"], self.mod_dial_values["fenv_dec"],
+                           self.mod_dial_values["fenv_sus"], self.mod_dial_values["fenv_rel"]]
+        self.fenv.process_block(self.fenv_in[:frames], self.fenv_out[:frames], fenv_mod_buffers, fenv_mod_values)
 
         # filter
         self.filt.process_block(self.osc_out[:frames], self.filt_out[:frames], self.fenv_out[:frames])
 
         # amplitude envelope
-        self.env.process_block(self.filt_out[:frames], output)
+        env_mod_buffers = [self.assign_mod_buffer(self.mod_dial_modes["env_att"])]
+        env_mod_buffers.append(self.assign_mod_buffer(self.mod_dial_modes["env_dec"]))
+        env_mod_buffers.append(self.assign_mod_buffer(self.mod_dial_modes["env_sus"]))
+        env_mod_buffers.append(self.assign_mod_buffer(self.mod_dial_modes["env_rel"]))
+        env_mod_values = [self.mod_dial_values["env_att"], self.mod_dial_values["env_dec"],
+                           self.mod_dial_values["env_sus"], self.mod_dial_values["env_rel"]]
+        self.env.process_block(self.filt_out[:frames], output, env_mod_buffers, env_mod_values)
 
         # output
         output *= self.velocity
