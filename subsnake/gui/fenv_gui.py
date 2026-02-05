@@ -159,7 +159,7 @@ class FilterEnvGUI(QGroupBox):
         self.release_changed.emit(rel)
 
     def change_amount(self, value):
-        amt = float(value)/100.0
+        amt = float(value)/500.0
         self.fenv_amt_display.display(f"{amt:.2f}")
         self.amount_changed.emit(amt)
 
