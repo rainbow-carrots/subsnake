@@ -539,7 +539,13 @@ class Voice():
         self.fenv.process_block(self.fenv_in[:frames], self.fenv_out[:frames], fenv_mod_buffers, fenv_mod_values)
 
         # filter
-        self.filt.process_block(self.osc_out[:frames], self.filt_out[:frames], self.fenv_out[:frames])
+        filt_mod_buffers = [self.assign_mod_buffer(self.mod_dial_modes["filt_freq"])]
+        filt_mod_buffers.append(self.assign_mod_buffer(self.mod_dial_modes["filt_res"]))
+        filt_mod_buffers.append(self.assign_mod_buffer(self.mod_dial_modes["filt_drive"]))
+        filt_mod_buffers.append(self.assign_mod_buffer(self.mod_dial_modes["filt_sat"]))
+        filt_mod_values = [self.mod_dial_values["filt_freq"], self.mod_dial_values["filt_res"],
+                           self.mod_dial_values["filt_drive"], self.mod_dial_values["filt_sat"]]
+        self.filt.process_block(self.osc_out[:frames], self.filt_out[:frames], self.fenv_out[:frames], filt_mod_buffers, filt_mod_values)
 
         # amplitude envelope
         env_mod_buffers = [self.assign_mod_buffer(self.mod_dial_modes["env_att"])]
