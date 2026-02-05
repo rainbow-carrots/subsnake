@@ -61,7 +61,7 @@ class HalSVF():
                 prev_low = state[c, 0]
                 prev_band = state[c, 1]
                 fenv_amount = max(-1.0, min(1.0, fenv_amount + fenv_mod[n]*fem_val))
-                new_cutoff = max(0.1, min(cutoff + cutoff*freq_mod_amt + 14080.0*fenv[n, c]*fenv_amount, 14080.0))
+                new_cutoff = max(0.1, min(cutoff + 14080.0*freq_mod_amt + 14080.0*fenv[n, c]*fenv_amount, 14080.0))
                 freq_c = 2*math.sin(np.pi*(new_cutoff/(8*fs)))
                 res_c = max(.01, min(10.0, state[c, 3] + res_mod_amt))
                 substate = int(state[c, 4])
