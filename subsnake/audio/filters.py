@@ -61,14 +61,14 @@ class HalSVF():
                 prev_low = state[c, 0]
                 prev_band = state[c, 1]
                 fenv_amount = max(-1.0, min(1.0, fenv_amount + fenv_mod[n]*fem_val))
-                new_cutoff = max(0.1, min(cutoff + cutoff*freq_mod_amt + 7040.0*fenv[n, c]*fenv_amount, 7040.0))
-                freq_c = 2*math.sin(np.pi*(new_cutoff/(4*fs)))
+                new_cutoff = max(0.1, min(cutoff + cutoff*freq_mod_amt + 14080.0*fenv[n, c]*fenv_amount, 14080.0))
+                freq_c = 2*math.sin(np.pi*(new_cutoff/(8*fs)))
                 res_c = max(.01, min(10.0, state[c, 3] + res_mod_amt))
                 substate = int(state[c, 4])
                 drive = max(.025, min(9.0, state[c, 5] + 4.5*drive_mod_amt))
                 saturate = max(1.0, min(12.0, state[c, 6] + 5.5*sat_mod_amt))
                 oneoverdrive = 1.0/drive
-                for m in range(4):
+                for m in range(8):
                     feedback = res_c*(np.tanh(prev_band*drive)*oneoverdrive)
                     high = clip_sample(input[n, c] - prev_low - feedback, saturate)
                     #clip band
@@ -86,7 +86,7 @@ class HalSVF():
                         subsample += clip_sample(state[c, 1], 1.5)
                     elif (substate == 3): #notch
                         subsample += clip_sample(notch, 1.5)
-                sample = subsample*0.25
+                sample = subsample*0.125
                 output[n, c] = sample
 
     @staticmethod
