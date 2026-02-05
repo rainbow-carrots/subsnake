@@ -6,6 +6,7 @@ fs = 44100
 oneoverfs = 1.0/float(fs)
 twopi = 2*np.pi
 oneoverpi = 1/np.pi
+oneovertwopi = 1/twopi
 piovertwo = np.pi/2.0
 max_det_inc = twopi*(10.0/float(fs))
 
@@ -127,11 +128,12 @@ class WrappedOsc():
 
             #increment phases & wrap
             state[0] += state[2]
-            state2[0] = state[0] + twopi*width + piovertwo*width_mod[n]*wm_amt
+            state2[0] = state[0] + twopi*width + twopi*width_mod[n]*wm_amt
+            norm_phase = state2[0]*oneovertwopi
+            wrapped_phase = norm_phase - np.floor(norm_phase)
+            state2[0] = twopi*wrapped_phase
             if (state[0] > twopi):
                 state[0] -= twopi
-            if (state2[0] > twopi):
-                state2[0] -= twopi
 
             #output
             sample -= sample2
