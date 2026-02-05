@@ -43,7 +43,7 @@ class FilterGUI(QGroupBox):
         #sliders
         self.filt_freq_slider = QSlider(Qt.Horizontal)
         self.filt_freq_slider.setSingleStep(1)
-        self.filt_freq_slider.setRange(0, 800)
+        self.filt_freq_slider.setRange(0, 900)
 
         self.filt_res_slider = QSlider(Qt.Horizontal)
         self.filt_res_slider.setSingleStep(1)
