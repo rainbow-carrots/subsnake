@@ -1,4 +1,4 @@
-subsnake
+#subsnake
 
 subsnake is a polyphonic virtual analog subtractive synthesizer, written in python.
 
@@ -25,16 +25,17 @@ what's the midi like?
 * gate on/off events use sample-accurate timing (works well with sequencers)
 
 ok. sweet. how can i play it?
-* since there's no package (yet), you'll need to run it in a python virtual environment. open a terminal and do the following:
+* since there's no package (yet), you'll need to run it in a python virtual environment. open a terminal (on linux) and do the following:
     * you'll need to install python first, along with pip (usually included - check by typing `pip`)
+    * download (or clone) this repo, and open a terminal in the folder
     * type `python -m venv ./.venv`, to create the environment
     * next, type `./.venv/bin/python/activate` - you should now see `.venv` before your command prompt
-    * install the dependencies with pip:
-        * PySide6 (Qt for GUI): `pip install pyside6`
-        * sounddevice for audio: `pip install sounddevice`
-        * numpy/numba for dsp: `pip install numba` (this will install numpy too)
-        * python-rtmidi for midi: `pip install python-rtmidi`
-        * mido for midi parsing: `pip install mido` (run this after installing rtmidi)
+    * now, type `pip install -r requirements.txt` - this will install the libraries you need to run it
+        * PySide6 (Qt) for the GUI
+        * sounddevice for audio output
+        * numpy/numba for DSP
+        * python-rtmidi for midi
+        * mido for midi parsing
     * finally, navigate to the project directory and type: `python ./main.py` - and away you shall go
 
 what's on the docket?
@@ -42,11 +43,12 @@ what's on the docket?
 * add settings panel to allow saving recorder buffer to (wav) file
 * finish delay modulation & enable delay mod dials
 * add trigger signals for mod envelopes
-* account for modulation dial states in patch save/load
-* add delay & modulator params as cc destinations
-* allow theming of UI & add more stock themes
+* record & restore modulation dial states from patches
+* add delay & modulator parameters as cc destinations
+* allow UI theming & add more stock themes (dark mode pending)
 * add themeable oscilloscope display
 * add more "factory" patches
 * add ping pong & filter to delay
 
-if you encounter any issues (not listed above), let me know with an issue report. 
+if you encounter any issues (not listed above), let me know with an issue report. otherwise, enjoy :3
+
