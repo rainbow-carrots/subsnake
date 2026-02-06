@@ -16,13 +16,25 @@ ok. sounds neat. what's in a voice?
     * LFOs: sine, triangle, ramp, saw, square, sample & hold | controllable speed & phase
     * envelopes: attack-release, attack-hold-release, loop (attack-release) | controllable attack & release
 
-there's also a stereo delay on the master bus (voices + recorder), and a stereo audio recorder/looper with overdubbing.
+there's also a stereo delay on the master bus (voices + recorder), and a stereo audio recorder/looper with continuous overdubbing.
 
 what's the midi like?
 * it supports device & channel selection, with note-on velocity (linear curve)
 * cc's can be added & removed, and freely assigned to control any parameter
-    * cc parameter updates are reflected visually, so the sliders & displays remain in sync
+    * parameter updates are reflected visually, so the sliders & displays remain in sync with cc's
 * gate on/off events use sample-accurate timing (works well with sequencers)
+
+how's the modulation?
+* every parameter has a dedicated bipolar modulation control (the small knobs left of each slider)
+* *right clicking* a knob changes the assigned modulator for that parameter
+    * none (disconnected) -> lfo1 -> lfo2 -> menv1 -> menv2 -> back to none
+* *left clicking* a knob and dragging up/down will increase/decrease the modulation amount
+* *double clicking* any knob will reset the modulation amount to 0.0 (centered)
+
+is there anything else?
+* to reset a parameter, double click the parameter display (to the right of each slider)
+* the keys A-' are mapped chromatically and can trigger note events (fixed velocity)
+    * you can shift the pc keyboard octave range up/down using the +/- keys
 
 ok. sweet. how can i play it?
 * since there's no package (yet), you'll need to run it in a python virtual environment. open a terminal (on linux) and do the following:
@@ -49,6 +61,8 @@ what's on the docket?
 * add themeable oscilloscope display
 * add more "factory" patches
 * add ping pong & filter to delay
+* add configurable oscillator drift
+* add voice stacking & spread
 
-if you encounter any issues (not listed above), let me know with an issue report. otherwise, enjoy :3
+if you encounter any issues, let me know with an issue report. otherwise, have fun :3
 
