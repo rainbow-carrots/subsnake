@@ -43,7 +43,7 @@ what's on the docket?
 * add settings panel to allow saving recorder buffer to (wav) file
 * finish delay modulation & enable delay mod dials
 * add trigger signals for mod envelopes
-* record & restore modulation dial states from patches
+* record & restore modulation dial states to/from patches
 * add delay & modulator parameters as cc destinations
 * allow UI theming & add more stock themes (dark mode pending)
 * add themeable oscilloscope display
