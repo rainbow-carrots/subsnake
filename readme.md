@@ -19,7 +19,7 @@ ok. sounds neat. what's in a voice?
 there's also a stereo delay on the master bus (voices + recorder), and a stereo audio recorder/looper with overdubbing.
 
 what's the midi like?
-* it supports device & channel selection (whoa...)
+* it supports device & channel selection, with note-on velocity (linear curve)
 * cc's can be added & removed, and freely assigned to control any parameter
     * cc parameter updates are reflected visually, so the sliders & displays remain in sync
 * gate on/off events use sample-accurate timing (works well with sequencers)
