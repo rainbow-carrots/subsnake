@@ -1,4 +1,4 @@
-#subsnake
+# subsnake
 
 subsnake is a polyphonic virtual analog subtractive synthesizer, written in python.
 
