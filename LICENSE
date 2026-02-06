@@ -31,7 +31,7 @@ All third party libraries belong to their respective owners.
 1.  NumPy (BSD 3-Clause License)
     Copyright (c) 2005-2026, NumPy Developers.
 
-2.  Numba (BSD 2-Clause License)
+2.  Numba & llvmlite (BSD 2-Clause License)
     Copyright (c) 2012, Anaconda, Inc.
 
 3.  Mido (MIT License)
@@ -40,8 +40,11 @@ All third party libraries belong to their respective owners.
 4.  python-rtmidi (MIT License)
     Copyright (c) 2012-2026 Christopher Arndt
 
-5.  PySide6 (LGPL v3 / GPL v2)
+5.  PySide6 & shiboken6 (LGPL v3 / GPL v2)
     This application uses PySide6, which is licensed under the LGPL v3.
     PySide6 is a Python binding of the Qt framework.
     Qt is a trademark of The Qt Company Ltd.
     For more information, see: https://www.qt.io/licensing/
+
+6.  sounddevice (MIT License)
+    Copyright (c) 2015-2026 Matthias Geier
