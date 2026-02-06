@@ -12,7 +12,7 @@ what does it do? well, i'm so very glad you asked.
 
 ok. sounds neat. what's in a voice?
 * 3 sine, polyblep (anti-aliased) sawtooth or pulse generators (+ PWM)
-* 1 state-variable filter - using an oversampled Chamberlin topology with feedback saturation & drive
+* 1 state-variable filter - using an oversampled Chamberlin topology with feedback, saturation & drive
 * 2 ADSR envelopes - one for amplitude, one for filter frequency, using leaky integrators
 * 4 modulators - 2 LFOs, 2 envelopes, with dedicated assignable attenuverters for every parameter
     * LFOs: sine, triangle, ramp, saw, square, sample & hold | controllable speed & phase
@@ -41,9 +41,9 @@ is there anything else?
 ok. sweet. how can i play it?
 * since there's no package (yet), you'll need to run it in a python virtual environment. open a terminal (on linux) and do the following:
     * you'll need to install python first, along with pip (usually included - check by typing `pip`)
-    * download (or clone) this repo, and open a terminal in the folder
+    * download (or clone) this repo, and point your terminal to the folder
     * type `python -m venv ./.venv`, to create the environment
-    * next, type `./.venv/bin/python/activate` - you should now see `.venv` before your command prompt
+    * next, type `source ./.venv/bin/activate` - you should now see `.venv` before your command prompt
     * now, type `pip install -r requirements.txt` - this will install the libraries you need to run it
         * PySide6 (Qt) for the GUI
         * sounddevice for audio output
