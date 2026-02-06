@@ -2,6 +2,8 @@
 
 subsnake is a polyphonic virtual analog subtractive synthesizer, written in python.
 
+![](./subsnake/images/subsnake.png)
+
 what does it do? well, i'm so very glad you asked.
 * it makes sound (yay!)
 * it has 12 voices
