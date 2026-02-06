@@ -4,11 +4,13 @@ subsnake is a polyphonic virtual analog subtractive synthesizer, written in pyth
 
 ![](./subsnake/images/subsnake.png)
 
+
 what does it do? well, i'm so very glad you asked.
 * it makes sound (yay!)
 * it has 12 voices
 * it supports midi (input)
 * it can save & load patches
+
 
 ok. sounds neat. what's in a voice?
 * 3 sine, polyblep (anti-aliased) sawtooth or pulse generators (+ PWM)
@@ -20,11 +22,13 @@ ok. sounds neat. what's in a voice?
 
 there's also a stereo delay on the master bus (voices + recorder), and a stereo audio recorder/looper with continuous overdubbing.
 
+
 what's the midi like?
 * it supports device & channel selection, with note-on velocity (linear curve)
 * cc's can be added & removed, and freely assigned to control any parameter
     * parameter updates are reflected visually, so the sliders & displays remain in sync with cc's
 * gate on/off events use sample-accurate timing (works well with sequencers)
+
 
 how's the modulation?
 * every parameter has a dedicated bipolar modulation control (the small knobs left of each slider)
@@ -33,10 +37,12 @@ how's the modulation?
 * *left clicking* a knob and dragging up/down will increase/decrease the modulation amount
 * *double clicking* any knob will reset the modulation amount to 0.0 (centered)
 
+
 is there anything else?
 * to reset a parameter, double click the parameter display (to the right of each slider)
 * the keys A-' are mapped chromatically and can trigger note events (fixed velocity)
     * you can shift the pc keyboard octave range up/down using the +/- keys
+
 
 ok. sweet. how can i play it?
 * since there's no package (yet), you'll need to run it in a python virtual environment. open a terminal (on linux) and do the following:
@@ -52,19 +58,22 @@ ok. sweet. how can i play it?
         * mido for midi parsing
     * finally, navigate to the project directory and type: `python ./main.py` - and away you shall go
 
+
 what's on the docket?
-* move midi settings to bottom right of module grid (currently hidden in toolbar & shown in bottom left)
+* move midi settings to bottom right of module grid
+* add option to save & auto-restore midi settings on load (channel, cc's, parameter mappings)
 * add settings panel to allow saving recorder buffer to (wav) file
 * finish delay modulation & enable delay mod dials
 * add trigger signals for mod envelopes
 * record & restore modulation dial states to/from patches
 * add delay & modulator parameters as cc destinations
-* allow UI theming & add more stock themes (dark mode pending)
+* allow UI theming, saving/loading of themese & add more stock themes (dark mode pending)
 * add themeable oscilloscope display
 * add more "factory" patches
 * add ping pong & filter to delay
 * add configurable oscillator drift
 * add voice stacking & spread
+* add control to set pc keyboard velocity
 
-if you encounter any issues, let me know with an issue report. otherwise, have fun :3
+if you encounter any issues, let me know with an issue report. otherwise, have fun ^w^
 
