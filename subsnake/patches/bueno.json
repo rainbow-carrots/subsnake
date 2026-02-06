@@ -6,6 +6,10 @@
     "osc2_det": -11,
     "osc2_amp": 335,
     "osc2_width": 171,
+    "osc3_freq": 0,
+    "osc3_det": 0,
+    "osc3_amp": 0,
+    "osc3_width": 252,
     "filt_freq": 617,
     "filt_res": 135,
     "filt_drive": 93,
@@ -14,7 +18,7 @@
     "fenv_dec": 274,
     "fenv_sus": 1,
     "fenv_rel": 336,
-    "fenv_amt": 76,
+    "fenv_amt": 165,
     "env_att": 10,
     "env_dec": 248,
     "env_sus": 1,
@@ -24,5 +28,6 @@
     "del_mix": 325,
     "osc_wave": "pulse",
     "osc2_wave": "pulse",
+    "osc3_wave": "pulse",
     "filt_type": "low"
 }
