@@ -31,7 +31,7 @@ HalSVF.filter_block(filt_test, np.zeros((16, 2), dtype=np.float32), np.zeros((16
                     osc_test, osc_test, osc_test, osc_test, osc_test, 0, 0, 0, 0, 0)
 ADSR.envelope_block(env_test, False, np.zeros((16, 2), dtype=np.float32), np.zeros((16, 2), dtype=np.float32), 0, 0, env_test, env_test, env_test, env_test, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1)
 AudioRecorder.process_samples(np.zeros((32, 2), dtype=np.float32), np.zeros((16, 2), dtype=np.float32), np.zeros((16, 2), dtype=np.float32), 0,
-                              [False], [True], [False], False, np.zeros((2), dtype=np.int32), np.zeros((2), dtype=np.int32), [0])
+                              [False], [True], [False], False, np.zeros((2), dtype=np.int32), np.zeros((2), dtype=np.int32), [False])
 StereoDelay.delay_block(np.zeros((32, 2), dtype=np.float32), np.zeros((32, 2), dtype=np.float32), np.zeros((32, 2), dtype=np.float32), 0,
                         np.zeros((2), dtype=np.int32), np.zeros((2), dtype=np.int32), 0.5, 0.5)
 LFO.generate_sine(phase_test, f32_increment, f32_offset, test_out)
