@@ -61,10 +61,11 @@ ok. sweet. how can i play it?
 
 what's on the docket?
 * move midi settings to bottom right of module grid
-* add option to save & auto-restore midi settings on load (channel, cc's, parameter mappings)
-* add settings panel to allow saving recorder buffer to (wav) file
+* option to save & auto-restore midi settings on load (channel, cc's, parameter mappings)
+* settings panel to allow saving recorder buffer to (wav) file
 * finish delay modulation & enable delay mod dials
 * add delay & modulator parameters as cc destinations
+* saving/loading of modulator params in patches (lfos & menvs)
 * allow UI theming, saving/loading of themes & add more stock themes (dark mode pending)
 * themeable oscilloscope display
 * more "factory" patches
@@ -74,5 +75,5 @@ what's on the docket?
 * control to set pc keyboard velocity
 * filter key tracking
 
-if you encounter any issues, let me know with an issue report. otherwise, have fun ^w^
+if you encounter any issues, let me know with an issue report. otherwise, have fun! ^w^
 
