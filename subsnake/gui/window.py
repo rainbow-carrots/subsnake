@@ -30,6 +30,7 @@ class MainWindow(QMainWindow):
 
         #attributes
         self.param_sliders = {}
+        self.mod_dials = {}
         self.param_button_groups = []
         self.midi_controls = []
         self.midi_cc_sliders = {}
@@ -39,7 +40,7 @@ class MainWindow(QMainWindow):
         self.display_color = QColor("black")
 
         #toolbar
-        self.patch_manager = PatchManager(self.param_sliders, self.param_button_groups)
+        self.patch_manager = PatchManager(self.param_sliders, self.param_button_groups, self.mod_dials)
         self.recorder = RecorderGUI()
         settings_layout = QHBoxLayout()
         self.settings_group = QWidget()
@@ -89,9 +90,10 @@ class MainWindow(QMainWindow):
         self.del_group = DelayGUI(self.display_color)
         self.mod_group = ModulatorGUI(self.display_color)
 
-        #init slider & button group dictionaries
+        #init slider, button group & mod dial dictionaries
         self.init_sliders_dict()
         self.init_buttons_dict()
+        self.init_mod_dials_dict()
 
         #grid spacers
         # row 0
@@ -360,6 +362,41 @@ class MainWindow(QMainWindow):
         self.param_button_groups.append(self.osc3_group.osc3_alg_group)
         self.param_button_groups.append(self.filt_group.filt_alg_group)
 
+    def init_mod_dials_dict(self):
+        self.mod_dials.update({"osc_freq": self.osc_group.osc_freq_mod_dial})
+        self.mod_dials.update({"osc_amp": self.osc_group.osc_amp_mod_dial})
+        self.mod_dials.update({"osc_width": self.osc_group.osc_width_mod_dial})
+
+        self.mod_dials.update({"osc2_freq": self.osc2_group.osc2_freq_mod_dial})
+        self.mod_dials.update({"osc2_det": self.osc2_group.osc2_det_mod_dial})
+        self.mod_dials.update({"osc2_amp": self.osc2_group.osc2_amp_mod_dial})
+        self.mod_dials.update({"osc2_width": self.osc2_group.osc2_width_mod_dial})
+
+        self.mod_dials.update({"osc3_freq": self.osc3_group.osc3_freq_mod_dial})
+        self.mod_dials.update({"osc3_det": self.osc3_group.osc3_det_mod_dial})
+        self.mod_dials.update({"osc3_amp": self.osc3_group.osc3_amp_mod_dial})
+        self.mod_dials.update({"osc3_width": self.osc3_group.osc3_width_mod_dial})
+
+        self.mod_dials.update({"filt_freq": self.filt_group.filt_freq_mod_dial})
+        self.mod_dials.update({"filt_res": self.filt_group.filt_res_mod_dial})
+        self.mod_dials.update({"filt_drive": self.filt_group.filt_drive_mod_dial})
+        self.mod_dials.update({"filt_sat": self.filt_group.filt_sat_mod_dial})
+
+        self.mod_dials.update({"fenv_att": self.fenv_group.fenv_att_mod_dial})
+        self.mod_dials.update({"fenv_dec": self.fenv_group.fenv_dec_mod_dial})
+        self.mod_dials.update({"fenv_sus": self.fenv_group.fenv_sus_mod_dial})
+        self.mod_dials.update({"fenv_rel": self.fenv_group.fenv_rel_mod_dial})
+        self.mod_dials.update({"fenv_amt": self.fenv_group.fenv_amt_mod_dial})
+
+        self.mod_dials.update({"env_att": self.env_group.env_att_mod_dial})
+        self.mod_dials.update({"env_dec": self.env_group.env_dec_mod_dial})
+        self.mod_dials.update({"env_sus": self.env_group.env_sus_mod_dial})
+        self.mod_dials.update({"env_rel": self.env_group.env_rel_mod_dial})
+
+        self.mod_dials.update({"del_time": self.del_group.del_time_mod_dial})
+        self.mod_dials.update({"del_fback": self.del_group.del_feedback_mod_dial})
+        self.mod_dials.update({"del_mix": self.del_group.del_mix_mod_dial})
+
     def load_patch(self, patch):
         for param in patch:
             if param in self.param_sliders:
@@ -373,6 +410,13 @@ class MainWindow(QMainWindow):
                 self.osc3_group.update_wave(patch[param])
             elif param == "filt_type":
                 self.filt_group.update_type(patch[param])
+            elif param.endswith("_mod"):
+                norm_param = param.removesuffix("_mod")
+                self.mod_dials[norm_param].setValue(patch[param])
+            elif param.endswith("_ass"):
+                norm_param = param.removesuffix("_ass")
+                self.mod_dials[norm_param].set_mode(patch[param])
+
 
     def assign_cc_function(self, module, param):
         cc_function = None
