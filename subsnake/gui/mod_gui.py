@@ -544,6 +544,15 @@ class CoolDial(QDial):
         norm_value = float(value)/float(self.max)
         self.value_changed.emit(self.name, norm_value)
 
+    #mode helpers (for patch save/load)
+    def get_mode(self):
+        return self.mode
+    
+    def set_mode(self, mode):
+        self.mode = mode
+        self.setStyleSheet("background-color:" + self.mode_colors[self.mode])
+        self.mode_changed.emit(self.name, self.mode)
+
     #redraw QDial - circle w/ border & notch
     def paintEvent(self, event):
         painter = QPainter(self)
