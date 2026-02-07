@@ -99,10 +99,18 @@ class PatchManager(QWidget):
         osc2_wave_button = self.button_group_list[1].checkedButton()
         osc3_wave_button = self.button_group_list[2].checkedButton()
         filt_alg_button = self.button_group_list[3].checkedButton()
+        lfo1_shape_button = self.button_group_list[4].checkedButton()
+        lfo2_shape_button = self.button_group_list[5].checkedButton()
+        menv1_mode_button = self.button_group_list[6].checkedButton()
+        menv2_mode_button = self.button_group_list[7].checkedButton()
         self.current_patch.update({"osc_wave": osc_wave_button.text()})
         self.current_patch.update({"osc2_wave": osc2_wave_button.text()})
         self.current_patch.update({"osc3_wave": osc3_wave_button.text()})
         self.current_patch.update({"filt_type": filt_alg_button.text()})
+        self.current_patch.update({"lfo1_shape": lfo1_shape_button.text()})
+        self.current_patch.update({"lfo2_shape": lfo2_shape_button.text()})
+        self.current_patch.update({"menv1_mode": menv1_mode_button.text()})
+        self.current_patch.update({"menv2_mode": menv2_mode_button.text()})
 
 class NewPatchDialog(QDialog):
     def __init__(self):
