@@ -65,7 +65,6 @@ what's on the docket?
 * settings panel to allow saving recorder buffer to (wav) file
 * finish delay modulation & enable delay mod dials
 * add delay & modulator parameters as cc destinations
-* saving/loading of modulator radio buttons in patches (lfo shape & menv mode)
 * allow UI theming, saving/loading of themes & add more stock themes (dark mode pending)
 * themeable oscilloscope display
 * more "factory" patches
