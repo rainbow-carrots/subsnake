@@ -67,7 +67,7 @@ what's on the docket?
 * add trigger signals for mod envelopes
 * record & restore modulation dial states to/from patches
 * add delay & modulator parameters as cc destinations
-* allow UI theming, saving/loading of themese & add more stock themes (dark mode pending)
+* allow UI theming, saving/loading of themes & add more stock themes (dark mode pending)
 * add themeable oscilloscope display
 * add more "factory" patches
 * add ping pong & filter to delay
