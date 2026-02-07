@@ -40,12 +40,12 @@ LFO.generate_ramp(phase_test, f32_increment, f32_offset, test_out)
 LFO.generate_sawtooth(phase_test, f32_increment, f32_offset, test_out)
 LFO.generate_square(phase_test, f32_increment, f32_offset, test_out, 0.5)
 LFO.sample_and_hold(phase_test, f32_increment, test_out, np.zeros((1), dtype=np.float32))
-ModEnv.gen_AR_oneshot(np.zeros((1), dtype=np.float32), np.zeros((1), dtype=np.float32), True, np.zeros((1), dtype=np.float32),
-                      f32_attack_c, f32_release_c, f32_threshold, np.zeros((16), dtype=np.float32))
-ModEnv.gen_AR_loop(np.zeros((1), dtype=np.float32), np.zeros((1), dtype=np.float32), True,
-                   f32_attack_c, f32_release_c, f32_threshold, np.zeros((16), dtype=np.float32))
+ModEnv.gen_AR_oneshot(np.zeros((1), dtype=np.float32), np.zeros((1), dtype=np.int32), True, np.zeros((1), dtype=np.int32),
+                      f32_attack_c, f32_release_c, f32_threshold, np.zeros((16), dtype=np.float32), 0, 0)
+ModEnv.gen_AR_loop(np.zeros((1), dtype=np.float32), np.zeros((1), dtype=np.int32), True,
+                   f32_attack_c, f32_release_c, f32_threshold, np.zeros((16), dtype=np.float32), 0, 0)
 ModEnv.gen_AHR(np.zeros((1), dtype=np.float32), np.zeros((1), dtype=np.float32), True,
-               f32_attack_c, f32_release_c, f32_threshold, np.zeros((16), dtype=np.float32))
+               f32_attack_c, f32_release_c, f32_threshold, np.zeros((16), dtype=np.float32), 0, 0)
 
 
 #get midi inputs & channels
