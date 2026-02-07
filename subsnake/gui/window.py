@@ -355,6 +355,18 @@ class MainWindow(QMainWindow):
         self.param_sliders.update({"del_time": self.del_group.del_time_slider})
         self.param_sliders.update({"del_fback": self.del_group.del_feedback_slider})
         self.param_sliders.update({"del_mix": self.del_group.del_mix_slider})
+
+        self.param_sliders.update({"lfo1_freq": self.mod_group.lfo_freq_slider_1})
+        self.param_sliders.update({"lfo1_phase": self.mod_group.lfo_phase_slider_1})
+
+        self.param_sliders.update({"lfo2_freq": self.mod_group.lfo_freq_slider_2})
+        self.param_sliders.update({"lfo2_phase": self.mod_group.lfo_phase_slider_2})
+
+        self.param_sliders.update({"menv1_att": self.mod_group.menv_att_slider_1})
+        self.param_sliders.update({"menv1_rel": self.mod_group.menv_rel_slider_1})
+
+        self.param_sliders.update({"menv2_att": self.mod_group.menv_att_slider_2})
+        self.param_sliders.update({"menv2_rel": self.mod_group.menv_rel_slider_2})
     
     def init_buttons_dict(self):
         self.param_button_groups.append(self.osc_group.osc_alg_group)
