@@ -146,7 +146,7 @@ class OscillatorGUI(QGroupBox):
 
     #slots
     def change_pitch(self, value):
-        offset = float(value)/100.0
+        offset = float(value)/250.0
         self.osc_freq_display.display(f"{offset:.2f}")
         self.pitch_changed.emit(offset)
 
