@@ -63,6 +63,11 @@ class KeyEventWorker(QRunnable):
             new_voice.env.update_gate(True)
             new_voice.fenv.update_attack_start(sample_offset)
             new_voice.fenv.update_gate(True)
+            new_voice.menv1.update_attack_start(sample_offset)
+            new_voice.menv1.update_gate(True)
+            new_voice.menv2.update_attack_start(sample_offset)
+            new_voice.menv2.update_gate(True)
+
             new_voice.status = 2
             new_voice.base_note = note
 
@@ -74,6 +79,10 @@ class KeyEventWorker(QRunnable):
             self.engine.voices[voice_index].env.update_gate(False)
             self.engine.voices[voice_index].fenv.update_release_start(sample_offset)
             self.engine.voices[voice_index].fenv.update_gate(False)
+            self.engine.voices[voice_index].menv1.update_release_start(sample_offset)
+            self.engine.voices[voice_index].menv1.update_gate(False)
+            self.engine.voices[voice_index].menv2.update_release_start(sample_offset)
+            self.engine.voices[voice_index].menv2.update_gate(False)
             self.engine.voices[voice_index].status = 1
 
     def assign_voice(self, note):
