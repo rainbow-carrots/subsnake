@@ -16,11 +16,11 @@ ok. sounds neat. what's in a voice?
 * 3 sine, polyblep (anti-aliased) sawtooth or pulse generators (+ PWM)
 * 1 state-variable filter - using an oversampled Chamberlin topology with feedback, saturation & drive
 * 2 ADSR envelopes - one for amplitude, one for filter frequency, using leaky integrators
-* 4 modulators - 2 LFOs, 2 envelopes, with dedicated assignable attenuverters for every parameter
-    * LFOs: sine, triangle, ramp, saw, square, sample & hold | controllable speed & phase
-    * envelopes: attack-release, attack-hold-release, loop (attack-release) | controllable attack & release
+* 4 modulators - 2 LFOs, 2 AR envelopes, with dedicated assignable attenuverters for every parameter
+    * shapes: sine, triangle, ramp, sawtooth, square, sample & hold | 0.01-10Hz w/ controllable phase shift
+    * modes: attack-release, attack-hold-release, loop (attack-release) | .01-1s per stage
 
-there's also a stereo delay on the master bus (voices + recorder), and a stereo audio recorder/looper with continuous overdubbing.
+there's also a stereo delay on the master bus (voice output + recorder), and a stereo audio recorder/looper with continuous overdubbing.
 
 
 what's the midi like?
@@ -32,7 +32,7 @@ what's the midi like?
 
 how's the modulation?
 * every parameter has a dedicated bipolar modulation control (the small knobs left of each slider)
-* *right clicking* a knob changes the assigned modulator for that parameter
+* *right clicking* a knob changes the assigned modulator (and color)
     * none (disconnected) -> lfo1 -> lfo2 -> menv1 -> menv2 -> back to none
 * *left clicking* a knob and dragging up/down will increase/decrease the modulation amount
 * *double clicking* any knob will reset the modulation amount to 0.0 (centered)
