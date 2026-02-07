@@ -129,6 +129,8 @@ class ModEnv():
         self.mode = mode
         self.fs = float(fs)
         self.threshold = np.float32(.001)
+        self.attack_sample = 0
+        self.release_sample = 0
 
     def process_block(self, frames):
         attack_time = self.attack*self.fs
@@ -136,11 +138,11 @@ class ModEnv():
         attack_c = np.float32(1.0 - math.exp(-1/attack_time))
         release_c = np.float32(1.0 - math.exp(-1/release_time))
         if self.mode == 0:
-            self.gen_AR_oneshot(self.value, self.state, self.gate, self.run, attack_c, release_c, self.threshold, self.output[:frames])
+            self.gen_AR_oneshot(self.value, self.state, self.gate, self.run, attack_c, release_c, self.threshold, self.output[:frames], self.attack_sample, self.release_sample)
         elif self.mode == 1:
-            self.gen_AHR(self.value, self.state, self.gate, attack_c, release_c, self.threshold, self.output[:frames])
+            self.gen_AHR(self.value, self.state, self.gate, attack_c, release_c, self.threshold, self.output[:frames], self.attack_sample, self.release_sample)
         elif self.mode == 2:
-            self.gen_AR_loop(self.value, self.state, self.gate, attack_c, release_c, self.threshold, self.output[:frames])
+            self.gen_AR_loop(self.value, self.state, self.gate, attack_c, release_c, self.threshold, self.output[:frames], self.attack_sample, self.release_sample)
 
     def set_attack(self, new_attack):
         self.attack = new_attack
@@ -151,9 +153,18 @@ class ModEnv():
     def set_mode(self, new_mode):
         self.mode = new_mode
 
+    def update_gate(self, new_gate):
+        self.gate = new_gate
+
+    def update_attack_start(self, attack_sample):
+        self.attack_sample = attack_sample
+
+    def update_release_start(self, release_sample):
+        self.release_sample = release_sample
+
     @staticmethod
     @njit(nogil=True, fastmath=True)
-    def gen_AR_oneshot(value, state, gate, run, attack_c, release_c, threshold, output):
+    def gen_AR_oneshot(value, state, gate, run, attack_c, release_c, threshold, output, attack_start, release_start):
         frames = len(output)
         top_threshold =  1.0 - threshold
         for n in range(0, frames):
@@ -167,26 +178,26 @@ class ModEnv():
                     value[0] = 0.0
             else:
                 if not run[0]:
-                    if state[0] == 0:               #start
+                    if (state[0] == 0) and (n >= attack_start):       #start
                         state[0] = 1
-                    elif state[0] == 1:             #attack
+                    elif state[0] == 1:                               #attack
                         if value[0] < top_threshold:
                             value[0] += attack_c*(1.0 - value[0])
                         else:
                             value[0] = 1.0
                             state[0] = 2
-                    elif state[0] == 2:             #release
+                    elif state[0] == 2:                               #release
                         if value[0] > threshold:
                             value[0] += release_c*(0.0 - value[0])
                         else:
                             value[0] = 0.0
-                            state[0] = 0            #stop
+                            state[0] = 0                              #stop
                             run[0] = 1
             output[n] = value[0]
 
     @staticmethod
     @njit(nogil=True, fastmath=True)
-    def gen_AR_loop(value, state, gate, attack_c, release_c, threshold, output):
+    def gen_AR_loop(value, state, gate, attack_c, release_c, threshold, output, attack_start, release_start):
         frames = len(output)
         top_threshold =  1.0 - threshold
         for n in range(0, frames):
@@ -197,7 +208,7 @@ class ModEnv():
                 else:                           #stop
                     value[0] = 0.0
             else:
-                if state[0] == 0:               #start
+                if state[0] == 0  and (n >= attack_start):               #start
                     state[0] = 1
                 elif state[0] == 1:             #attack
                     if value[0] < top_threshold:
@@ -215,7 +226,7 @@ class ModEnv():
 
     @staticmethod
     @njit(nogil=True, fastmath=True)
-    def gen_AHR(value, state, gate, attack_c, release_c, threshold, output):
+    def gen_AHR(value, state, gate, attack_c, release_c, threshold, output, attack_start, release_start):
         frames = len(output)
         top_threshold =  1.0 - threshold
         for n in range(0, frames):
@@ -226,7 +237,7 @@ class ModEnv():
                 else:                           #stop
                     value[0] = 0.0
             else:
-                if state[0] == 0:               #start
+                if state[0] == 0  and (n >= attack_start):               #start
                     state[0] = 1
                 elif state[0] == 1:             #attack
                     if value[0] < top_threshold:
