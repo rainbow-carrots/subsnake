@@ -373,6 +373,10 @@ class MainWindow(QMainWindow):
         self.param_button_groups.append(self.osc2_group.osc2_alg_group)
         self.param_button_groups.append(self.osc3_group.osc3_alg_group)
         self.param_button_groups.append(self.filt_group.filt_alg_group)
+        self.param_button_groups.append(self.mod_group.lfo_shape_buttons_1)
+        self.param_button_groups.append(self.mod_group.lfo_shape_buttons_2)
+        self.param_button_groups.append(self.mod_group.menv_mode_buttons_1)
+        self.param_button_groups.append(self.mod_group.menv_mode_buttons_2)
 
     def init_mod_dials_dict(self):
         self.mod_dials.update({"osc_freq": self.osc_group.osc_freq_mod_dial})
@@ -422,6 +426,14 @@ class MainWindow(QMainWindow):
                 self.osc3_group.update_wave(patch[param])
             elif param == "filt_type":
                 self.filt_group.update_type(patch[param])
+            elif param == "lfo1_shape":
+                self.mod_group.set_lfo1_shape(patch[param])
+            elif param == "lfo2_shape":
+                self.mod_group.set_lfo2_shape(patch[param])
+            elif param == "menv1_mode":
+                self.mod_group.set_menv1_mode(patch[param])
+            elif param == "menv2_mode":
+                self.mod_group.set_menv2_mode(patch[param])
             elif param.endswith("_mod"):
                 norm_param = param.removesuffix("_mod")
                 self.mod_dials[norm_param].setValue(patch[param])
