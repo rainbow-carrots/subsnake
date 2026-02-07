@@ -64,15 +64,15 @@ what's on the docket?
 * add option to save & auto-restore midi settings on load (channel, cc's, parameter mappings)
 * add settings panel to allow saving recorder buffer to (wav) file
 * finish delay modulation & enable delay mod dials
-* add trigger signals for mod envelopes
 * add delay & modulator parameters as cc destinations
 * allow UI theming, saving/loading of themes & add more stock themes (dark mode pending)
-* add themeable oscilloscope display
-* add more "factory" patches
-* add ping pong & filter to delay
-* add configurable oscillator drift
-* add voice stacking & spread
-* add control to set pc keyboard velocity
+* themeable oscilloscope display
+* more "factory" patches
+* ping pong & filter to delay
+* configurable oscillator drift
+* voice stacking & spread
+* control to set pc keyboard velocity
+* filter key tracking
 
 if you encounter any issues, let me know with an issue report. otherwise, have fun ^w^
 
