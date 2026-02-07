@@ -75,6 +75,8 @@ window.engine.start_audio()
 style_file = resources.files(gui) / 'window.qss'
 style = style_file.read_text(encoding='utf-8')
 app.setStyleSheet(style)
+app.setApplicationName("subsnake")
+app.setApplicationDisplayName("subsnake")
 
 #show window
 window.show()
