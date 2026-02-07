@@ -505,6 +505,73 @@ class ModulatorGUI(QGroupBox):
     def reset_menv2_rel(self):
         self.menv_rel_slider_2.setValue(500)
 
+    #patch helpers
+    def set_lfo1_shape(self, shape):
+        if shape == "sine":
+            new_shape = 0
+            self.lfo_sin_button_1.setChecked(True)
+        elif shape == "tri":
+            new_shape = 1
+            self.lfo_tri_button_1.setChecked(True)
+        elif shape == "ramp":
+            new_shape = 2
+            self.lfo_rmp_button_1.setChecked(True)
+        elif shape == "saw":
+            new_shape = 3
+            self.lfo_saw_button_1.setChecked(True)
+        elif shape == "square":
+            new_shape = 4
+            self.lfo_sqr_button_1.setChecked(True)
+        elif shape == "s+h":
+            new_shape = 5
+            self.lfo_sah_button_1.setChecked(True)
+        self.lfo1_shape_changed.emit(new_shape)
+    
+    def set_lfo2_shape(self, shape):
+        if shape == "sine":
+            new_shape = 0
+            self.lfo_sin_button_2.setChecked(True)
+        elif shape == "tri":
+            new_shape = 1
+            self.lfo_tri_button_2.setChecked(True)
+        elif shape == "ramp":
+            new_shape = 2
+            self.lfo_rmp_button_2.setChecked(True)
+        elif shape == "saw":
+            new_shape = 3
+            self.lfo_saw_button_2.setChecked(True)
+        elif shape == "square":
+            new_shape = 4
+            self.lfo_sqr_button_2.setChecked(True)
+        elif shape == "s+h":
+            new_shape = 5
+            self.lfo_sah_button_2.setChecked(True)
+        self.lfo2_shape_changed.emit(new_shape)
+
+    def set_menv1_mode(self, mode):
+        if mode == "AR":
+            new_mode = 0
+            self.menv_ar_button_1.setChecked(True)
+        elif mode == "AHR":
+            new_mode = 1
+            self.menv_ahr_button_1.setChecked(True)
+        elif mode == "Loop":
+            new_mode = 2
+            self.menv_loop_button_1.setChecked(True)
+        self.menv1_mode_changed.emit(new_mode)
+
+    def set_menv2_mode(self, mode):
+        if mode == "AR":
+            new_mode = 0
+            self.menv_ar_button_2.setChecked(True)
+        elif mode == "AHR":
+            new_mode = 1
+            self.menv_ahr_button_2.setChecked(True)
+        elif mode == "Loop":
+            new_mode = 2
+            self.menv_loop_button_2.setChecked(True)
+        self.menv2_mode_changed.emit(new_mode)
+
     #helpers
     def configure_display(self, display, num_digits, num_mode, dig_style, small_dec):
         display.setMode(num_mode)
