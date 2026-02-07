@@ -18,13 +18,28 @@ class PatchManager(QWidget):
         self.save_patch = QPushButton("save")
         self.new_patch = QPushButton("new")
         self.patch_dialog = NewPatchDialog()
-        self.default_patch = {"osc_freq": 0, "osc_amp": 250, "osc_width": 250, "osc_wave": "pulse",
-                            "osc2_freq": 0, "osc2_det": 0, "osc2_amp": 250, "osc2_width": 250, "osc2_wave": "pulse",
-                            "osc3_freq": 0, "osc3_det": 0, "osc3_amp": 250, "osc3_width": 250, "osc3_wave": "pulse",
+        self.default_patch = {"osc_freq": 0, "osc_amp": 500, "osc_width": 250, "osc_wave": "pulse",
+                            "osc2_freq": 0, "osc2_det": 0, "osc2_amp": 0, "osc2_width": 250, "osc2_wave": "saw",
+                            "osc3_freq": 0, "osc3_det": 0, "osc3_amp": 0, "osc3_width": 250, "osc3_wave": "saw",
                             "filt_freq": 700, "filt_res": 0, "filt_drive": 40, "filt_sat": 100, "filt_type": "low",
                             "fenv_att": 10, "fenv_dec": 500, "fenv_sus": 1000, "fenv_rel": 500, "fenv_amt": 0,
-                            "env_att": 10, "env_dec": 500, "env_sus": 1000, "env_rel": 500,
-                            "del_time": 100, "del_fback": 500, "del_mix": 0}
+                            "env_att": 10, "env_dec": 500, "env_sus": 1000, "env_rel": 250,
+                            "del_time": 100, "del_fback": 500, "del_mix": 0,
+                            "lfo1_freq": 100, "lfo1_phase": 0, "lfo2_freq": 267, "lfo2_phase": 500,
+                            "menv1_att": 500, "menv1_rel": 500, "menv2_att": 250, "menv2_rel": 250,
+                            "osc_freq_mod": 0, "osc_freq_ass": 0, "osc_amp_mod": 0, "osc_amp_ass": 0, "osc_width_mod": 0, "osc_width_ass": 0,
+                            "osc2_freq_mod": 0, "osc2_freq_ass": 0, "osc2_det_mod": 0, "osc2_det_ass": 0,
+                            "osc2_amp_mod": 0, "osc2_amp_ass": 0, "osc2_width_mod": 0, "osc2_width_ass": 0,
+                            "osc3_freq_mod": 0, "osc3_freq_ass": 0, "osc3_det_mod": 0, "osc3_det_ass": 0,
+                            "osc3_amp_mod": 0, "osc3_amp_ass": 0, "osc3_width_mod": 0, "osc3_width_ass": 0,
+                            "filt_freq_mod": 0, "filt_freq_ass": 0, "filt_res_mod": 0, "filt_res_ass": 0,
+                            "filt_drive_mod": 0, "filt_drive_ass": 0, "filt_sat_mod": 0, "filt_sat_ass": 0,
+                            "fenv_att_mod": 0, "fenv_att_ass": 0, "fenv_dec_mod": 0, "fenv_dec_ass": 0,
+                            "fenv_sus_mod": 0, "fenv_sus_ass": 0, "fenv_rel_mod": 0, "fenv_rel_ass": 0, "fenv_amt_mod": 0, "fenv_amt_ass": 0,
+                            "env_att_mod": 0, "env_att_ass": 0, "env_dec_mod": 0, "env_dec_ass": 0,
+                            "env_sus_mod": 0, "env_sus_ass": 0, "env_rel_mod": 0, "env_rel_ass": 0,
+                            "del_time_mod": 0, "del_time_ass": 0, "del_fback_mod": 0, "del_fback_ass": 0, "del_mix_mod": 0, "del_mix_ass": 0,
+                            "lfo1_shape": "sine", "lfo2_shape": "sine", "menv1_mode": "AR","menv2_mode": "Loop"}
         self.current_patch = {}
         self.sliders_dict = sliders_dict
         self.button_group_list = button_group_list
