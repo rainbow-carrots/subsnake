@@ -10,7 +10,7 @@ import subsnake.patches
 
 class PatchManager(QWidget):
     patch_loaded = Signal(dict)
-    def __init__(self, sliders_dict, button_group_list):
+    def __init__(self, sliders_dict, button_group_list, mod_dials_dict):
         super().__init__()
 
         self.patch_select = QComboBox()
@@ -28,6 +28,7 @@ class PatchManager(QWidget):
         self.current_patch = {}
         self.sliders_dict = sliders_dict
         self.button_group_list = button_group_list
+        self.mod_dials_dict = mod_dials_dict
 
         layout = QHBoxLayout()
         layout.addStretch()
@@ -91,6 +92,9 @@ class PatchManager(QWidget):
     def update_patch(self):
         for param in self.sliders_dict:
             self.current_patch.update({param: self.sliders_dict[param].value()})
+        for param in self.mod_dials_dict:
+            self.current_patch.update({param + "_mod": self.mod_dials_dict[param].value()})
+            self.current_patch.update({param + "_ass": self.mod_dials_dict[param].get_mode()})
         osc_wave_button = self.button_group_list[0].checkedButton()
         osc2_wave_button = self.button_group_list[1].checkedButton()
         osc3_wave_button = self.button_group_list[2].checkedButton()
