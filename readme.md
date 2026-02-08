@@ -60,19 +60,22 @@ ok. sweet. how can i play it?
 
 
 what's on the docket?
-* option to save & auto-restore midi settings on load (channel, cc's, parameter mappings)
-* settings panel to allow saving recorder buffer to (wav) file
-* finish delay modulation & enable delay mod dials
-* add delay & modulator parameters as cc destinations
-* allow UI theming, saving/loading of themes & add more stock themes (dark mode pending)
+* save & auto-restore midi settings on load (channel, cc's, parameter mappings)
+* configurable velocity for PC keyboard note events (currently fixed at 127)
+* recorder settings panel
+    * interface for fine tuning loop start/end points
+    * allow saving of recorder buffer to (wav) file
+* synth settings panel
+    * configurable oscillator drift
+    * filter key tracking amount
+    * voice stacking & spread
+* stereo delay
+    * connect mod dials for parameter modulation
+    * add delay parameters as cc destinations
+    * add ping pong & dampening parameters
+* allow UI theming, saving/loading of themes & add stock themes (dark mode pending)
 * themeable oscilloscope display
 * more "factory" patches
-* ping pong & filter to delay
-* configurable oscillator drift
-* voice stacking & spread
-* control to set pc keyboard velocity
-* filter key tracking
-* finish synth settings (currently inactive)
 
 if you encounter any issues, let me know with an issue report. otherwise, have fun! ^w^
 
