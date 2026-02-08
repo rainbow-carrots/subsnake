@@ -112,7 +112,7 @@ class MainWindow(QMainWindow):
         self.grid_space_2.setObjectName("grid_space")
         self.grid_space_3.setObjectName("grid_space")
 
-        #add modules/midi groups to window
+        #add modules/settings groups to window
         self.window_grid.addWidget(self.grid_space_2, 0, 0)
         self.window_grid.addWidget(self.grid_space_0, 0, 2)
         self.window_grid.addWidget(self.grid_space_1, 0, 4)
@@ -132,8 +132,8 @@ class MainWindow(QMainWindow):
 
         self.window_grid.addWidget(self.osc3_group, 3, 1)
         self.window_grid.addWidget(self.mod_group, 3, 3)
+        self.window_grid.addWidget(self.midi_group, 3, 5)
         
-        self.window_grid.addWidget(self.midi_group, 4, 1)
         self.window_grid.addWidget(self.synth_group, 4, 3)
 
         #set column spacing
