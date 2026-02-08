@@ -33,7 +33,7 @@ class MIDISettings(QGroupBox):
 
         #internal group box & scroll area
         self.cc_group_scroll = QScrollArea()
-        self.cc_group = QGroupBox("cc assign")
+        self.cc_group = QGroupBox()
         self.cc_group.setFocusPolicy(Qt.NoFocus)
         self.cc_group.setAutoFillBackground(True)
 
