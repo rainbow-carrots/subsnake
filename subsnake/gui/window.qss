@@ -33,17 +33,16 @@ MainWindow QGroupBox {
 }
 
 QScrollArea {
-    background-color: #ac9ab8;
+    background-color: #baa9c5;
+    border-radius: 6px;
     border: 1px solid white;
-    border-radius: 3px;
 }
 
 QGroupBox#cc_group {
-    background-color: #ac9ab8;
-    min-width: 320px;
+    background-color: #baa9c5;
+    min-width: 280px;
     max-width: 460px;
-    border: 1px solid white;
-    border-radius: 3px;
+    border: 0px;
 }
 
 QRadioButton {
@@ -218,7 +217,7 @@ QGroupBox::title {
     color: black;
 }
 
-QGroupBox#filt_group, QGroupBox#osc_group, QGroupBox#osc2_group, QGroupBox#osc3_group, QGroupBox#env_group, QGroupBox#fenv_group, QGroupBox#del_group, QGroupBox#mod_group {
+QGroupBox#filt_group, QGroupBox#osc_group, QGroupBox#osc2_group, QGroupBox#osc3_group, QGroupBox#env_group, QGroupBox#fenv_group, QGroupBox#del_group, QGroupBox#mod_group, QGroupBox#midi_group {
     min-height: 200px;
     max-height: 200px;
 }
@@ -303,6 +302,11 @@ QGroupBox#midi_group, QGroupBox#synth_group {
 
 QGroupBox#midi_group {
     background-color: #ab8ebe;
+    min-width:360px;
+}
+
+QGroupBox#midi_group QComboBox {
+    max-width: 120px;
 }
 
 QGroupBox#synth_group QLabel {
