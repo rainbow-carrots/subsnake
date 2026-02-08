@@ -60,7 +60,6 @@ ok. sweet. how can i play it?
 
 
 what's on the docket?
-* move midi settings to bottom right of module grid
 * option to save & auto-restore midi settings on load (channel, cc's, parameter mappings)
 * settings panel to allow saving recorder buffer to (wav) file
 * finish delay modulation & enable delay mod dials
