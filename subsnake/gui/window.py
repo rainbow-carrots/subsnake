@@ -774,7 +774,7 @@ class MainWindow(QMainWindow):
                     key_text = event.text()
                     #set pitch
                     note = 12*self.engine.octave + offset + 60
-                    self.engine.key_pressed(note, 127)
+                    self.engine.key_pressed(min(note, 127), 127)
                     return super().keyPressEvent(event)
                 else:
                     if (offset == 18):
@@ -796,7 +796,7 @@ class MainWindow(QMainWindow):
                     key_text = event.text()
                     #release gate
                     note = 12*self.engine.octave + offset + 60
-                    self.engine.key_released(note)
+                    self.engine.key_released(min(note, 127))
 
     def closeEvent(self, event):
         self.engine.close()
