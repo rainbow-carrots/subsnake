@@ -73,6 +73,7 @@ what's on the docket?
 * voice stacking & spread
 * control to set pc keyboard velocity
 * filter key tracking
+* finish synth settings (currently inactive)
 
 if you encounter any issues, let me know with an issue report. otherwise, have fun! ^w^
 
