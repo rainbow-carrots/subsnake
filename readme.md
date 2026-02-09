@@ -45,7 +45,7 @@ is there anything else?
 
 
 ok. sweet. how can i play it?
-* since there's no package (yet), you'll need to run it in a python virtual environment. open a terminal (on linux) and do the following:
+* since there's no package (yet), you'll need to run it in a python virtual environment. open a terminal (on linux/macos) and do the following:
     * you'll need to install python first, along with pip (usually included - check by typing `pip`)
     * download (or clone) this repo, and point your terminal to the folder
     * type `python -m venv ./.venv`, to create the environment
