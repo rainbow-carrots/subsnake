@@ -7,6 +7,8 @@ from PySide6.QtWidgets import (
 from importlib import resources
 import json
 import subsnake.patches
+from platformdirs import user_data_dir
+from pathlib import Path
 
 class PatchManager(QWidget):
     patch_loaded = Signal(dict)
@@ -59,16 +61,28 @@ class PatchManager(QWidget):
         self.setObjectName("patch_manager")
         self.setAttribute(Qt.WA_StyledBackground, True)
 
-        #get path to patches
-        self.patch_path = resources.files(subsnake.patches)
-        self.patch_names = []
+        #get paths to patches & create name lists
+        self.factory_patch_path = resources.files(subsnake.patches)
+        self.factory_patch_names = []
+        self.user_patch_path = Path(user_data_dir("subsnake", "rainbow-carrots")) / "patches"
+        self.user_patch_names = []
+
+        #ensure user patch directory exists
+        self.check_user_dir()
 
         #init patch_select
-        for patch in self.patch_path.iterdir():
+        for patch in self.factory_patch_path.iterdir():
             if patch.is_file() and patch.name.endswith(".json"):
                 filename = patch.name.removesuffix(".json")
-                self.patch_names.append(filename)
-        self.patch_select.addItems(self.patch_names)
+                self.factory_patch_names.append(filename)
+
+        for patch in self.user_patch_path.iterdir():
+            if patch.is_file() and patch.name.endswith(".json"):
+                filename = patch.name.removesuffix(".json")
+                self.user_patch_names.append(filename)
+        
+        sorted_patches = sorted(list(set(self.factory_patch_names + self.user_patch_names)))
+        self.patch_select.addItems(sorted_patches)
 
         self.patch_select.currentTextChanged.connect(self.load_patch)
         self.new_patch.clicked.connect(self.create_patch)
@@ -76,18 +90,23 @@ class PatchManager(QWidget):
 
     def load_patch(self, patch_name):
         patch_file = patch_name + ".json"
-        patch_path = self.patch_path / patch_file
-        with open(patch_path, "r") as f:
+        if patch_name in self.user_patch_names:
+            patch_path = self.user_patch_path / patch_file
+        else:
+            patch_path = Path(self.factory_patch_path / patch_file)
+        with patch_path.open("r") as f:
             patch_data = json.load(f)
         self.patch_loaded.emit(patch_data)
 
     def create_patch(self):
         if self.patch_dialog.exec():
             new_name = self.patch_dialog.get_name()
+            if new_name not in self.user_patch_names:
+                    self.user_patch_names.append(new_name)
             if (new_name != ""):
                 new_filename = new_name + ".json"
-                new_path = self.patch_path / new_filename
-                with open(new_path, "w") as f:
+                new_path = self.user_patch_path / new_filename
+                with new_path.open("w") as f:
                     json.dump(self.default_patch, f, indent=4)
                 self.patch_select.blockSignals(True)
                 self.patch_select.addItem(new_name)
@@ -98,10 +117,12 @@ class PatchManager(QWidget):
 
     def save_patch_data(self):
         new_name = self.patch_select.currentText()
+        if new_name not in self.user_patch_names:
+            self.user_patch_names.append(new_name)
         new_filename = new_name + ".json"
-        new_path = self.patch_path / new_filename
+        new_path = self.user_patch_path / new_filename
         self.update_patch()
-        with open(new_path, "w") as f:
+        with new_path.open("w") as f:
             json.dump(self.current_patch, f, indent=4)
 
     def update_patch(self):
@@ -126,6 +147,9 @@ class PatchManager(QWidget):
         self.current_patch.update({"lfo2_shape": lfo2_shape_button.text()})
         self.current_patch.update({"menv1_mode": menv1_mode_button.text()})
         self.current_patch.update({"menv2_mode": menv2_mode_button.text()})
+
+    def check_user_dir(self):
+        self.user_patch_path.mkdir(parents=True, exist_ok=True)
 
 class NewPatchDialog(QDialog):
     def __init__(self):
