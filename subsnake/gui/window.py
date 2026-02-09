@@ -775,7 +775,6 @@ class MainWindow(QMainWindow):
                     note = min(127, 12*self.engine.octave + offset + 60)
                     self.key_to_note.update({offset: note})
                     self.engine.key_pressed(self.key_to_note[offset], 127)
-                    return super().keyPressEvent(event)
                 else:
                     if (offset == 18):
                         if (self.engine.octave < 5):
@@ -785,6 +784,8 @@ class MainWindow(QMainWindow):
                             self.engine.octave -= 1
             else:
                 print(f"DEBUG: key: {event.text()}, value: {event.key()}")
+            return super().keyPressEvent(event)
+
     
     def keyReleaseEvent(self, event):
         if (event.isAutoRepeat()):
@@ -796,6 +797,7 @@ class MainWindow(QMainWindow):
                     if offset in self.key_to_note:
                         self.engine.key_released(self.key_to_note[offset])
                         self.key_to_note.pop(offset)
+            return super().keyReleaseEvent(event)
 
     def closeEvent(self, event):
         self.engine.close()
