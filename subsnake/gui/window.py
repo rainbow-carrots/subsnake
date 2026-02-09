@@ -38,6 +38,7 @@ class MainWindow(QMainWindow):
         self.cc_rows = 0
         self.engine = engine
         self.display_color = QColor("black")
+        self.key_to_note = {}
 
         #toolbar
         self.patch_manager = PatchManager(self.param_sliders, self.param_button_groups, self.mod_dials)
@@ -771,10 +772,9 @@ class MainWindow(QMainWindow):
             offset = key_conv.key_offset(event.key())
             if (offset is not None):
                 if (offset < 18):
-                    key_text = event.text()
-                    #set pitch
-                    note = 12*self.engine.octave + offset + 60
-                    self.engine.key_pressed(min(note, 127), 127)
+                    note = min(127, 12*self.engine.octave + offset + 60)
+                    self.key_to_note.update({offset: note})
+                    self.engine.key_pressed(self.key_to_note[offset], 127)
                     return super().keyPressEvent(event)
                 else:
                     if (offset == 18):
@@ -793,10 +793,9 @@ class MainWindow(QMainWindow):
             offset = key_conv.key_offset(event.key())
             if (offset is not None):
                 if (offset < 18):
-                    key_text = event.text()
-                    #release gate
-                    note = 12*self.engine.octave + offset + 60
-                    self.engine.key_released(min(note, 127))
+                    if offset in self.key_to_note:
+                        self.engine.key_released(self.key_to_note[offset])
+                        self.key_to_note.pop(offset)
 
     def closeEvent(self, event):
         self.engine.close()
