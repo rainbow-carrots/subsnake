@@ -1,5 +1,6 @@
 # -*- mode: python ; coding: utf-8 -*-
 from PyInstaller.utils.hooks import collect_data_files
+import sys
 
 a = Analysis(
     ['main.py'],
@@ -15,6 +16,10 @@ a = Analysis(
     optimize=0,
 )
 pyz = PYZ(a.pure)
+
+icon_path = 'images/icon.png'
+if sys.platform.startswith("win"):
+    icon_path = None
 
 exe = EXE(
     pyz,
@@ -35,5 +40,5 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon='images/icon.png'
+    icon=icon_path
 )
