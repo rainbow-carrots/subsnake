@@ -11,3 +11,4 @@ PySide6_Essentials==6.10.1
 python-rtmidi==1.5.8
 shiboken6==6.10.1
 sounddevice==0.5.3
+platformdirs==4.5.1
