@@ -2,6 +2,8 @@ import sys
 import numpy as np
 import mido
 from PySide6.QtWidgets import QApplication
+from PySide6.QtGui import QIcon, QPixmap
+from PySide6.QtCore import Qt
 from subsnake.gui import MainWindow
 import subsnake.gui as gui
 from subsnake.audio import WrappedOsc, HalSVF, ADSR, AudioEngine
@@ -14,7 +16,7 @@ twopi = 2*np.pi
 oneoverpi = 1/np.pi
 
 #init compile (numba functions)
-osc_test = np.array([0.0, 0.0, 0.0], dtype=np.float32)
+osc_test = np.array([0.1, 0.1, 0.1], dtype=np.float32)
 filt_test = np.array([[0.0, 0.0, 1.0, 2.0, 0.0, 1.0, 8.0], [0.0, 0.0, 1.0, 2.0, 0.0, 1.0, 8.0]], dtype=np.float32)
 env_test = np.array([0.0, 0.0, 1.0, 1.0, 0.5, 1.0], dtype=np.float32)
 phase_test = np.zeros((1), dtype=np.float32)
@@ -77,6 +79,19 @@ style = style_file.read_text(encoding='utf-8')
 app.setStyleSheet(style)
 app.setApplicationName("subsnake")
 app.setApplicationDisplayName("subsnake")
+app.setDesktopFileName("subsnake")
+with resources.as_file(resources.files("subsnake").joinpath("images/icon.png")) as icon_path:
+    path_str = str(icon_path)
+    app_pixmap = QPixmap(path_str)
+    app_icon = QIcon()
+    app_icon.addPixmap(app_pixmap)
+    for size in [16, 24, 32, 48, 64, 256]:
+        smooth_pixmap = app_pixmap.scaled(
+            size, size, Qt.KeepAspectRatio, Qt.SmoothTransformation
+        )
+        app_icon.addPixmap(smooth_pixmap)
+    app.setWindowIcon(app_icon)
+    window.setWindowIcon(app_icon)
 
 #show window
 window.show()
