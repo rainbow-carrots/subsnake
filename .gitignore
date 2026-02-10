@@ -1,4 +1,3 @@
-#dependencies
 Include
 Lib
 Scripts
@@ -10,3 +9,4 @@ lib64
 __pycache__/
 pyvenv.cfg
 *:Zone.Identifier
+build
