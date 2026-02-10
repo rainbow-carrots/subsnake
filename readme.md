@@ -45,19 +45,10 @@ is there anything else?
 
 
 ok. sweet. how can i play it?
-* since there's no package (yet), you'll need to run it in a python virtual environment. open a terminal (on linux/macos) and do the following:
-    * you'll need to install python first, along with pip (usually included - check by typing `pip`)
-    * download (or clone) this repo, and point your terminal to the folder
-    * type `python -m venv ./.venv`, to create the environment
-    * next, type `source ./.venv/bin/activate` - you should now see `.venv` before your command prompt
-    * now, type `pip install -r requirements.txt` - this will install the libraries you need to run it
-        * PySide6 (Qt) for the GUI
-        * sounddevice for audio output
-        * numpy/numba for DSP
-        * python-rtmidi for midi
-        * mido for midi parsing
-    * finally, navigate to the project directory and type: `python ./main.py` - and away you shall go
-
+* [v0.1.0](https://github.com/rainbow-carrots/subsnake/releases/tag/v0.1.0) is the latest build
+* click on the version that corresponds to your platform to download the zip, extract it, & run!
+* **note**: this project is in active development. you probably will encounter bugs.
+    * if you do spot something, [let me know](https://github.com/rainbow-carrots/subsnake/issues)
 
 what's on the docket?
 * save & auto-restore midi settings on load (channel, cc's, parameter mappings)
@@ -76,6 +67,4 @@ what's on the docket?
 * allow UI theming, saving/loading of themes & add stock themes (dark mode pending)
 * themeable oscilloscope display
 * more "factory" patches
-
-if you encounter any issues, let me know with an issue report. otherwise, have fun! ^w^
 
