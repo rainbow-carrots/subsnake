@@ -16,7 +16,9 @@ twopi = 2*np.pi
 oneoverpi = 1/np.pi
 
 #init compile (numba functions)
-osc_test = np.array([0.1, 0.1, 0.1], dtype=np.float32)
+osc_test = np.array([0.1, 0.5, .01], dtype=np.float32)
+osc2_test = np.array([0.1, 0.5, .01], dtype=np.float32)
+mod_test = np.zeros((16), dtype=np.float32)
 filt_test = np.array([[0.0, 0.0, 1.0, 2.0, 0.0, 1.0, 8.0], [0.0, 0.0, 1.0, 2.0, 0.0, 1.0, 8.0]], dtype=np.float32)
 env_test = np.array([0.0, 0.0, 1.0, 1.0, 0.5, 1.0], dtype=np.float32)
 phase_test = np.zeros((1), dtype=np.float32)
@@ -26,12 +28,12 @@ f32_offset = np.float32(0.0)
 f32_attack_c = np.float32(0.1)
 f32_release_c = np.float32(0.1)
 f32_threshold = np.float32(.001)
-WrappedOsc.generate_sine(osc_test, np.zeros((16, 2), dtype=np.float32), osc_test, osc_test, osc_test, 0, 0, 0)
-WrappedOsc.polyblep_saw(osc_test, np.zeros((16, 2), dtype=np.float32), osc_test, osc_test, osc_test, 0, 0, 0)
-WrappedOsc.polyblep_pulse(osc_test, np.zeros((16, 2), dtype=np.float32), osc_test, 0.5, osc_test, osc_test, osc_test, osc_test, 0, 0, 0, 0)
+WrappedOsc.generate_sine(osc_test, np.zeros((16, 2), dtype=np.float32), mod_test, mod_test, mod_test, 0, 0, 0)
+WrappedOsc.polyblep_saw(osc_test, np.zeros((16, 2), dtype=np.float32), mod_test, mod_test, mod_test, 0, 0, 0)
+WrappedOsc.polyblep_pulse(osc_test, np.zeros((16, 2), dtype=np.float32), osc2_test, 0.5, mod_test, mod_test, mod_test, mod_test, 0, 0, 0, 0)
 HalSVF.filter_block(filt_test, np.zeros((16, 2), dtype=np.float32), np.zeros((16, 2), dtype=np.float32), np.ones((16, 2), dtype=np.float32), 0.0, HalSVF.clip_sample, 100,
-                    osc_test, osc_test, osc_test, osc_test, osc_test, 0, 0, 0, 0, 0)
-ADSR.envelope_block(env_test, False, np.zeros((16, 2), dtype=np.float32), np.zeros((16, 2), dtype=np.float32), 0, 0, env_test, env_test, env_test, env_test, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1)
+                    mod_test, mod_test, mod_test, mod_test, mod_test, 0, 0, 0, 0, 0)
+ADSR.envelope_block(env_test, False, np.zeros((16, 2), dtype=np.float32), np.zeros((16, 2), dtype=np.float32), 0, 0, mod_test, mod_test, mod_test, mod_test, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1)
 AudioRecorder.process_samples(np.zeros((32, 2), dtype=np.float32), np.zeros((16, 2), dtype=np.float32), np.zeros((16, 2), dtype=np.float32), 0,
                               [False], [True], [False], False, np.zeros((2), dtype=np.int32), np.zeros((2), dtype=np.int32), [False])
 StereoDelay.delay_block(np.zeros((32, 2), dtype=np.float32), np.zeros((32, 2), dtype=np.float32), np.zeros((32, 2), dtype=np.float32), 0,
