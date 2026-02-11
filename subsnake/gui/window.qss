@@ -91,19 +91,19 @@ QGroupBox#osc3_group QRadioButton::indicator:checked {
     background-color: #2bd6ae;
 }
 
-QGroupBox#mod_group QGroupBox#lfo1_group QRadioButton::indicator:checked {
+QWidget#mod_group QGroupBox#lfo1_group QRadioButton::indicator:checked {
     background-color: #6f7cf7;
 }
 
-QGroupBox#mod_group QGroupBox#lfo2_group QRadioButton::indicator:checked {
+QWidget#mod_group QGroupBox#lfo2_group QRadioButton::indicator:checked {
     background-color: #867efc;
 }
 
-QGroupBox#mod_group QGroupBox#menv1_group QRadioButton::indicator:checked {
+QWidget#mod_group QGroupBox#menv1_group QRadioButton::indicator:checked {
     background-color: #957cfc;
 }
 
-QGroupBox#mod_group QGroupBox#menv2_group QRadioButton::indicator:checked {
+QWidget#mod_group QGroupBox#menv2_group QRadioButton::indicator:checked {
     background-color: #9268fc;
 }
 
@@ -150,19 +150,19 @@ QGroupBox#del_group QSlider::sub-page {
     background-color: #fab055;
 }
 
-QGroupBox#mod_group QGroupBox#lfo1_group QSlider::sub-page {
+QWidget#mod_group QGroupBox#lfo1_group QSlider::sub-page {
     background-color: #6f7cf7;
 }
 
-QGroupBox#mod_group QGroupBox#lfo2_group QSlider::sub-page {
+QWidget#mod_group QGroupBox#lfo2_group QSlider::sub-page {
     background-color: #867efc;
 }
 
-QGroupBox#mod_group QGroupBox#menv1_group QSlider::sub-page {
+QWidget#mod_group QGroupBox#menv1_group QSlider::sub-page {
     background-color: #957cfc;
 }
 
-QGroupBox#mod_group QGroupBox#menv2_group QSlider::sub-page {
+QWidget#mod_group QGroupBox#menv2_group QSlider::sub-page {
     background-color: #9268fc;
 }
 
@@ -194,19 +194,19 @@ QGroupBox#del_group QSlider::handle {
     background-color: #fa9f2f;
 }
 
-QGroupBox#mod_group QGroupBox#lfo1_group QSlider::handle {
+QWidget#mod_group QGroupBox#lfo1_group QSlider::handle {
     background-color: #5a67e0;
 }
 
-QGroupBox#mod_group QGroupBox#lfo2_group QSlider::handle {
+QWidget#mod_group QGroupBox#lfo2_group QSlider::handle {
     background-color: #7168e8;
 }
 
-QGroupBox#mod_group QGroupBox#menv1_group QSlider::handle {
+QWidget#mod_group QGroupBox#menv1_group QSlider::handle {
     background-color: #836aeb;
 }
 
-QGroupBox#mod_group QGroupBox#menv2_group QSlider::handle {
+QWidget#mod_group QGroupBox#menv2_group QSlider::handle {
     background-color: #8758fc;
 }
 
@@ -217,14 +217,14 @@ QGroupBox::title {
     color: black;
 }
 
-QGroupBox#filt_group, QGroupBox#osc_group, QGroupBox#osc2_group, QGroupBox#osc3_group, QGroupBox#env_group, QGroupBox#fenv_group, QGroupBox#del_group, QGroupBox#mod_group, QGroupBox#midi_group {
+QGroupBox#filt_group, QGroupBox#osc_group, QGroupBox#osc2_group, QGroupBox#osc3_group, QGroupBox#env_group, QGroupBox#fenv_group, QGroupBox#del_group, QWidget#mod_group, QGroupBox#midi_group {
     min-height: 200px;
     max-height: 200px;
 }
 
-QGroupBox#mod_subgroup {
-    height: 180px;
-    min-width: 200px;
+ModulatorGUI QGroupBox {
+    max-height: 180px;
+    min-width: 360px;
 }
 
 QGroupBox#filt_group {
@@ -253,10 +253,6 @@ QGroupBox#fenv_group {
 
 QGroupBox#del_group {
     background-color: #fcd4a2;
-}
-
-QGroupBox#mod_group {
-    background-color: #acb3fc
 }
 
 QGroupBox#lfo1_group, QPushButton#lfo1_button {
@@ -317,7 +313,12 @@ QGroupBox#synth_group {
     background-color: #8eb2be;
 }
 
-QGroupBox#mod_group QPushButton {
+QWidget#mod_group {
+    min-width: 380px;
+    max-width: 480px;
+}
+
+QWidget#mod_group QPushButton {
     width: 48px;
     height: 16px;
     color: #000000;
@@ -400,8 +401,9 @@ PatchManager#patch_manager {
     background-color: #f2999f;
     border: 1px solid white;
     border-radius: 6px;
-    min-width: 360px;
     max-height: 40px;
+    min-width: 380px;
+    max-width: 480px;
 }
 
 PatchManager QPushButton {
@@ -422,7 +424,8 @@ RecorderGUI#recorder {
     background-color: #99f2da;
     border: 1px solid white;
     border-radius: 6px;
-    min-width: 360px;
+    min-width: 380px;
+    max-width: 480px;
     max-height: 40px;
 }
 
@@ -436,7 +439,8 @@ RecorderGUI QPushButton {
 }
 
 QWidget#settings_group {
-    min-width:360px;
+    min-width: 380px;
+    max-width: 480px;
     max-height: 40px;
 }
 
