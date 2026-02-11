@@ -137,9 +137,6 @@ class MainWindow(QMainWindow):
         
         self.window_grid.addWidget(self.synth_group, 4, 3)
 
-        #set column spacing
-        self.window_grid.setColumnMinimumWidth(5, 30)
-
         #set layout of window
         window_widget = QWidget()
         window_widget.setLayout(self.window_grid)
