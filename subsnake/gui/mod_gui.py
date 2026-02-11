@@ -9,7 +9,7 @@ from PySide6.QtWidgets import (
 )
 from subsnake.gui.lcd import ClickLCD
 
-class ModulatorGUI(QGroupBox):
+class ModulatorGUI(QWidget):
     #signals
     lfo1_freq_changed = Signal(float)
     lfo1_offset_changed = Signal(float)
@@ -340,7 +340,6 @@ class ModulatorGUI(QGroupBox):
         self.lfo_button_2.setObjectName("lfo2_button")
         self.menv_button_1.setObjectName("menv1_button")
         self.menv_button_2.setObjectName("menv2_button")
-        self.setTitle("modulators")
 
         #connect signals
         self.mod_buttons_group.buttonClicked.connect(self.setModule)
