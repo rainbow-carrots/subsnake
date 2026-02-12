@@ -74,7 +74,7 @@ class KeyEventWorker(QRunnable):
     def key_released(self, release_event):
         note, sample_offset = release_event
         if note in self.engine.note_to_voice: 
-            voice_index = self.engine.note_to_voice.get(note)
+            voice_index = self.engine.note_to_voice.pop(note)
             self.engine.voices[voice_index].env.update_release_start(sample_offset)
             self.engine.voices[voice_index].env.update_gate(False)
             self.engine.voices[voice_index].fenv.update_release_start(sample_offset)
@@ -85,20 +85,6 @@ class KeyEventWorker(QRunnable):
             self.engine.voices[voice_index].menv2.update_gate(False)
             self.engine.voices[voice_index].status = 1
             self.engine.released_voice_indeces.append(voice_index)
-        else:
-            for kill_voice in self.engine.voices:
-                if kill_voice.base_note == note:
-                    kill_voice.env.update_release_start(sample_offset)
-                    kill_voice.env.update_gate(False)
-                    kill_voice.fenv.update_release_start(sample_offset)
-                    kill_voice.fenv.update_gate(False)
-                    kill_voice.menv1.update_release_start(sample_offset)
-                    kill_voice.menv1.update_gate(False)
-                    kill_voice.menv2.update_release_start(sample_offset)
-                    kill_voice.menv2.update_gate(False)
-                    kill_voice.status = 1
-                    self.engine.released_voice_indeces.append(kill_voice.index)
-
         
 
     def assign_voice(self, note):
