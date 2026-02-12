@@ -67,4 +67,4 @@ what's on the docket?
 * allow UI theming, saving/loading of themes & add stock themes (dark mode pending)
 * oscilloscope display
 * more "factory" patches
-
+* make oscillator 3 & modulator parameters cc-assignable
