@@ -48,3 +48,6 @@ All third party libraries belong to their respective owners.
 
 6.  sounddevice (MIT License)
     Copyright (c) 2015-2026 Matthias Geier
+
+7.  platformdirs (MIT License)
+    Copyright (c) 2010-2026 the platformdirs developers
