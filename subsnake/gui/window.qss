@@ -111,13 +111,13 @@ QGroupBox QSlider::handle {
     width: 16px;
     height: 16px;
     border-radius: 3px;
-    border: 1px solid black;
+    border: 1px solid #555555;
     margin: -4px 0px;
 }
 
 QGroupBox QSlider::groove {
     height: 8px;
-    background-color: #333333;
+    background-color: #555555;
     border: 1px solid white;
     border-radius: 3px;
 }
@@ -341,6 +341,7 @@ QPushButton#env_gate:checked {
 QPushButton#midi_refresh, QGroupBox#cc_group QPushButton {
     color: black;
     border: 1px solid white;
+    border-radius: 6px;
     font-size: 18px;
     font-style: bold;
     max-width: 28px;
