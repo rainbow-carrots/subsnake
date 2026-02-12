@@ -593,7 +593,7 @@ class CoolDial(QDial):
     def __init__(self, step, min, max, name):
         super().__init__()
         self.mode = 0
-        self.mode_colors = ["#BBBBBB", "#9ba4fa", "#a19bfa", "#ae9bfa", "#b69bfa"]
+        self.mode_colors = ["#BBBBBB", "#6fabff", "#7686ff", "#b770ff", "#ce73ff"]
         self.max = max
         self.min = min
         self.name = name
