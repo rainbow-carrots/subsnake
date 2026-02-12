@@ -340,6 +340,7 @@ QPushButton#env_gate:checked {
 }
 
 QPushButton#midi_refresh, QGroupBox#cc_group QPushButton {
+    border: 1px solid white;
     color: #000000;
     font-size: 18px;
     font-style: bold;
