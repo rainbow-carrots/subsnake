@@ -84,6 +84,8 @@ class KeyEventWorker(QRunnable):
             self.engine.voices[voice_index].menv2.update_release_start(sample_offset)
             self.engine.voices[voice_index].menv2.update_gate(False)
             self.engine.voices[voice_index].status = 1
+            self.engine.released_voice_indeces.append(voice_index)
+        
 
     def assign_voice(self, note):
         if note in self.engine.note_to_voice:      #assign releasing voice of same note
@@ -98,7 +100,7 @@ class KeyEventWorker(QRunnable):
             if note in self.engine.note_to_voice:
                 self.engine.note_to_voice.pop(note)
             self.engine.note_to_voice.update({note: voice_index})
-            return self.engine.voices(voice_index)
+            return self.engine.voices[voice_index]
         else:                                      #steal oldest voice
             first_note = next(iter(self.engine.note_to_voice))
             first_voice_index = self.engine.note_to_voice.pop(first_note)
