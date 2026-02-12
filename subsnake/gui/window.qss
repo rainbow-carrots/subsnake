@@ -33,13 +33,13 @@ MainWindow QGroupBox {
 }
 
 QScrollArea {
-    background-color: #baa9c5;
+    background-color: transparent;
     border-radius: 6px;
     border: 1px solid white;
 }
 
 QGroupBox#cc_group {
-    background-color: #baa9c5;
+    background-color: none;
     min-width: 280px;
     max-width: 460px;
     border: 0px;
@@ -228,46 +228,46 @@ ModulatorGUI QGroupBox {
 }
 
 QGroupBox#filt_group {
-    background-color: #a8edba;
+    background-color: none;
 }
 
 QGroupBox#osc_group {
-    background-color: #a9c9e8;
+    background-color: none;
 }
 
 QGroupBox#osc2_group {
-    background-color: #aae6e0;
+    background-color: none;
 }
 
 QGroupBox#osc3_group {
-    background-color: #aae6ce;
+    background-color: none;
 }
 
 QGroupBox#env_group {
-    background-color: #f0c0d4;
+    background-color: none;
 }
 
 QGroupBox#fenv_group {
-    background-color: #c6fab9;
+    background-color: none;
 }
 
 QGroupBox#del_group {
-    background-color: #fcd4a2;
+    background-color: none;
 }
 
-QGroupBox#lfo1_group, QPushButton#lfo1_button {
+QPushButton#lfo1_button {
     background-color: #9ba4fa;
 }
 
-QGroupBox#lfo2_group, QPushButton#lfo2_button {
+QPushButton#lfo2_button {
     background-color: #a19bfa;
 }
 
-QGroupBox#menv1_group, QPushButton#menv1_button {
+QPushButton#menv1_button {
     background-color: #ae9bfa;
 }
 
-QGroupBox#menv2_group, QPushButton#menv2_button {
+QPushButton#menv2_button {
     background-color: #b69bfa;
 }
 
@@ -297,7 +297,6 @@ QGroupBox#midi_group, QGroupBox#synth_group {
 }
 
 QGroupBox#midi_group {
-    background-color: #ab8ebe;
     min-width:360px;
 }
 
@@ -307,10 +306,6 @@ QGroupBox#midi_group QComboBox {
 
 QGroupBox#synth_group QLabel {
     max-width: 60px;
-}
-
-QGroupBox#synth_group {
-    background-color: #8eb2be;
 }
 
 QWidget#mod_group {
@@ -328,7 +323,6 @@ QWidget#mod_group QPushButton {
 
 QPushButton#env_gate {
     color: #000000;
-    background-color: #bd91a4;
     border: 1px solid white;
     border-radius: 6px;
     height: 24px;
@@ -345,7 +339,8 @@ QPushButton#env_gate:checked {
 }
 
 QPushButton#midi_refresh, QGroupBox#cc_group QPushButton {
-    color: #000000;
+    color: black;
+    border: 1px solid white;
     font-size: 18px;
     font-style: bold;
     max-width: 28px;
@@ -353,14 +348,26 @@ QPushButton#midi_refresh, QGroupBox#cc_group QPushButton {
 }
 
 QPushButton#midi_refresh {
-    background-color: #ab8ebe;
+    background-color: transparent;
 }
 
 QPushButton#cc_add {
-    background-color: #9fc983;
+    background-color: transparent;
 }
 
 QPushButton#cc_delete {
+    background-color: transparent;
+}
+
+QPushButton#midi_refresh:hover {
+    background-color: #ab8ebe;
+}
+
+QPushButton#cc_add:hover {
+    background-color: #9fc983;
+}
+
+QPushButton#cc_delete:hover {
     background-color: #c77581;
 }
 
@@ -373,20 +380,12 @@ QPushButton#toggle_midi, QPushButton#toggle_synth, QPushButton#toggle_record {
     border-radius: 6px;
 }
 
-QPushButton#toggle_midi {
-    background-color: #857093;
-}
-
 QPushButton#toggle_midi:hover {
     background-color: #a086b1;
 }
 
 QPushButton#toggle_midi:checked {
     background-color: #c1a1d6;
-}
-
-QPushButton#toggle_synth {
-    background-color: #708b93;
 }
 
 QPushButton#toggle_synth:hover {
@@ -398,7 +397,7 @@ QPushButton#toggle_synth:checked {
 }
 
 PatchManager#patch_manager {
-    background-color: #f2999f;
+    background-color: none;
     border: 1px solid white;
     border-radius: 6px;
     max-height: 40px;
@@ -407,7 +406,7 @@ PatchManager#patch_manager {
 }
 
 PatchManager QPushButton {
-    background-color: #e86f77;
+    background-color: none;
     width: 60px;
     height: 20px;
     color: #000000;
@@ -421,7 +420,7 @@ PatchManager QPushButton:hover {
 
 
 RecorderGUI#recorder {
-    background-color: #99f2da;
+    background-color: none;
     border: 1px solid white;
     border-radius: 6px;
     min-width: 380px;
@@ -454,17 +453,17 @@ QFrame#record_spacer {
 }
 
 QPushButton#record_button, QPushButton#play_button, QPushButton#stop_button, QPushButton#delete_button {
-    background-color: #34cea5;
+    background-color: none;
     padding-top: -4px;
 }
 
 QPushButton#delete_button {
-    background-color: #34cea5;
+    background-color: none;
     padding-top: 4px;
 }
 
 QPushButton#loop_button {
-    background-color: #34cea5;
+    background-color: none;
     font-style: bold;
     font-size: 21px;
 }
@@ -476,8 +475,4 @@ QPushButton#record_button:hover, QPushButton#play_button:hover, QPushButton#stop
 QPushButton#record_button:checked, QPushButton#loop_button:checked, QPushButton#play_button:checked {
     color: #e6e6e6;
     background-color: #158668;
-}
-
-QPushButton#delete_button:disabled {
-    background-color: #8534cea5;
 }
