@@ -74,7 +74,7 @@ class KeyEventWorker(QRunnable):
     def key_released(self, release_event):
         note, sample_offset = release_event
         if note in self.engine.note_to_voice: 
-            voice_index = self.engine.note_to_voice.pop(note)
+            voice_index = self.engine.note_to_voice.get(note)
             self.engine.voices[voice_index].env.update_release_start(sample_offset)
             self.engine.voices[voice_index].env.update_gate(False)
             self.engine.voices[voice_index].fenv.update_release_start(sample_offset)
