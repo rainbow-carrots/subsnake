@@ -25,7 +25,7 @@ jobs:
             asset_name: subsnake-windows-amd64.exe
           - os: macos-latest
             artifact_name: subsnake
-            asset_name: subsnake-macos-amd64
+            asset_name: subsnake-macos-arm64
 
     steps:
     - name: Checkout Code
