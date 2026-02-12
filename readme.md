@@ -45,7 +45,7 @@ is there anything else?
 
 
 ok. sweet. how can i play it?
-* [v0.1.1](https://github.com/rainbow-carrots/subsnake/releases/tag/v0.1.1) is the latest build
+* [v0.1.2](https://github.com/rainbow-carrots/subsnake/releases/tag/v0.1.2) is the latest build
 * click on the version that corresponds to your platform to download the zip, extract it, & run!
 * **note**: this project is in active development. you probably will encounter bugs.
     * if you do spot something, [let me know](https://github.com/rainbow-carrots/subsnake/issues)
@@ -58,13 +58,13 @@ what's on the docket?
     * allow saving of recorder buffer to (wav) file
 * synth settings panel
     * configurable oscillator drift
-    * filter key tracking amount
     * voice stacking & spread
+    * filter key tracking
 * stereo delay
     * connect mod dials for parameter modulation
     * add delay parameters as cc destinations
     * add ping pong & dampening parameters
 * allow UI theming, saving/loading of themes & add stock themes (dark mode pending)
-* themeable oscilloscope display
+* oscilloscope display
 * more "factory" patches
 
