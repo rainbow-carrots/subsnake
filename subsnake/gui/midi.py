@@ -141,8 +141,6 @@ class MIDISettings(QGroupBox):
         self.cc_param_changed.emit(cc, new_param, module)
 
     def delete_cc(self, cc, row):
-        print(f"DEBUG: delete row {row}")
-        print(f"DEBUG: row_ccs before row deletion: {self.row_ccs}")
         if row in self.row_ccs:
             self.row_ccs.pop(row)
         cc_widget = self.cc_stack.itemAtPosition(row, 0).widget()
@@ -158,7 +156,6 @@ class MIDISettings(QGroupBox):
                     self.row_ccs.pop(cc_control.row)
                 cc_control.row -= 1
                 self.row_ccs.update({cc_control.row: cc_control.cc_select.value()})
-        print(f"DEBUG: row_ccs after row deletion: {self.row_ccs}")
         self.cc_stack.removeWidget(cc_widget)
         self.cc_rows -= 1
         cc_widget.deleteLater()
