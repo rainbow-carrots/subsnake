@@ -1,10 +1,10 @@
 from PySide6.QtWidgets import (
-    QWidget, QPushButton, QHBoxLayout,
+    QGroupBox, QPushButton, QHBoxLayout,
     QLabel, QSizePolicy, QFrame
 )
 from PySide6.QtCore import Qt, Signal
 
-class RecorderGUI(QWidget):
+class RecorderGUI(QGroupBox):
     delete = Signal()
     pause = Signal()
     play = Signal()
@@ -14,6 +14,7 @@ class RecorderGUI(QWidget):
     
     def __init__(self):
         super().__init__()
+        self.setTitle("recorder")
 
         self.current_time_label = QLabel("00:00")
         slash_label = QLabel("/")

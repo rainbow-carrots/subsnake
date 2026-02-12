@@ -1,6 +1,6 @@
 from PySide6.QtCore import Signal, Qt
 from PySide6.QtWidgets import (
-    QWidget, QComboBox, QPushButton,
+    QGroupBox, QComboBox, QPushButton,
     QHBoxLayout, QDialog, QDialogButtonBox,
     QLineEdit, QGridLayout
 )
@@ -10,10 +10,11 @@ import subsnake.patches
 from platformdirs import user_data_dir
 from pathlib import Path
 
-class PatchManager(QWidget):
+class PatchManager(QGroupBox):
     patch_loaded = Signal(dict)
     def __init__(self, sliders_dict, button_group_list, mod_dials_dict):
         super().__init__()
+        self.setTitle("patch")
 
         self.patch_select = QComboBox()
         self.patch_select.setFocusPolicy(Qt.NoFocus)
@@ -59,6 +60,8 @@ class PatchManager(QWidget):
         self.setLayout(layout)
 
         self.setObjectName("patch_manager")
+        self.save_patch.setObjectName("save_patch")
+        self.new_patch.setObjectName("new_patch")
         self.setAttribute(Qt.WA_StyledBackground, True)
 
         #get paths to patches & create name lists
