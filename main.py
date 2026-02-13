@@ -99,6 +99,8 @@ app.setStyleSheet(style)
 app.setApplicationName("subsnake")
 app.setApplicationDisplayName("subsnake")
 app.setDesktopFileName("subsnake")
+
+#load icon
 with resources.as_file(resources.files("subsnake").joinpath("images/icon.png")) as icon_path:
     path_str = str(icon_path)
     app_pixmap = QPixmap(path_str)
