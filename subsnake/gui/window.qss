@@ -16,8 +16,7 @@ CoolDial {
 
 QGroupBox {
     font-family: "Dogica Pixel";
-    font-weight: bold;
-    font-size: 9px;
+    font-size: 10px;
     margin-top: 12px;
 }
 
