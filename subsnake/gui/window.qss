@@ -484,8 +484,8 @@ QPushButton#record_button, QPushButton#play_button, QPushButton#stop_button, QPu
 }
 
 QPushButton#delete_button {
-    background-color: none;
-    padding-top: 4px;
+    font-family: "Dogica Pixel";
+    padding-top: -2px; 
 }
 
 QPushButton#loop_button {
