@@ -559,13 +559,7 @@ class Voice():
 
         # output
         output *= self.velocity
-        if (self.env.state[0] == 0.0) and (self.status > 0):
-            if self.base_note in note_to_voice:
-                old_voice = note_to_voice.pop(self.base_note)
-                if old_voice in released_voices:
-                    old_index = released_voices.index(old_voice)
-                    released_voices.pop(old_index)
-            stopped_voices.append(self.index)    
+        if (self.env.state[0] == 0.0) and (self.status > 0):  
             self.status = 0
     
     def assign_mod_buffer(self, mode):
