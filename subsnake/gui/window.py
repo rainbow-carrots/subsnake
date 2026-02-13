@@ -17,7 +17,8 @@ from PySide6.QtGui import QColor
 from PySide6.QtWidgets import (
     QMainWindow, QGridLayout,
     QFrame, QWidget,
-    QPushButton, QHBoxLayout)
+    QPushButton, QHBoxLayout,
+    QStackedLayout, QButtonGroup)
 
 key_conv = Keys()
 
@@ -50,7 +51,7 @@ class MainWindow(QMainWindow):
         self.toggle_midi = QPushButton("midi")
         self.toggle_midi.setToolTip("show/hide midi menu")
         self.toggle_midi.setCheckable(True)
-        self.toggle_midi.setChecked(False)
+        self.toggle_midi.setChecked(True)
         self.toggle_synth = QPushButton("synth")
         self.toggle_synth.setToolTip("show/hide synth menu")
         self.toggle_synth.setCheckable(True)
@@ -69,17 +70,27 @@ class MainWindow(QMainWindow):
         self.toggle_synth.setObjectName("toggle_synth")
         self.toggle_record.setObjectName("toggle_record")
 
+        self.toggle_button_group = QButtonGroup()
+        self.toggle_button_group.addButton(self.toggle_midi)
+        self.toggle_button_group.addButton(self.toggle_synth)
+        self.toggle_button_group.addButton(self.toggle_record)
+
         #layouts
         self.window_grid = QGridLayout()
 
         #settings widgets
         self.midi_group = MIDISettings()
         self.midi_group.setFocusPolicy(Qt.NoFocus)
-        self.midi_group.hide()
 
         self.synth_group = SynthSettings()
         self.synth_group.setFocusPolicy(Qt.NoFocus)
-        self.synth_group.hide()
+
+        self.settings_view = QWidget()
+        self.settings_stack = QStackedLayout()
+        self.settings_stack.addWidget(self.midi_group)
+        self.settings_stack.addWidget(self.synth_group)
+        self.settings_stack.setCurrentIndex(0)
+        self.settings_view.setLayout(self.settings_stack)
 
         #module GUIs
         self.filt_group = FilterGUI(self.display_color)
@@ -133,9 +144,7 @@ class MainWindow(QMainWindow):
 
         self.window_grid.addWidget(self.osc3_group, 3, 1)
         self.window_grid.addWidget(self.mod_group, 3, 3)
-        self.window_grid.addWidget(self.midi_group, 3, 5)
-        
-        self.window_grid.addWidget(self.synth_group, 4, 3)
+        self.window_grid.addWidget(self.settings_view, 3, 5)
 
         #set layout of window
         window_widget = QWidget()
@@ -160,8 +169,7 @@ class MainWindow(QMainWindow):
         self.midi_group.cc_deleted.connect(self.delete_cc)
 
         # settings
-        self.toggle_midi.toggled.connect(self.toggle_midi_box)
-        self.toggle_synth.toggled.connect(self.toggle_synth_box)
+        self.toggle_button_group.buttonClicked.connect(self.update_active_settings)
 
         # filter
         self.filt_group.freq_changed.connect(self.update_filt_freq)
@@ -499,6 +507,16 @@ class MainWindow(QMainWindow):
         return cc_function
 
     #slots
+    # settings toggles
+    def update_active_settings(self, button):
+        text = button.text()
+        if text == "midi":
+            self.settings_stack.setCurrentIndex(0)
+        elif text == "synth":
+            print("DEBUG: synth settings")
+        elif text == "recorder":
+            print("DEBUG: recorder settings")
+
     # modulator dials
     def update_mod_dial_value(self, name, value):
         self.engine.update_mod_value(name, value)
@@ -512,9 +530,6 @@ class MainWindow(QMainWindow):
 
     def update_midi_ch(self, channel):
         self.engine.set_midi_channel(channel)
-
-    def toggle_midi_box(self, state):
-        self.midi_group.setVisible(state)
 
     def refresh_midi_ins(self):
         self.midi_group.midi_select.clear()
@@ -568,10 +583,6 @@ class MainWindow(QMainWindow):
             self.midi_cc_sliders.pop(cc)
         if cc in self.midi_cc_displays:
             self.midi_cc_displays.pop(cc)
-
-    # audio settings
-    def toggle_synth_box(self, state):
-        self.synth_group.setVisible(state)
 
     # recorder
     def update_rec_delete(self):
