@@ -20,7 +20,7 @@ class RecorderGUI(QGroupBox):
         slash_label = QLabel("/")
         self.end_time_label = QLabel(("01:23"))
 
-        self.delete_button = QPushButton("⮾")
+        self.delete_button = QPushButton("x")
         self.record_button = QPushButton("●︎")
         self.play_button = QPushButton("▶")
         self.stop_button = QPushButton("■")
