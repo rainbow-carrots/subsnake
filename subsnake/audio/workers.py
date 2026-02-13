@@ -2,7 +2,7 @@ from PySide6.QtCore import QRunnable
 import time
 
 middle_a = 69
-sleeptime = 0.00145125
+sleeptime = 0.0025
 
 class KeyEventWorker(QRunnable):
     def __init__(self, engine):
@@ -15,6 +15,7 @@ class KeyEventWorker(QRunnable):
         self.frame_end = 0
         self.frames = 2048
         self.pending_event = None
+        self.steal_voice = 0
 
     def run(self):
         while self.engine.run_threads:
@@ -67,43 +68,36 @@ class KeyEventWorker(QRunnable):
             new_voice.menv1.update_gate(True)
             new_voice.menv2.update_attack_start(sample_offset)
             new_voice.menv2.update_gate(True)
-
             new_voice.status = 2
             new_voice.base_note = note
 
     def key_released(self, release_event):
         note, sample_offset = release_event
-        if note in self.engine.note_to_voice: 
-            voice_index = self.engine.note_to_voice.get(note)
-            self.engine.voices[voice_index].env.update_release_start(sample_offset)
-            self.engine.voices[voice_index].env.update_gate(False)
-            self.engine.voices[voice_index].fenv.update_release_start(sample_offset)
-            self.engine.voices[voice_index].fenv.update_gate(False)
-            self.engine.voices[voice_index].menv1.update_release_start(sample_offset)
-            self.engine.voices[voice_index].menv1.update_gate(False)
-            self.engine.voices[voice_index].menv2.update_release_start(sample_offset)
-            self.engine.voices[voice_index].menv2.update_gate(False)
-            self.engine.voices[voice_index].status = 1
-            self.engine.released_voice_indeces.append(voice_index)
+        for voice in self.engine.voices:
+            if voice.base_note == note: 
+                voice.env.update_release_start(sample_offset)
+                voice.env.update_gate(False)
+                voice.fenv.update_release_start(sample_offset)
+                voice.fenv.update_gate(False)
+                voice.menv1.update_release_start(sample_offset)
+                voice.menv1.update_gate(False)
+                voice.menv2.update_release_start(sample_offset)
+                voice.menv2.update_gate(False)
+                voice.status = 1
         
 
     def assign_voice(self, note):
-        if note in self.engine.note_to_voice:      #assign releasing voice of same note
-            if (self.engine.voices[self.engine.note_to_voice[note]].status == 1):
-                return self.engine.voices[self.engine.note_to_voice[note]]
-        elif self.engine.stopped_voice_indeces:    #assign first stopped voice
-            voice_index = self.engine.stopped_voice_indeces.pop(0)
-            self.engine.note_to_voice.update({note: voice_index})
-            return self.engine.voices[voice_index]
-        elif self.engine.released_voice_indeces:   #assign oldest releasing voice
-            voice_index = self.engine.released_voice_indeces.pop(0)
-            if note in self.engine.note_to_voice:
-                self.engine.note_to_voice.pop(note)
-            self.engine.note_to_voice.update({note: voice_index})
-            return self.engine.voices[voice_index]
-        else:                                      #steal oldest voice
-            first_note = next(iter(self.engine.note_to_voice))
-            first_voice_index = self.engine.note_to_voice.pop(first_note)
-            first_voice = self.engine.voices[first_voice_index]
-            self.engine.note_to_voice.update({note: first_voice_index})
-            return first_voice
+        for voice in self.engine.voices:           #voice of same note
+            if voice.base_note == note:
+                return voice
+        for voice in self.engine.voices:           #first stopped voice
+            if voice.status == 0:
+                return voice
+        for voice in self.engine.voices:           #first releasing voice
+            if voice.status == 1:
+                return voice
+        self.steal_voice += 1                      #steal voice (round-robin)
+        if self.steal_voice > 11:
+            self.steal_voice = 0
+        return self.engine.voices[self.steal_voice]
+
