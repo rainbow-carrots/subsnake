@@ -2,7 +2,7 @@ import sys
 import numpy as np
 import mido
 from PySide6.QtWidgets import QApplication
-from PySide6.QtGui import QIcon, QPixmap
+from PySide6.QtGui import QIcon, QPixmap, QFontDatabase
 from PySide6.QtCore import Qt
 from subsnake.gui import MainWindow
 import subsnake.gui as gui
@@ -74,6 +74,23 @@ for channel in midi_channels:
 
 #start audio & assign midi input
 window.engine.start_audio()
+
+#load font (Dogica Pixel)
+with resources.as_file(resources.files("subsnake").joinpath("gui/fonts/dogica/dogicapixel.ttf")) as font_file:
+    font_id = QFontDatabase.addApplicationFont(str(font_file))
+    if font_id == -1:
+        print(f"error: could not load font file at {font_file}")
+    else:
+        font_family = QFontDatabase.applicationFontFamilies(font_id)[0]
+        print(f"success! loaded font {font_family}")
+
+with resources.as_file(resources.files("subsnake").joinpath("gui/fonts/dogica/dogicapixelbold.ttf")) as font_file:
+    font_id = QFontDatabase.addApplicationFont(str(font_file))
+    if font_id == -1:
+        print(f"error: could not load font file at {font_file}")
+    else:
+        font_family = QFontDatabase.applicationFontFamilies(font_id)[0]
+        print(f"success! loaded font {font_family}")
 
 #load stylesheet
 style_file = resources.files(gui) / 'window.qss'
