@@ -14,13 +14,26 @@ CoolDial {
     background-color: #bbbbbb;
 }
 
+QGroupBox {
+    font-family: "Dogica Pixel";
+    font-weight: bold;
+    font-size: 9px;
+    margin-top: 12px;
+}
+
 QGroupBox QLabel {
     color: #000000;
-    margin-top: -4.5px;
+    font-family: "Dogica Pixel";
+    font-size: 9px;
 }
 
 QWidget QLabel {
     color: #000000;
+}
+
+QGroupBox#recorder QLabel {
+    margin-top: 0px;
+    font-size: 12px;
 }
 
 MainWindow QGroupBox {
@@ -49,14 +62,8 @@ QRadioButton {
     color: #000000;
     font-size: 12px;
     spacing: 6px;
-}
-
-QToolBar {
-    background-color: #333333;
-    border: 2px groove gray;
-    border-top: none;
-    border-bottom-left-radius: 3px;
-    border-bottom-right-radius: 3px;
+    font-family: "Dogica Pixel";
+    font-size: 7px;
 }
 
 QGroupBox QSlider {
@@ -211,10 +218,15 @@ QWidget#mod_group QGroupBox#menv2_group QSlider::handle {
 }
 
 QGroupBox::title {
-    subcontrol-origin: margin;
+    subcontrol-origin: padding;
     subcontrol-position: top center;
-    padding: 1px;
     color: black;
+    top: -9px;
+    min-height: 16px;
+}
+
+QGroupBox::title#recorder, QGroupBox:title#patch_manager {
+    background-color: #c1c1e3;
 }
 
 QGroupBox#filt_group, QGroupBox#osc_group, QGroupBox#osc2_group, QGroupBox#osc3_group, QGroupBox#env_group, QGroupBox#fenv_group, QGroupBox#del_group, QWidget#mod_group, QGroupBox#midi_group {
@@ -253,6 +265,11 @@ QGroupBox#fenv_group {
 
 QGroupBox#del_group {
     background-color: none;
+}
+
+ModulatorGUI QPushButton {
+    font-family: "Dogica Pixel";
+    font-size: 9px;
 }
 
 QPushButton#lfo1_button {
@@ -327,6 +344,8 @@ QPushButton#env_gate {
     border-radius: 6px;
     height: 24px;
     text-align: center;
+    font-family: "Dogica Pixel";
+    font-size: 9px;
 }
 
 QPushButton#env_gate:hover {
@@ -379,6 +398,8 @@ QPushButton#toggle_midi, QPushButton#toggle_synth, QPushButton#toggle_record {
     color: #000000;
     border: 1px solid white;
     border-radius: 6px;
+    font-family: "Dogica Pixel";
+    font-size: 12px;
 }
 
 QPushButton#toggle_midi:hover {
@@ -413,6 +434,8 @@ PatchManager QPushButton {
     color: #000000;
     border: 1px solid white;
     border-radius: 6px;
+    font-family: "Dogica Pixel";
+    font-size: 9px;
 }
 
 QPushButton#new_patch:hover {
