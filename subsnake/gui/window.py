@@ -331,6 +331,7 @@ class MainWindow(QMainWindow):
         return display
     
     def init_sliders_dict(self):
+        self.param_sliders.update({"osc_drift": self.synth_group.drift_slider})
         self.param_sliders.update({"osc_freq": self.osc_group.osc_freq_slider})
         self.param_sliders.update({"osc_amp": self.osc_group.osc_amp_slider})
         self.param_sliders.update({"osc_width": self.osc_group.osc_width_slider})
