@@ -156,6 +156,10 @@ QGroupBox#del_group QSlider::sub-page {
     background-color: #fab055;
 }
 
+QGroupBox#synth_group QSlider::sub-page {
+    background-color: #ff8d8d;
+}
+
 QWidget#mod_group QGroupBox#lfo1_group QSlider::sub-page {
     background-color: #88b7f9;
 }
@@ -198,6 +202,10 @@ QGroupBox#fenv_group QSlider::handle {
 
 QGroupBox#del_group QSlider::handle {
     background-color: #fa9f2f;
+}
+
+QGroupBox#synth_group QSlider::handle {
+    background-color: #f66767;
 }
 
 QWidget#mod_group QGroupBox#lfo1_group QSlider::handle {
@@ -318,10 +326,6 @@ QGroupBox#midi_group {
 
 QGroupBox#midi_group QComboBox {
     max-width: 120px;
-}
-
-QGroupBox#synth_group QLabel {
-    max-width: 60px;
 }
 
 QWidget#mod_group {
