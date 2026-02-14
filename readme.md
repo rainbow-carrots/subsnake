@@ -45,7 +45,7 @@ is there anything else?
 
 
 ok. sweet. how can i play it?
-* [v0.1.4](https://github.com/rainbow-carrots/subsnake/releases/tag/v0.1.4) is the latest build
+* [v0.1.5](https://github.com/rainbow-carrots/subsnake/releases/tag/v0.1.5) is the latest build
 * click on the version that corresponds to your platform to download the zip, extract, & run! if it doesn't open:
     * __on linux__: right click the file, go to *Properties* -> *Permissions*, and make sure "Allow executing file as program" is checked 
     * __on macos__: you'll need to [authorize the app](https://support.apple.com/guide/mac-help/open-a-mac-app-from-an-unknown-developer-mh40616/mac) when running it for the first time. go to *System Settings* -> *Privacy & Security*, scroll down to the bottom, and choose *Open anyway* (under *Security*)
@@ -60,7 +60,6 @@ what's on the docket?
     * interface for fine tuning loop start/end points
     * allow saving of recorder buffer to (wav) file
 * synth settings panel
-    * configurable oscillator drift
     * voice stacking & spread
     * filter key tracking
 * stereo delay
