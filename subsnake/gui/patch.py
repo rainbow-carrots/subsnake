@@ -21,7 +21,7 @@ class PatchManager(QGroupBox):
         self.save_patch = QPushButton("save")
         self.new_patch = QPushButton("new")
         self.patch_dialog = NewPatchDialog()
-        self.default_patch = {"osc_freq": 0, "osc_amp": 500, "osc_width": 250, "osc_wave": "pulse",
+        self.default_patch = {"osc_drift": 0, "osc_freq": 0, "osc_amp": 500, "osc_width": 250, "osc_wave": "pulse",
                             "osc2_freq": 0, "osc2_det": 0, "osc2_amp": 0, "osc2_width": 250, "osc2_wave": "saw",
                             "osc3_freq": 0, "osc3_det": 0, "osc3_amp": 0, "osc3_width": 250, "osc3_wave": "saw",
                             "filt_freq": 700, "filt_res": 0, "filt_drive": 40, "filt_sat": 100, "filt_type": "low",
