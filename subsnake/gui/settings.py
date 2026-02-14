@@ -1,51 +1,63 @@
 from PySide6.QtWidgets import (
     QGroupBox, QGridLayout,
-    QLabel, QComboBox
+    QLabel, QSlider, QLCDNumber
 )
 from PySide6.QtCore import Signal, Qt
+from PySide6.QtGui import QColor, QPalette
+from subsnake.gui.lcd import ClickLCD
 
 class SynthSettings(QGroupBox):
-    device_changed = Signal(str)
-    rate_changed = Signal(int)
+    drift_changed = Signal(float)
 
-    def __init__(self):
+    def __init__(self, display_color=QColor("black")):
         super().__init__()
 
-        device_label = QLabel("device:")
-        device_label.setAlignment(Qt.AlignCenter)
-        rate_label = QLabel("rate:")
-        rate_label.setAlignment(Qt.AlignCenter)
+        drift_label = QLabel("osc drift:")
 
-        self.device_select = QComboBox()
-        self.device_select.setEditable(False)
-        self.device_select.setInsertPolicy(QComboBox.InsertAtBottom)
-        self.device_select.setFocusPolicy(Qt.NoFocus)
-        self.rate_select = QComboBox()
-        self.rate_select.setEditable(False)
-        self.rate_select.setInsertPolicy(QComboBox.InsertAtBottom)
-        self.rate_select.setFocusPolicy(Qt.NoFocus)
+        self.drift_slider = QSlider(Qt.Horizontal)
+        self.drift_slider.setRange(0, 1000)
+        self.drift_slider.setSingleStep(1)
+        self.drift_slider.setValue(0)
+
+        self.display_color = display_color        
+        self.drift_display = self.configure_display(ClickLCD(), 3, QLCDNumber.Dec, QLCDNumber.Flat, True)
+        self.set_palette(self.drift_display)
 
         layout = QGridLayout()
 
-        layout.addWidget(device_label, 0, 0)
-        layout.addWidget(rate_label, 1, 0)
-
-        layout.addWidget(self.device_select, 0, 1)
-        layout.addWidget(self.rate_select, 1, 1)
+        layout.addWidget(drift_label, 0, 0)
+        layout.addWidget(self.drift_slider, 0, 1)
+        layout.addWidget(self.drift_display, 0, 2)
         
         self.setLayout(layout)
         self.setObjectName("synth_group")
         self.setTitle("synth settings")
 
-        self.device_select.currentTextChanged.connect(self.change_device)
-        self.rate_select.currentTextChanged.connect(self.change_rate)
+        self.drift_slider.valueChanged.connect(self.change_drift)
+        self.drift_display.double_clicked.connect(self.reset_drift)
 
-    def change_device(self, new_device):
-        self.device_changed.emit(new_device)
+    def change_drift(self, value):
+        norm_value = float(value)/100.0
+        self.drift_display.display(f"{norm_value:.2f}")
+        self.drift_changed.emit(norm_value)
 
-    def change_rate(self, new_rate):
-        rate = int(new_rate)
-        self.device_changed.emit(rate)
+    def reset_drift(self):
+        self.drift_slider.setValue(0)
+
+    #helpers
+    def configure_display(self, display, num_digits, num_mode, dig_style, small_dec):
+        display.setMode(num_mode)
+        display.setDigitCount(num_digits)
+        display.setSegmentStyle(dig_style)
+        display.setSmallDecimalPoint(small_dec)
+        return display
+    
+    def set_palette(self, display):
+        text_color = self.display_color
+        display_palette = display.palette()
+        display_palette.setColor(QPalette.ColorRole.WindowText, text_color)
+        display.setAutoFillBackground(True)
+        display.setPalette(display_palette)
 
 
 
