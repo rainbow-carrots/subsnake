@@ -21,21 +21,21 @@ class WrappedOsc():
         self.hardSyncBuffer = np.zeros((2048, 2), dtype=np.float32)
         self.random_walk = np.zeros((2048), dtype=np.float32)
         self.walk_state = np.zeros((1), dtype=np.float32)
+        self.walk_amt = 0.0
         self.alg = alg
         self.pulsewidth = width
         self.freq = frequency
         self.amp = amplitude
     
     def process_block(self, buffer, mod_buffers, mod_values):
-        walk_amt = 1.0
         frames = len(buffer)
         self.generate_walk(self.random_walk[:frames], self.walk_state)
         if (self.alg == 0):
-            self.generate_sine(self.state, buffer, self.random_walk[:frames], walk_amt, mod_buffers[0], mod_buffers[1], mod_buffers[2], mod_values[0], mod_values[1], mod_values[2], self.amp, self.freq)
+            self.generate_sine(self.state, buffer, self.random_walk[:frames], self.walk_amt, mod_buffers[0], mod_buffers[1], mod_buffers[2], mod_values[0], mod_values[1], mod_values[2], self.amp, self.freq)
         elif (self.alg == 1.0):
-            self.polyblep_saw(self.state, buffer, self.random_walk[:frames], walk_amt, mod_buffers[0], mod_buffers[1], mod_buffers[2], mod_values[0], mod_values[1], mod_values[2], self.amp, self.freq)
+            self.polyblep_saw(self.state, buffer, self.random_walk[:frames], self.walk_amt, mod_buffers[0], mod_buffers[1], mod_buffers[2], mod_values[0], mod_values[1], mod_values[2], self.amp, self.freq)
         elif (self.alg == 2.0):
-            self.polyblep_pulse(self.state, buffer, self.state2, self.pulsewidth, self.random_walk[:frames], walk_amt, mod_buffers[0], mod_buffers[1], mod_buffers[2], mod_buffers[3], mod_values[0], mod_values[1], mod_values[2], mod_values[3], self.amp, self.freq)
+            self.polyblep_pulse(self.state, buffer, self.state2, self.pulsewidth, self.random_walk[:frames], self.walk_amt, mod_buffers[0], mod_buffers[1], mod_buffers[2], mod_buffers[3], mod_values[0], mod_values[1], mod_values[2], mod_values[3], self.amp, self.freq)
 
     def update_pitch(self, newPitch):
         self.freq = newPitch
@@ -53,6 +53,9 @@ class WrappedOsc():
     
     def update_algorithm(self, newAlg):
         self.alg = newAlg
+
+    def update_drift(self, newDrift):
+        self.walk_amt = newDrift
 
 
     #phase-wrapped sine wave
@@ -152,5 +155,5 @@ class WrappedOsc():
         frames = len(output)
         walk_offset = 2*random.random() - 1.0
         for n in range(0, frames):
-            walk_state[0] = walk_state[0]*.99995 + .00005*walk_offset
+            walk_state[0] = walk_state[0]*.99999 + .00001*walk_offset
             output[n] = walk_state[0]
