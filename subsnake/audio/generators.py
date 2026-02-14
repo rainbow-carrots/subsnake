@@ -1,6 +1,7 @@
 import numpy as np
 import math
 from numba import njit
+import random
 
 fs = 44100
 oneoverfs = 1.0/float(fs)
@@ -18,19 +19,22 @@ class WrappedOsc():
         self.state = np.array([0.0, amplitude, phase_increment], dtype=np.float32)
         self.state2 = np.array([0.0, amplitude, phase_increment], dtype=np.float32)
         self.hardSyncBuffer = np.zeros((2048, 2), dtype=np.float32)
+        self.random_walk = np.zeros((2048, 2), dtype=np.float32)
+        self.walk_state = np.zeros((1, 2), dtype=np.float32)
         self.alg = alg
         self.pulsewidth = width
         self.freq = frequency
         self.amp = amplitude
     
     def process_block(self, buffer, mod_buffers, mod_values):
-        #print(f"DEBUG: buffer shape is {buffer.shape}")
+        frames = len(buffer)
+        self.generate_walk(self.random_walk[:frames], self.walk_state)
         if (self.alg == 0):
-            self.generate_sine(self.state, buffer, mod_buffers[0], mod_buffers[1], mod_buffers[2], mod_values[0], mod_values[1], mod_values[2], self.amp, self.freq)
+            self.generate_sine(self.state, buffer, self.random_walk[:frames], mod_buffers[0], mod_buffers[1], mod_buffers[2], mod_values[0], mod_values[1], mod_values[2], self.amp, self.freq)
         elif (self.alg == 1.0):
-            self.polyblep_saw(self.state, buffer, mod_buffers[0], mod_buffers[1], mod_buffers[2], mod_values[0], mod_values[1], mod_values[2], self.amp, self.freq)
+            self.polyblep_saw(self.state, buffer, self.random_walk[:frames], mod_buffers[0], mod_buffers[1], mod_buffers[2], mod_values[0], mod_values[1], mod_values[2], self.amp, self.freq)
         elif (self.alg == 2.0):
-            self.polyblep_pulse(self.state, buffer, self.state2, self.pulsewidth, mod_buffers[0], mod_buffers[1], mod_buffers[2], mod_buffers[3], mod_values[0], mod_values[1], mod_values[2], mod_values[3], self.amp, self.freq)
+            self.polyblep_pulse(self.state, buffer, self.state2, self.pulsewidth, self.random_walk[:frames], mod_buffers[0], mod_buffers[1], mod_buffers[2], mod_buffers[3], mod_values[0], mod_values[1], mod_values[2], mod_values[3], self.amp, self.freq)
 
     def update_pitch(self, newPitch):
         self.freq = newPitch
@@ -53,7 +57,7 @@ class WrappedOsc():
     #phase-wrapped sine wave
     @staticmethod
     @njit(nogil=True, fastmath=True)
-    def generate_sine(state, outdata, pitch_mod, det_mod, amp_mod, pm_amt, dm_amt, am_amt, amp=1.0, freq=440.0):
+    def generate_sine(state, outdata, walk_mod, pitch_mod, det_mod, amp_mod, pm_amt, dm_amt, am_amt, amp=1.0, freq=440.0):
         base_inc = twopi*freq*oneoverfs
         for n in range(len(outdata)):
             state[2] = base_inc + base_inc*pitch_mod[n]*pm_amt + max_det_inc*det_mod[n]*dm_amt
@@ -67,7 +71,7 @@ class WrappedOsc():
     #anti-aliased sawtooth
     @staticmethod
     @njit(nogil=True, fastmath=True)
-    def polyblep_saw(state, outdata, pitch_mod, det_mod, amp_mod, pm_amt, dm_amt, am_amt, amp=1.0, freq=440.0):
+    def polyblep_saw(state, outdata, walk_mod, pitch_mod, det_mod, amp_mod, pm_amt, dm_amt, am_amt, amp=1.0, freq=440.0):
         frames = len(outdata)
         base_inc = twopi*freq*oneoverfs
         for n in range(frames):
@@ -98,7 +102,7 @@ class WrappedOsc():
     #anti-aliased pulse
     @staticmethod
     @njit(nogil=True, fastmath=True)
-    def polyblep_pulse(state, outdata, state2, width, pitch_mod, det_mod, amp_mod, width_mod, pm_amt, dm_amt, am_amt, wm_amt, amp=1.0, freq=440.0):
+    def polyblep_pulse(state, outdata, state2, width, walk_mod, pitch_mod, det_mod, amp_mod, width_mod, pm_amt, dm_amt, am_amt, wm_amt, amp=1.0, freq=440.0):
         frames = len(outdata)
         base_inc = twopi*freq*oneoverfs
         for n in range(frames):
@@ -140,3 +144,13 @@ class WrappedOsc():
             sample *= state[1]
             outdata[n, 0] = sample*(amp - amp_mod[n]*am_amt)
             outdata[n, 1] = sample*(amp - amp_mod[n]*am_amt)
+
+    @staticmethod
+    @njit(nogil=True, fastmath=True)
+    def generate_walk(output, walk_state):
+        frames = len(output)
+        for c in range(0, 2):
+            for n in range(0, frames):
+                walk_offset = 2*random.random() - 1.0
+                walk_state[0, c] = walk_state[0, c]*.99995 + .00005*walk_offset
+                output[n, c] = walk_state[0, c]
