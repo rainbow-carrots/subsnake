@@ -309,6 +309,9 @@ class MainWindow(QMainWindow):
         # patch select
         self.patch_manager.patch_loaded.connect(self.load_patch)
 
+        # synth settings
+        self.synth_group.drift_changed.connect(self.update_osc_drift)
+
         self.setCentralWidget(window_widget)
 
         #start slider cc update timer
@@ -513,7 +516,7 @@ class MainWindow(QMainWindow):
         if text == "midi":
             self.settings_stack.setCurrentIndex(0)
         elif text == "synth":
-            print("DEBUG: synth settings")
+            self.settings_stack.setCurrentIndex(1)
         elif text == "recorder":
             print("DEBUG: recorder settings")
 
@@ -626,6 +629,10 @@ class MainWindow(QMainWindow):
         elif (text == "notch"):
             newAlg = 3.0
         self.engine.update_type(newAlg)
+
+    # oscillator drift
+    def update_osc_drift(self, value):
+        self.engine.update_osc_drift(value)
         
     # oscillator 1
     def update_osc_freq(self, value):
