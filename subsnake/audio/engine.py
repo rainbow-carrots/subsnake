@@ -57,6 +57,7 @@ class AudioEngine():
         self.key_to_note = {}
         self.note_to_voice = {}
         self.octave = 0
+        self.osc_drift_amt = 0.0
         self.pitch_offset_1 = 0
         self.pitch_offset_2 = 0
         self.pitch_offset_3 = 0
@@ -164,6 +165,13 @@ class AudioEngine():
         self.recorder.set_loop(state)
 
     #voice helper functions
+    # oscillator drift
+    def update_osc_drift(self, drift):
+        for voice in self.voices:
+            voice.osc.update_drift(drift)
+            voice.osc2.update_drift(drift)
+            voice.osc3.update_drift(drift)
+
     # oscillators
     def update_pitch_1(self, offset):
         for voice in self.voices:
