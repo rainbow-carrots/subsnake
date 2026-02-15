@@ -45,12 +45,14 @@ class MIDIControl(QWidget):
         #param name LUT
         self.param_names = [["pitch", "level", "width"], ["pitch", "detune", "level", "width"], ["pitch", "detune", "level", "width"],
                             ["cutoff", "feedback", "drive", "saturate"], ["attack", "decay", "sustain", "release", "depth"],
-                            ["attack", "decay", "sustain", "release"], ["time", "feedback", "mix"]]
+                            ["attack", "decay", "sustain", "release"], ["time", "feedback", "mix"],
+                            ["speed", "phase"], ["speed", "phase"], ["attack", "release"], ["attack", "release"]]
 
         #init widgets
         self.cc_select.setRange(0, 127)
         self.cc_select.setValue(self.prev_cc)
-        self.module_select.addItems(["oscillator 1", "oscillator 2", "oscillator 3", "filter", "filter env", "envelope", "delay"])
+        self.module_select.addItems(["oscillator 1", "oscillator 2", "oscillator 3", "filter", "filter env", "envelope", "delay",
+                                     "lfo 1", "lfo 2", "menv 1", "menv 2"])
         self.module_select.setCurrentIndex(0)
         self.param_select.addItems(self.param_names[0])
         self.param_select.setCurrentIndex(0)
