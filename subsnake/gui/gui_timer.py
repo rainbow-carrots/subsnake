@@ -165,7 +165,7 @@ class UpdateGUI(QTimer):
     def update_cc_display(self, display, module, param, value):
         if (module == "oscillator 1"):
             if (param == "pitch"):
-                display_val = float(value)/100.0
+                display_val = float(value)/250.0
             elif (param == "level"):
                 display_val = float(value)/500.0
             elif (param == "width"):
@@ -206,7 +206,7 @@ class UpdateGUI(QTimer):
                 display.display(f"{display_val:.2f}")
         elif (module == "filter env"):
             if (param == "depth"):
-                display_val = float(value)/100.0
+                display_val = float(value)/500.0
             else:
                 display_val = float(value)/1000.0
             display.display(f"{display_val:.2f}")
