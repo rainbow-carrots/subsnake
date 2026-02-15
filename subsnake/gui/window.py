@@ -515,6 +515,26 @@ class MainWindow(QMainWindow):
                 cc_function = self.engine.cc_change_del_feedback
             elif (param == "mix"):
                 cc_function = self.engine.cc_change_del_mix
+        elif (module == "lfo 1"):
+            if (param == "speed"):
+                cc_function = self.engine.cc_change_lfo1_speed
+            elif (param == "phase"):
+                cc_function = self.engine.cc_change_lfo1_phase
+        elif (module == "lfo 2"):
+            if (param == "speed"):
+                cc_function = self.engine.cc_change_lfo2_speed
+            elif (param == "phase"):
+                cc_function = self.engine.cc_change_lfo2_phase
+        elif (module == "menv 1"):
+            if (param == "attack"):
+                cc_function = self.engine.cc_change_menv1_attack
+            elif (param == "release"):
+                cc_function = self.engine.cc_change_menv1_release
+        elif (module == "menv 2"):
+            if (param == "attack"):
+                cc_function = self.engine.cc_change_menv2_attack
+            elif (param == "release"):
+                cc_function = self.engine.cc_change_menv2_release
         return cc_function
 
     #slots
