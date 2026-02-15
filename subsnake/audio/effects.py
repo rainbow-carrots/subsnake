@@ -104,10 +104,12 @@ class AudioRecorder():
 
     def get_time(self):
         current_time_seconds = int(float(self.play_heads[0]) / 44100.0)
+        display_current_time_seconds = current_time_seconds % 60
         current_time_minutes = int(current_time_seconds / 60)
         max_time_seconds = int(float(self.end_heads[0]) / 44100.0)
+        display_max_time_seconds = max_time_seconds % 60
         max_time_minutes = int(max_time_seconds / 60)
-        output = (current_time_minutes, current_time_seconds, max_time_minutes, max_time_seconds)
+        output = (current_time_minutes, display_current_time_seconds, max_time_minutes, display_max_time_seconds)
         return output
 
     def process_block(self, indata, outdata):
