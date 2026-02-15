@@ -1,5 +1,5 @@
 MainWindow#main_window {
-    background-color: #c1c1e3;
+    background-color: #b4b4d2;
 }
 
 QLCDNumber {
@@ -18,6 +18,7 @@ QGroupBox {
     font-family: "Dogica Pixel";
     font-size: 10px;
     margin-top: 12px;
+    background-color: #c1c1e3;
 }
 
 QGroupBox QLabel {
@@ -230,6 +231,9 @@ QGroupBox::title {
     color: black;
     top: -9px;
     min-height: 16px;
+    border-radius: 4px;
+    border: .5px solid white;
+    background-color: #c1c1e3;
 }
 
 QGroupBox::title#recorder, QGroupBox:title#patch_manager {
@@ -244,34 +248,6 @@ QGroupBox#filt_group, QGroupBox#osc_group, QGroupBox#osc2_group, QGroupBox#osc3_
 ModulatorGUI QGroupBox {
     max-height: 180px;
     min-width: 360px;
-}
-
-QGroupBox#filt_group {
-    background-color: none;
-}
-
-QGroupBox#osc_group {
-    background-color: none;
-}
-
-QGroupBox#osc2_group {
-    background-color: none;
-}
-
-QGroupBox#osc3_group {
-    background-color: none;
-}
-
-QGroupBox#env_group {
-    background-color: none;
-}
-
-QGroupBox#fenv_group {
-    background-color: none;
-}
-
-QGroupBox#del_group {
-    background-color: none;
 }
 
 ModulatorGUI QPushButton {
@@ -403,6 +379,7 @@ QPushButton#toggle_midi, QPushButton#toggle_synth, QPushButton#toggle_record {
     border-radius: 6px;
     font-family: "Dogica Pixel";
     font-size: 12px;
+    background-color: #c1c1e3;
 }
 
 QPushButton#toggle_midi:hover {
@@ -422,7 +399,6 @@ QPushButton#toggle_synth:checked {
 }
 
 PatchManager#patch_manager {
-    background-color: none;
     border: 1px solid white;
     border-radius: 6px;
     max-height: 40px;
@@ -450,7 +426,6 @@ QPushButton#save_patch:hover {
 }
 
 RecorderGUI#recorder {
-    background-color: none;
     border: 1px solid white;
     border-radius: 6px;
     min-width: 380px;
