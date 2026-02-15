@@ -508,6 +508,13 @@ class MainWindow(QMainWindow):
                 cc_function = self.engine.cc_change_env_sustain
             elif (param == "release"):
                 cc_function = self.engine.cc_change_env_release
+        elif (module == "delay"):
+            if (param == "time"):
+                cc_function = self.engine.cc_change_del_time
+            elif (param == "feedback"):
+                cc_function = self.engine.cc_change_del_feedback
+            elif (param == "mix"):
+                cc_function = self.engine.cc_change_del_mix
         return cc_function
 
     #slots
@@ -738,7 +745,7 @@ class MainWindow(QMainWindow):
         self.engine.update_del_feedback(value)
 
     def update_del_mix(self, value):
-        self.engine.updat_del_mix(value)
+        self.engine.update_del_mix(value)
 
     # lfo 1
     def update_lfo1_freq(self, value):
