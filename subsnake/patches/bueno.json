@@ -23,7 +23,7 @@
     "env_dec": 248,
     "env_sus": 1,
     "env_rel": 310,
-    "del_time": 200,
+    "del_time": 400,
     "del_fback": 790,
     "del_mix": 325,
     "lfo1_freq": 1,
