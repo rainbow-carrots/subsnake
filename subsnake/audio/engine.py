@@ -306,7 +306,7 @@ class AudioEngine():
     def update_del_feedback(self, newFeedback):
         self.delay.update_feedback(newFeedback)
 
-    def updat_del_mix(self, newMix):
+    def update_del_mix(self, newMix):
         self.delay.update_mix(newMix)
 
     # modulators
@@ -461,6 +461,19 @@ class AudioEngine():
     def cc_change_env_release(self, value):
         new_release = (float(value)/127.0) + .001
         self.update_release(new_release)
+
+    #delay
+    def cc_change_del_time(self, value):
+        new_time = (float(value)/127.0)
+        self.update_del_time(new_time)
+
+    def cc_change_del_feedback(self, value):
+        new_feedback = (float(value)/127.0)
+        self.update_del_feedback(new_feedback)
+
+    def cc_change_del_mix(self, value):
+        new_mix = (float(value)/127.0)
+        self.update_del_mix(new_mix)
 
     #mod dial helpers
     def update_mod_value(self, name, value):
