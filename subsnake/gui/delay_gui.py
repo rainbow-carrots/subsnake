@@ -35,7 +35,7 @@ class DelayGUI(QGroupBox):
 
         #sliders
         self.del_time_slider = QSlider(Qt.Horizontal)
-        self.del_time_slider.setRange(1, 500)
+        self.del_time_slider.setRange(1, 1000)
         self.del_time_slider.setSingleStep(1)
 
         self.del_feedback_slider = QSlider(Qt.Horizontal)
@@ -92,7 +92,7 @@ class DelayGUI(QGroupBox):
 
     #slots
     def change_time(self, value):
-        new_time = float(value)/500.0
+        new_time = float(value)/1000.0
         self.del_time_display.display(f"{new_time:.2f}")
         self.time_changed.emit(new_time)
 
