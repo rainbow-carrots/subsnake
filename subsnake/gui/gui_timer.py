@@ -109,6 +109,26 @@ class UpdateGUI(QTimer):
                 cc_slider = self.window.del_group.del_feedback_slider
             elif (param == "mix"):
                 cc_slider = self.window.del_group.del_mix_slider
+        elif (module == "lfo 1"):
+            if (param == "speed"):
+                cc_slider = self.window.mod_group.lfo_freq_slider_1
+            elif (param == "phase"):
+                cc_slider = self.window.mod_group.lfo_phase_slider_1
+        elif (module == "lfo 2"):
+            if (param == "speed"):
+                cc_slider = self.window.mod_group.lfo_freq_slider_2
+            elif (param == "phase"):
+                cc_slider = self.window.mod_group.lfo_phase_slider_2
+        elif (module == "menv 1"):
+            if (param == "attack"):
+                cc_slider = self.window.mod_group.menv_att_slider_1
+            elif (param == "release"):
+                cc_slider = self.window.mod_group.menv_rel_slider_1
+        elif (module == "menv 2"):
+            if (param == "attack"):
+                cc_slider = self.window.mod_group.menv_att_slider_2
+            elif (param == "release"):
+                cc_slider = self.window.mod_group.menv_rel_slider_2
         return cc_slider
     
     def assign_cc_display(self, module, param):
@@ -174,6 +194,26 @@ class UpdateGUI(QTimer):
                 cc_display = self.window.del_group.del_feedback_display
             elif (param == "mix"):
                 cc_display = self.window.del_group.del_mix_display
+        elif (module == "lfo 1"):
+            if (param == "speed"):
+                cc_display = self.window.mod_group.lfo_freq_display_1
+            elif (param == "phase"):
+                cc_display = self.window.mod_group.lfo_phase_display_1
+        elif (module == "lfo 2"):
+            if (param == "speed"):
+                cc_display = self.window.mod_group.lfo_freq_display_2
+            elif (param == "phase"):
+                cc_display = self.window.mod_group.lfo_phase_display_2
+        elif (module == "menv 1"):
+            if (param == "attack"):
+                cc_display = self.window.mod_group.menv_att_display_1
+            elif (param == "release"):
+                cc_display = self.window.mod_group.menv_rel_display_1
+        elif (module == "menv 2"):
+            if (param == "attack"):
+                cc_display = self.window.mod_group.menv_att_display_2
+            elif (param == "release"):
+                cc_display = self.window.mod_group.menv_rel_display_2
         return cc_display
     
     def update_cc_display(self, display, module, param, value):
@@ -224,6 +264,12 @@ class UpdateGUI(QTimer):
             else:
                 display_val = float(value)/1000.0
             display.display(f"{display_val:.2f}")
-        elif (module == "envelope" or module == "delay"):
+        elif (module == "envelope" or module == "delay" or module == "menv 1" or module == "menv 2"):
             display_val = float(value)/1000.0
+            display.display(f"{display_val:.2f}")
+        elif (module == "lfo 1" or module == "lfo 2"):
+            if param == "speed":
+                display_val = (float(value)/100.0)
+            else:
+                display_val = (float(value)/1000.0)
             display.display(f"{display_val:.2f}")
