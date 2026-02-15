@@ -362,7 +362,7 @@ class AudioEngine():
     #cc helpers
     #osc 1
     def cc_change_pitch_1(self, value):
-        new_pitch = (float(value)/127.0)*10 - 5
+        new_pitch = (float(value)/127.0)*4.0 - 2
         self.update_pitch_1(new_pitch)
 
     def cc_change_level_1(self, value):
@@ -375,7 +375,7 @@ class AudioEngine():
 
     #osc 2
     def cc_change_pitch_2(self, value):
-        new_pitch = (float(value)/127.0)*10.0 - 5
+        new_pitch = (float(value)/127.0)*4.0 - 2
         self.update_pitch_2(new_pitch)
 
     def cc_change_level_2(self, value):
@@ -392,7 +392,7 @@ class AudioEngine():
 
     #osc 3
     def cc_change_pitch_3(self, value):
-        new_pitch = (float(value)/127.0)*10.0 - 5
+        new_pitch = (float(value)/127.0)*4.0 - 2
         self.update_pitch_3(new_pitch)
 
     def cc_change_level_3(self, value):
@@ -442,7 +442,7 @@ class AudioEngine():
         self.update_fenv_release(new_release)
 
     def cc_change_fenv_amount(self, value):
-        new_depth = (float(value)/127.0)*10.0 - 5.0
+        new_depth = (float(value)/127.0)*2.0 - 1
         self.update_fenv_amount(new_depth)
 
     #envelope
