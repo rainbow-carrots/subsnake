@@ -102,6 +102,13 @@ class UpdateGUI(QTimer):
                 cc_slider = self.window.env_group.adsr_sus_slider
             elif (param == "release"):
                 cc_slider = self.window.env_group.adsr_rel_slider
+        elif (module == "delay"):
+            if (param == "time"):
+                cc_slider = self.window.del_group.del_time_slider
+            elif (param == "feedback"):
+                cc_slider = self.window.del_group.del_feedback_slider
+            elif (param == "mix"):
+                cc_slider = self.window.del_group.del_mix_slider
         return cc_slider
     
     def assign_cc_display(self, module, param):
@@ -160,6 +167,13 @@ class UpdateGUI(QTimer):
                 cc_display = self.window.env_group.adsr_sus_display
             elif (param == "release"):
                 cc_display = self.window.env_group.adsr_rel_display
+        elif (module == "delay"):
+            if (param == "time"):
+                cc_display = self.window.del_group.del_time_display
+            elif (param == "feedback"):
+                cc_display = self.window.del_group.del_feedback_display
+            elif (param == "mix"):
+                cc_display = self.window.del_group.del_mix_display
         return cc_display
     
     def update_cc_display(self, display, module, param, value):
@@ -210,6 +224,6 @@ class UpdateGUI(QTimer):
             else:
                 display_val = float(value)/1000.0
             display.display(f"{display_val:.2f}")
-        elif (module == "envelope"):
+        elif (module == "envelope" or module == "delay"):
             display_val = float(value)/1000.0
             display.display(f"{display_val:.2f}")
