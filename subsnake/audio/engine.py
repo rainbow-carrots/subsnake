@@ -434,7 +434,7 @@ class AudioEngine():
         self.update_fenv_decay(new_decay)
 
     def cc_change_fenv_sustain(self, value):
-        new_sustain = (float(value)/127.0) + .001
+        new_sustain = (float(value)/127.0)
         self.update_fenv_sustain(new_sustain)
 
     def cc_change_fenv_release(self, value):
@@ -455,7 +455,7 @@ class AudioEngine():
         self.update_decay(new_decay)
 
     def cc_change_env_sustain(self, value):
-        new_sustain = (float(value)/127.0) + .001
+        new_sustain = (float(value)/127.0)
         self.update_sustain(new_sustain)
 
     def cc_change_env_release(self, value):
@@ -474,6 +474,44 @@ class AudioEngine():
     def cc_change_del_mix(self, value):
         new_mix = (float(value)/127.0)
         self.update_del_mix(new_mix)
+
+    #modulators
+    # lfo 1
+    def cc_change_lfo1_speed(self, value):
+        new_speed = (float(value)/127.0)*10.0 + .001
+        self.update_lfo1_freq(new_speed)
+    
+    def cc_change_lfo1_phase(self, value):
+        new_phase = (float(value)/127.0)
+        self.update_lfo1_offset(new_phase)
+    
+    # lfo 2
+    def cc_change_lfo2_speed(self, value):
+        new_speed = (float(value)/127.0)*10.0 + .001
+        self.update_lfo2_freq(new_speed)
+    
+    def cc_change_lfo2_phase(self, value):
+        new_phase = (float(value)/127.0)
+        self.update_lfo2_offset(new_phase)
+
+    # menv 1
+    def cc_change_menv1_attack(self, value):
+        new_attack = (float(value)/127.0) + .001
+        self.update_menv1_att(new_attack)
+
+    def cc_change_menv1_release(self, value):
+        new_release = (float(value)/127.0) + .001
+        self.update_menv1_rel(new_release)
+
+    # menv 2
+    def cc_change_menv2_attack(self, value):
+        new_attack = (float(value)/127.0) + .001
+        self.update_menv2_att(new_attack)
+
+    def cc_change_menv2_release(self, value):
+        new_release = (float(value)/127.0) + .001
+        self.update_menv2_rel(new_release)
+    
 
     #mod dial helpers
     def update_mod_value(self, name, value):
