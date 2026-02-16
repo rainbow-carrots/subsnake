@@ -5,20 +5,19 @@ subsnake is a polyphonic virtual analog subtractive synthesizer, written in pyth
 ![](./subsnake/images/subsnake.png)
 
 
-what does it do? well, i'm so very glad you asked.
-* it makes sound (yay!)
-* it has 12 voices
+what does it do? well, i'm very glad you asked.
+* it generates sound (yay!)
+* it has 12 voices of polyphony
 * it supports midi (input)
 * it can save & load patches
 
-
-ok. sounds neat. what's in a voice?
+what's in a voice?
 * 3 sine, polyblep (anti-aliased) sawtooth or pulse generators (+ PWM)
 * 1 state-variable filter - using an oversampled Chamberlin topology with feedback, saturation & drive
-* 2 ADSR envelopes - one for amplitude, one for filter frequency, using leaky integrators
-* 4 modulators - 2 LFOs, 2 AR envelopes, with dedicated assignable attenuverters for every parameter
-    * shapes: sine, triangle, ramp, sawtooth, square, sample & hold | 0.01-10Hz w/ controllable phase shift
-    * modes: attack-release, attack-hold-release, loop (attack-release) | .01-1s per stage
+* 2 ADSR envelopes - one for amplitude, one for filter frequency, with bipolar depth control
+* 4 modulators - 2 LFOs, 2 envelopes, with dedicated assignable attenuverters for every parameter
+    * LFO shapes: sine, triangle, ramp, sawtooth, square, sample & hold | 0.01-10Hz w/ controllable phase shift
+    * env. modes: attack-release, attack-hold-release, loop (attack-release) | .01-1s per stage
 
 there's also a stereo delay on the master bus (voice output + recorder), and a stereo audio recorder/looper with continuous overdubbing.
 
