@@ -11,15 +11,18 @@ what does it do? well, i'm very glad you asked.
 * it supports midi (input)
 * it can save & load patches
 
+
 what's in a voice?
 * 3 sine, polyblep (anti-aliased) sawtooth or pulse generators (+ PWM)
 * 1 state-variable filter - using an oversampled Chamberlin topology with feedback, saturation & drive
-* 2 ADSR envelopes - one for amplitude, one for filter frequency, with bipolar depth control
-* 4 modulators - 2 LFOs, 2 envelopes, with dedicated assignable attenuverters for every parameter
-    * LFO shapes: sine, triangle, ramp, sawtooth, square, sample & hold | 0.01-10Hz w/ controllable phase shift
-    * env. modes: attack-release, attack-hold-release, loop (attack-release) | .01-1s per stage
+* 2 ADSR envelopes - one for amplitude, one for filter frequency (with bipolar depth control)
+* 4 modulators - 2 LFOs, 2 envelopes, with dedicated assignable attenuverters for every slider parameter
+    * LFO shapes: sine, triangle, ramp, sawtooth, square, sample & hold
+        * 0.01-10Hz w/ controllable phase shift
+    * env. modes: attack-release, attack-hold-release, loop (attack-release)
+        * .01-1s per stage
 
-there's also a stereo delay on the master bus (voice output + recorder), and a stereo audio recorder/looper with continuous overdubbing.
+there's also a stereo delay effect on the master bus (voice output + recorder), and a stereo audio recorder/looper with continuous overdubbing.
 
 
 what's the midi like?
@@ -43,7 +46,7 @@ is there anything else?
     * you can shift the pc keyboard octave range up/down using the +/- keys
 
 
-ok. sweet. how can i play it?
+how can i play it?
 * [v0.1.6](https://github.com/rainbow-carrots/subsnake/releases/tag/v0.1.6) is the latest build
 * click on the version that corresponds to your platform to download the zip, extract, & run! if it doesn't open:
     * __on linux__: right click the file, go to *Properties* -> *Permissions*, and make sure "Allow executing file as program" is checked 
@@ -51,6 +54,7 @@ ok. sweet. how can i play it?
     * __on windows__: click *More info* and choose *Run anyway* 
 * **note**: this project is in active development. you probably will encounter bugs.
     * if you do spot something, [let me know](https://github.com/rainbow-carrots/subsnake/issues)
+
 
 what's on the docket?
 * save & auto-restore midi settings on load (channel, cc's, parameter mappings)
@@ -64,6 +68,7 @@ what's on the docket?
 * stereo delay
     * connect mod dials for parameter modulation
     * add ping pong & dampening parameters
+* allow modulators to modulate themselves (and other modulators)
 * allow UI theming, saving/loading of themes & add stock themes (dark mode pending)
 * oscilloscope display
 * more "factory" patches
