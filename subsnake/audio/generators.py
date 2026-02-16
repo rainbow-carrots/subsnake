@@ -37,6 +37,7 @@ class WrappedOsc():
             self.generate_sine(self.state, buffer, self.random_walk[:frames], self.walk_amt, mod_buffers[0], mod_buffers[1], mod_buffers[2], mod_values[0], mod_values[1], mod_values[2], self.amp, self.freq)
         elif (self.alg == 1.0):
             self.polyblep_saw(self.state, buffer, self.random_walk[:frames], self.walk_amt, mod_buffers[0], mod_buffers[1], mod_buffers[2], mod_values[0], mod_values[1], mod_values[2], self.amp, self.freq)
+            #self.blit_saw(buffer, self.blit_states, self.blit_integrators, self.amp, self.freq)
         elif (self.alg == 2.0):
             self.polyblep_pulse(self.state, buffer, self.state2, self.pulsewidth, self.random_walk[:frames], self.walk_amt, mod_buffers[0], mod_buffers[1], mod_buffers[2], mod_buffers[3], mod_values[0], mod_values[1], mod_values[2], mod_values[3], self.amp, self.freq)
 
@@ -167,7 +168,7 @@ class WrappedOsc():
         frames = len(outdata)
         for n in range(0, frames):
             for c in range(0, 2):
-                harmonics = int(nyquist/freq)
+                harmonics = 2*int(nyquist/freq) + 1
                 increment = freq*oneoverfs
                 phase = states[c, 0]
                 kernel_den = math.sin(np.pi*phase)
@@ -175,7 +176,7 @@ class WrappedOsc():
                     slope = 1.0-harmonics
                 else:
                     slope = 1.0-math.sin(np.pi*harmonics*phase)/kernel_den
-                slope *= increment
+                slope *= increment*2
                 integrators[0, c] = integrators[0, c]*.999 + slope
                 states[c, 0] += increment
                 states[c, 0] -= np.floor(states[c, 0])
