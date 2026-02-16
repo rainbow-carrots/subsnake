@@ -171,13 +171,14 @@ class WrappedOsc():
                 harmonics = 2*int(nyquist/freq) + 1
                 increment = freq*oneoverfs
                 phase = states[c, 0]
+                leak_c = 1.0 - twopi*increment*.1
                 kernel_den = math.sin(np.pi*phase)
                 if phase < .0000001:
                     slope = 1.0-harmonics
                 else:
                     slope = 1.0-math.sin(np.pi*harmonics*phase)/kernel_den
                 slope *= increment*2
-                integrators[0, c] = integrators[0, c]*.999 + slope
+                integrators[0, c] = integrators[0, c]*leak_c + slope
                 states[c, 0] += increment
                 states[c, 0] -= np.floor(states[c, 0])
                 outdata[n, c] = integrators[0, c]*amp
