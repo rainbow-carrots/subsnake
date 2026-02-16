@@ -4,6 +4,7 @@ from numba import njit
 import random
 
 fs = 44100
+nyquist = 22050
 oneoverfs = 1.0/float(fs)
 twopi = 2*np.pi
 oneoverpi = 1/np.pi
@@ -22,6 +23,8 @@ class WrappedOsc():
         self.random_walk = np.zeros((2048), dtype=np.float32)
         self.walk_state = np.zeros((1), dtype=np.float32)
         self.walk_amt = 0.0
+        self.blit_integrators = np.zeros((1, 2), dtype=np.float32)
+        self.blit_states = np.array([[0.0, amplitude, phase_increment], [0.0, amplitude, phase_increment]], dtype=np.float32)
         self.alg = alg
         self.pulsewidth = width
         self.freq = frequency
@@ -157,3 +160,23 @@ class WrappedOsc():
         for n in range(0, frames):
             walk_state[0] = walk_state[0]*.99999 + .00001*walk_offset
             output[n] = walk_state[0]
+
+    @staticmethod
+    @njit(nogil=True, fastmath=True)
+    def blit_saw(outdata, states, integrators, amp=1.0, freq=440.0):
+        frames = len(outdata)
+        for n in range(0, frames):
+            for c in range(0, 2):
+                harmonics = int(nyquist/freq)
+                increment = freq*oneoverfs
+                phase = states[c, 0]
+                kernel_den = math.sin(np.pi*phase)
+                if phase < .0000001:
+                    slope = 1.0-harmonics
+                else:
+                    slope = 1.0-math.sin(np.pi*harmonics*phase)/kernel_den
+                slope *= increment
+                integrators[0, c] = integrators[0, c]*.999 + slope
+                states[c, 0] += increment
+                states[c, 0] -= np.floor(states[c, 0])
+                outdata[n, c] = integrators[0, c]*amp
