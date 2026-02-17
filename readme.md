@@ -16,11 +16,13 @@ what's in a voice?
 * 3 sine, BLIT sawtooth, or polyBLEP pulse generators (+ PWM)
 * 1 state-variable filter - using an oversampled Chamberlin topology with feedback, saturation & drive
 * 2 ADSR envelopes - one for amplitude, one for filter frequency (with bipolar depth control)
-* 4 modulators - 2 LFOs, 2 envelopes, with dedicated assignable attenuverters for every slider parameter
+* 4 modulators - 2 LFOs, 2 envelopes, with dedicated assignable attenuverters for every₁₂ parameter
     * LFO shapes: sine, triangle, ramp, sawtooth, square, sample & hold
         * 0.01-10Hz w/ controllable phase shift
     * env. modes: attack-release, attack-hold-release, loop (attack-release)
         * .01-1s per stage
+    * __₁__ *slider-controlled (excluding radio buttons)*
+    * __₂__ *delay modulation currently disabled*
 
 there's also a stereo delay effect on the master bus (voice output + recorder), and a stereo audio recorder/looper with continuous overdubbing.
 
