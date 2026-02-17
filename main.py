@@ -41,6 +41,8 @@ WrappedOsc.polyblep_saw(osc_test, np.zeros((16, 2), dtype=np.float32), walk_test
 WrappedOsc.polyblep_pulse(osc_test, np.zeros((16, 2), dtype=np.float32), osc2_test, 0.5, walk_test, 1.0, mod_test, mod_test, mod_test, mod_test, 0, 0, 0, 0)
 WrappedOsc.blit_saw(test_blit_out, test_blit_buffer, test_blit_buffer_write, test_blit_states, test_blit_integrators, WrappedOsc.hermite_interpolate, 
                     walk_test, 1.0, mod_test, mod_test, mod_test, 0, 0, 0, 0.5, 440.0)
+WrappedOsc.blit_pulse(test_blit_out, test_blit_buffer, test_blit_buffer_write, test_blit_states, test_blit_integrators, WrappedOsc.hermite_interpolate, 
+                    walk_test, 1.0, mod_test, mod_test, mod_test, mod_test, 0, 0, 0, 0, 0.5, 440.0, 0.5)
 HalSVF.filter_block(filt_test, np.zeros((16, 2), dtype=np.float32), np.zeros((16, 2), dtype=np.float32), np.ones((16, 2), dtype=np.float32), 0.0, HalSVF.clip_sample, 100,
                     mod_test, mod_test, mod_test, mod_test, mod_test, 0, 0, 0, 0, 0)
 ADSR.envelope_block(env_test, False, np.zeros((16, 2), dtype=np.float32), np.zeros((16, 2), dtype=np.float32), 0, 0, mod_test, mod_test, mod_test, mod_test, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1)
