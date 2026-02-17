@@ -25,6 +25,9 @@ class WrappedOsc():
         self.walk_amt = 0.0
         self.blit_integrators = np.zeros((1, 2), dtype=np.float32)
         self.blit_states = np.array([[0.0, amplitude, phase_increment], [0.0, amplitude, phase_increment]], dtype=np.float32)
+        self.blit_buffer = np.zeros((8192, 2))
+        self.blit_buffer_read = np.zeros((1, 2), dtype=np.float32)
+        self.blit_buffer_write = np.zeros((1, 2), dtype=np.int32)
         self.alg = alg
         self.pulsewidth = width
         self.freq = frequency
@@ -36,8 +39,8 @@ class WrappedOsc():
         if (self.alg == 0):
             self.generate_sine(self.state, buffer, self.random_walk[:frames], self.walk_amt, mod_buffers[0], mod_buffers[1], mod_buffers[2], mod_values[0], mod_values[1], mod_values[2], self.amp, self.freq)
         elif (self.alg == 1.0):
-            self.polyblep_saw(self.state, buffer, self.random_walk[:frames], self.walk_amt, mod_buffers[0], mod_buffers[1], mod_buffers[2], mod_values[0], mod_values[1], mod_values[2], self.amp, self.freq)
-            #self.blit_saw(buffer, self.blit_states, self.blit_integrators, self.amp, self.freq)
+            self.blit_saw(buffer, self.blit_buffer, self.blit_buffer_write, self.blit_states, self.blit_integrators, self.hermite_interpolate,  
+                          self.random_walk[:frames], self.walk_amt, mod_buffers[0], mod_buffers[1], mod_buffers[2], mod_values[0], mod_values[1], mod_values[2], self.amp, self.freq)
         elif (self.alg == 2.0):
             self.polyblep_pulse(self.state, buffer, self.state2, self.pulsewidth, self.random_walk[:frames], self.walk_amt, mod_buffers[0], mod_buffers[1], mod_buffers[2], mod_buffers[3], mod_values[0], mod_values[1], mod_values[2], mod_values[3], self.amp, self.freq)
 
@@ -164,12 +167,17 @@ class WrappedOsc():
 
     @staticmethod
     @njit(nogil=True, fastmath=True)
-    def blit_saw(outdata, states, integrators, amp=1.0, freq=440.0):
+    def blit_saw(outdata, buffer, write_heads, states, integrators, hermite_interpolate,
+                 walk_mod, walk_amt, pitch_mod, det_mod, amp_mod, pm_amt, dm_amt, am_amt, amp=1.0, freq=440.0):
         frames = len(outdata)
+        buffer_len = len(buffer)
         for n in range(0, frames):
             for c in range(0, 2):
-                harmonics = 2*int(nyquist/freq) + 1
-                increment = freq*oneoverfs
+                increment = freq*oneoverfs + max_det_inc*walk_mod[n]*walk_amt + max_det_inc*det_mod[n]*dm_amt
+                increment = max(1e-9, increment)
+                period = 1/increment
+                new_freq = increment*fs
+                harmonics = 2*int(nyquist/new_freq) + 1
                 phase = states[c, 0]
                 leak_c = 1.0 - twopi*increment*.1
                 kernel_den = math.sin(np.pi*phase)
@@ -181,4 +189,35 @@ class WrappedOsc():
                 integrators[0, c] = integrators[0, c]*leak_c + slope
                 states[c, 0] += increment
                 states[c, 0] -= np.floor(states[c, 0])
-                outdata[n, c] = integrators[0, c]*amp
+
+                buffer[write_heads[0, c], c] = integrators[0, c]
+                base_delay = period + 2.0
+                total_delay = base_delay + pm_amt*pitch_mod[n]*period
+                int_offset = np.floor(total_delay)
+                frac_offset = total_delay - int_offset
+                read_head = write_heads[0, c] - int(int_offset)
+                read_head = read_head % buffer_len
+                y0_index = read_head-1
+                if y0_index < 0:
+                    y0_index += buffer_len
+                y2_index = read_head+1
+                if y2_index >= buffer_len:
+                    y2_index -= buffer_len
+                y3_index = read_head+2
+                if y3_index >= buffer_len:
+                    y3_index -= buffer_len
+                mod_amp = max(-1.0, min(1.0, amp + amp_mod[n]*am_amt))
+                outdata[n, c] = hermite_interpolate(buffer[y0_index, c], buffer[read_head, c], buffer[y2_index, c], buffer[y3_index, c], frac_offset)*mod_amp
+                write_heads[0, c] += 1
+                if write_heads[0, c] >= buffer_len:
+                    write_heads[0, c] -= buffer_len
+
+    @staticmethod
+    @njit(nogil=True, fastmath=True)
+    def hermite_interpolate(y0, y1, y2, y3, frac):
+        c0 = y1
+        c1 = 0.5*(y2-y0)
+        c2 = y0 - 2.5*y1 + 2.0*y2 - 0.5*y3
+        c3 = 0.5*(y3-y0) + 1.5*(y1-y2)
+
+        return ((c3*frac + c2)*frac + c1)*frac + c0
