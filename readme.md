@@ -13,7 +13,7 @@ what does it do? well, i'm very glad you asked.
 
 
 what's in a voice?
-* 3 sine, polyblep (anti-aliased) sawtooth or pulse generators (+ PWM)
+* 3 sine, BLIT sawtooth, or polyBLEP pulse generators (+ PWM)
 * 1 state-variable filter - using an oversampled Chamberlin topology with feedback, saturation & drive
 * 2 ADSR envelopes - one for amplitude, one for filter frequency (with bipolar depth control)
 * 4 modulators - 2 LFOs, 2 envelopes, with dedicated assignable attenuverters for every slider parameter
