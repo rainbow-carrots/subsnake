@@ -9,18 +9,18 @@ class StereoDelay():
         self.buffer = np.zeros((samples, 2), dtype=np.float32)
         self.delay_time = delay_time
         self.delay_feedback = delay_feedback
-        self.write_heads = [0, 0]
+        self.write_heads = np.zeros((2), dtype=np.int32)
         self.offset = 22050
-        self.offset_smooth = [22050, 22050]
+        self.offset_smooth = np.array([22050, 22050], dtype=np.int32)
         self.mix_level = mix
 
     def process_block(self, input, output):
         self.offset = self.delay_time*self.fs
-        self.delay_block(input, output, self.buffer, self.offset, self.offset_smooth, self.write_heads, self.delay_feedback, self.mix_level)
+        self.delay_block(input, output, self.buffer, self.offset, self.offset_smooth, self.write_heads, self.delay_feedback, self.mix_level, self.hermite_interpolate)
 
     @staticmethod
     @njit(nogil=True, fastmath=True)
-    def delay_block(input, output, buffer, offset_raw, offset_smooth, write_heads, feedback, mix):
+    def delay_block(input, output, buffer, offset_raw, offset_smooth, write_heads, feedback, mix, hermite_interpolate):
         frames = len(input)
         buffer_size = len(buffer)
         alpha = .0001
@@ -28,19 +28,26 @@ class StereoDelay():
             for n in range(0, frames):
                 #integrate offset & calculate whole/fractional parts
                 offset_smooth[c] = offset_smooth[c]*(1.0 - alpha) + offset_raw*alpha
-                offset = int(offset_smooth[c])
-                offset_frac = offset_smooth[c] - offset
 
                 #calculate read head position & wrap
-                read_head = write_heads[c] - offset
-                if (read_head < 0):
-                    read_head = read_head + buffer_size
+                read_head_exact = write_heads[c] - offset_smooth[c]
+                read_head_int = np.floor(read_head_exact)
+                offset_frac = read_head_exact - read_head_int
+                read_head = int(read_head_int) % buffer_size
+
+                #calculate interpolation indeces
+                y0_index = read_head-1
+                if y0_index < 0:
+                    y0_index += buffer_size
+                y2_index = read_head+1
+                if y2_index >= buffer_size:
+                    y2_index -= buffer_size
+                y3_index = read_head+2
+                if y3_index >= buffer_size:
+                    y3_index -= buffer_size
 
                 #interpolate sample
-                if (read_head + 1 < buffer_size):
-                    delayed_sample = (1.0-offset_frac)*buffer[read_head, c] + offset_frac*buffer[read_head + 1, c]
-                else:
-                    delayed_sample = (1.0-offset_frac)*buffer[read_head, c] + offset_frac*buffer[0, c]
+                delayed_sample = hermite_interpolate(buffer[y0_index, c], buffer[read_head, c], buffer[y2_index, c], buffer[y3_index, c], offset_frac)
 
                 #write to output buffer & increment/wrap write head
                 buffer[write_heads[c], c] = delayed_sample*feedback + input[n, c]
@@ -60,6 +67,16 @@ class StereoDelay():
 
     def update_mix(self, new_mix):
         self.mix_level = new_mix
+
+    @staticmethod
+    @njit(nogil=True, fastmath=True)
+    def hermite_interpolate(y0, y1, y2, y3, frac):
+        c0 = y1
+        c1 = 0.5*(y2-y0)
+        c2 = y0 - 2.5*y1 + 2.0*y2 - 0.5*y3
+        c3 = 0.5*(y3-y0) + 1.5*(y1-y2)
+
+        return ((c3*frac + c2)*frac + c1)*frac + c0
 
 
 class AudioRecorder():
