@@ -13,7 +13,7 @@ piovertwo = np.pi/2.0
 max_det_inc = twopi*(10.0/float(fs))
 
 # phase-wrapped oscillator
-# alg = 0.0: sine, 1.0: polyblep ramp, 2.0: polyblep pulse | width = 0.0 to 1.0
+# alg = 0.0: sine, 1.0: BLIT sawtooth, 2.0: BLIT pulse | width = 0.0 to 1.0
 class WrappedOsc():
     def __init__(self, alg, amplitude, frequency, sample_rate, width=0.5):
         phase_increment = twopi * (frequency/sample_rate)
