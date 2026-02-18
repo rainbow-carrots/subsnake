@@ -11,7 +11,6 @@ oneoverpi = 1/np.pi
 oneovertwopi = 1/twopi
 piovertwo = np.pi/2.0
 max_det_inc = twopi*(10.0/float(fs))
-block_c = 1.0 - (twopi*6.0*oneoverfs)
 
 # phase-wrapped oscillator
 # alg = 0.0: sine, 1.0: polyblep ramp, 2.0: polyblep pulse | width = 0.0 to 1.0
@@ -24,7 +23,7 @@ class WrappedOsc():
         self.random_walk = np.zeros((2048), dtype=np.float32)
         self.walk_state = np.zeros((1), dtype=np.float32)
         self.walk_amt = 0.0
-        self.blit_integrators = np.zeros((1, 2), dtype=np.float32)
+        self.blit_integrators = np.zeros((2, 2), dtype=np.float32)
         self.blit_states = np.array([[0.0, amplitude, phase_increment], [0.0, amplitude, phase_increment]], dtype=np.float32)
         self.blit_buffer = np.zeros((8192, 2))
         self.blit_buffer_read = np.zeros((1, 2), dtype=np.float32)
@@ -33,6 +32,7 @@ class WrappedOsc():
         self.blit_blocker_outs = np.zeros((1, 2), dtype=np.float32)
         self.alg = alg
         self.pulsewidth = width
+        self.smoothed_widths = np.zeros((1, 2), dtype=np.float32)
         self.freq = frequency
         self.amp = amplitude
     
@@ -45,7 +45,7 @@ class WrappedOsc():
             self.blit_saw(buffer, self.blit_buffer, self.blit_buffer_write, self.blit_states, self.blit_integrators, self.hermite_interpolate,  
                           self.random_walk[:frames], self.walk_amt, mod_buffers[0], mod_buffers[1], mod_buffers[2], mod_values[0], mod_values[1], mod_values[2], self.amp, self.freq)
         elif (self.alg == 2.0):
-            self.blit_pulse(buffer, self.blit_buffer, self.blit_buffer_write, self.blit_states, self.blit_integrators, self.hermite_interpolate, self.blit_blocker_ins, self.blit_blocker_outs,
+            self.blit_pulse(buffer, self.blit_buffer, self.blit_buffer_write, self.blit_states, self.blit_integrators, self.hermite_interpolate, self.smoothed_widths,
                           self.random_walk[:frames], self.walk_amt, mod_buffers[0], mod_buffers[1], mod_buffers[2], mod_buffers[3], mod_values[0], mod_values[1], mod_values[2], mod_values[3], self.amp, self.freq, self.pulsewidth)
 
     def update_pitch(self, newPitch):
@@ -218,10 +218,12 @@ class WrappedOsc():
 
     @staticmethod
     @njit(nogil=True, fastmath=True)
-    def blit_pulse(outdata, buffer, write_heads, states, integrators, hermite_interpolate, dc_blocker_ins, dc_blocker_outs,
+    def blit_pulse(outdata, buffer, write_heads, states, integrators, hermite_interpolate, smoothed_widths,
                     walk_mod, walk_amt, pitch_mod, det_mod, amp_mod, width_mod, pm_amt, dm_amt, am_amt, wm_amt, amp=1.0, freq=440.0, width=0.5):
         frames = len(outdata)
         buffer_len = len(buffer)
+        alpha = 1.0 - math.exp(-twopi*50.0*oneoverfs)
+        leak_c = .9995
         for n in range(0, frames):
             for c in range(0, 2):
                 increment = freq*oneoverfs + max_det_inc*walk_mod[n]*walk_amt + max_det_inc*det_mod[n]*dm_amt
@@ -229,31 +231,30 @@ class WrappedOsc():
                 period = 1/increment
                 new_freq = increment*fs
                 harmonics = 2*int(nyquist/new_freq) + 1
-                phase1 = states[c, 0]
                 new_width = max(0.0, min(1.0, width + width_mod[n]*wm_amt))
-                phase2 = phase1 + new_width
+                smoothed_widths[0, c] += alpha*(new_width - smoothed_widths[0, c])
+                smoothed_width = smoothed_widths[0, c]
+                phase1 = states[c, 0]
+                phase2 = phase1 + smoothed_width
                 phase2 -= np.floor(phase2)
-                leak_c = .9995
-                kernel_den_rise = math.sin(np.pi*phase1)
-                kernel_den_fall = math.sin(np.pi*phase2)
+                kernel_den_1 = math.sin(np.pi*phase1)
+                kernel_den_2 = math.sin(np.pi*phase2)
                 if phase1 < .0000001:
-                    slope_rise = harmonics
+                    slope1 = 1.0-harmonics
                 else:
-                    slope_rise = math.sin(np.pi*harmonics*phase1)/kernel_den_rise
+                    slope1 = 1.0-math.sin(np.pi*harmonics*phase1)/kernel_den_1
                 if phase2 < .0000001:
-                    slope_fall = harmonics
+                    slope2 = 1.0-harmonics
                 else:
-                    slope_fall = math.sin(np.pi*harmonics*phase2)/kernel_den_fall
-                slope = (slope_rise - slope_fall)*increment*2
-                integrators[0, c] = integrators[0, c]*leak_c + slope
-                current_x = integrators[0, c]
-                current_y = current_x - dc_blocker_ins[0, c] + block_c*dc_blocker_outs[0, c]
-                dc_blocker_ins[0, c] = current_x
-                dc_blocker_outs[0, c] = current_y
+                    slope2 = 1.0-math.sin(np.pi*harmonics*phase2)/kernel_den_2
+                slope1 *= increment*2
+                slope2 *= increment*2
+                integrators[0, c] = integrators[0, c]*leak_c + slope1
+                integrators[1, c] = integrators[1, c]*leak_c + slope2
                 states[c, 0] += increment
                 states[c, 0] -= np.floor(states[c, 0])
 
-                buffer[write_heads[0, c], c] = current_y
+                buffer[write_heads[0, c], c] = integrators[0, c] - integrators[1, c]
                 base_delay = period + 2.0
                 total_delay = base_delay + pm_amt*pitch_mod[n]*period
                 int_offset = np.floor(total_delay)
