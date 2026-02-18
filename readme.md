@@ -14,7 +14,6 @@ what does it do? well, i'm very glad you asked.
 
 what's in a voice?
 * 3 sine, sawtooth, or pulse oscillators (+ PWM) with pitch, detune & level controls
-    *  the sawtooth & pulse waveforms are generated using BLITs (bandlimited impulse trains)
 * 1 state-variable filter - using an oversampled Chamberlin topology with feedback, saturation & drive
 * 2 ADSR envelopes - one for amplitude, one for filter frequency (with bipolar depth control)
 * 4 modulators - 2 LFOs, 2 envelopes, with dedicated assignable attenuverters for every₁₂ parameter
