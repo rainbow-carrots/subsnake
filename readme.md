@@ -13,7 +13,8 @@ what does it do? well, i'm very glad you asked.
 
 
 what's in a voice?
-* 3 sine, BLIT sawtooth, or polyBLEP pulse generators (+ PWM)
+* 3 sine, sawtooth, or pulse oscillators (+ PWM) with pitch, detune & level controls
+    *  the sawtooth & pulse waveforms are generated using BLITs (bandlimited impulse trains)
 * 1 state-variable filter - using an oversampled Chamberlin topology with feedback, saturation & drive
 * 2 ADSR envelopes - one for amplitude, one for filter frequency (with bipolar depth control)
 * 4 modulators - 2 LFOs, 2 envelopes, with dedicated assignable attenuverters for every₁₂ parameter
@@ -49,7 +50,7 @@ is there anything else?
 
 
 how can i play it?
-* [v0.1.7](https://github.com/rainbow-carrots/subsnake/releases/tag/v0.1.7) is the latest build
+* [v0.1.8](https://github.com/rainbow-carrots/subsnake/releases/tag/v0.1.8) is the latest build
 * click on the version that corresponds to your platform to download the zip, extract, & run! if it doesn't open:
     * __on linux__: right click the file, go to *Properties* -> *Permissions*, and make sure "Allow executing file as program" is checked 
     * __on macos__: you'll need to [authorize the app](https://support.apple.com/guide/mac-help/open-a-mac-app-from-an-unknown-developer-mh40616/mac) when running it for the first time. go to *System Settings* -> *Privacy & Security*, scroll down to the bottom, and choose *Open anyway* (under *Security*)
