@@ -11,7 +11,7 @@ class StereoDelay():
         self.delay_feedback = delay_feedback
         self.write_heads = np.zeros((2), dtype=np.int32)
         self.offset = 22050
-        self.offset_smooth = np.array([22050, 22050], dtype=np.int32)
+        self.offset_smooth = np.array([22050, 22050], dtype=np.float32)
         self.mix_level = mix
 
     def process_block(self, input, output):
