@@ -1,6 +1,10 @@
 import numpy as np
 from numba import njit
 from queue import SimpleQueue
+import math
+
+oneoverfs = 1.0/float(44100.0)
+twopi = 2*np.pi
 
 class StereoDelay():
     def __init__(self, fs, delay_time=0.5, delay_feedback=0.5, mix=.5):
@@ -14,23 +18,26 @@ class StereoDelay():
         self.offset_smooth = np.array([22050, 22050], dtype=np.float32)
         self.mix_level = mix
 
-    def process_block(self, input, output):
+    def process_block(self, input, output, mod_buffers, mod_values):
         self.offset = self.delay_time*self.fs
-        self.delay_block(input, output, self.buffer, self.offset, self.offset_smooth, self.write_heads, self.delay_feedback, self.mix_level, self.hermite_interpolate)
+        self.delay_block(input, output, self.buffer, self.offset, self.offset_smooth, self.write_heads, self.delay_feedback, self.mix_level, self.hermite_interpolate,
+                         mod_buffers[0], mod_buffers[1], mod_buffers[2], mod_values[0], mod_values[1], mod_values[2])
 
     @staticmethod
     @njit(nogil=True, fastmath=True)
-    def delay_block(input, output, buffer, offset_raw, offset_smooth, write_heads, feedback, mix, hermite_interpolate):
+    def delay_block(input, output, buffer, offset_raw, offset_smooth, write_heads, feedback, mix, hermite_interpolate, time_mod, feedback_mod, mix_mod, tm_amt, fm_amt, mm_amt):
         frames = len(input)
         buffer_size = len(buffer)
         alpha = .0001
         for c in range (0, 2):
             for n in range(0, frames):
-                #integrate offset & calculate whole/fractional parts
+                #smooth offset
                 offset_smooth[c] = offset_smooth[c]*(1.0 - alpha) + offset_raw*alpha
+                offset_mod = offset_smooth[c] + 44100.0*time_mod[n]*tm_amt
+                offset_mod = max(0.0, min(44100.0, offset_mod))
 
                 #calculate read head position & wrap
-                read_head_exact = write_heads[c] - offset_smooth[c]
+                read_head_exact = write_heads[c] - offset_mod
                 read_head_int = np.floor(read_head_exact)
                 offset_frac = read_head_exact - read_head_int
                 read_head = int(read_head_int) % buffer_size
@@ -50,13 +57,15 @@ class StereoDelay():
                 delayed_sample = hermite_interpolate(buffer[y0_index, c], buffer[read_head, c], buffer[y2_index, c], buffer[y3_index, c], offset_frac)
 
                 #write to output buffer & increment/wrap write head
-                buffer[write_heads[c], c] = delayed_sample*feedback + input[n, c]
+                mod_feedback = max(0.0, min(1.0, feedback + feedback_mod[n]*fm_amt))
+                buffer[write_heads[c], c] = delayed_sample*mod_feedback + input[n, c]
                 write_heads[c] += 1
                 if (write_heads[c] >= buffer_size):
                     write_heads[c] = 0
 
                 #output
-                output[n, c] = (1.0-mix)*input[n, c] + mix*delayed_sample
+                mod_mix = max(0.0, min(1.0, mix + mix_mod[n]*mm_amt))
+                output[n, c] = (1.0-mod_mix)*input[n, c] + mod_mix*delayed_sample
 
     #helpers
     def update_time(self, new_time):
