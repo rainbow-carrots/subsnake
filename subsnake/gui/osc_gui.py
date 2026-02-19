@@ -1,7 +1,7 @@
 from PySide6.QtWidgets import(
     QSlider, QLabel, QGridLayout,
     QRadioButton, QButtonGroup, QLCDNumber,
-    QHBoxLayout, QGroupBox
+    QHBoxLayout, QGroupBox, QStyle, QStyleOptionGroupBox
 )
 from PySide6.QtCore import Signal, Qt
 from PySide6.QtGui import QPalette, QColor
@@ -14,10 +14,12 @@ class OscillatorGUI(QGroupBox):
     level_changed = Signal(float)
     width_changed = Signal(float)
     alg_changed = Signal(str)
+    type_changed = Signal(int, int)
 
     def __init__(self, display_color=QColor("black")):
         super().__init__()
         self.display_color = display_color
+        self.type = 0
 
         #set title
         self.setTitle("oscillator 1")
@@ -171,3 +173,23 @@ class OscillatorGUI(QGroupBox):
 
     def reset_width(self):
         self.osc_width_slider.setValue(250)
+
+    def mouseReleaseEvent(self, event):
+        if event.button() == Qt.MouseButton.RightButton:
+            style_option = QStyleOptionGroupBox()
+            self.initStyleOption(style_option)
+        
+            title_rect = self.style().subControlRect(
+                QStyle.ComplexControl.CC_GroupBox,
+                style_option, QStyle.SubControl.SC_GroupBoxLabel, self 
+            )
+
+            if title_rect.contains(event.position().toPoint()):
+                if self.type < 1:
+                    self.type += 1
+                else:
+                    self.type = 0
+                self.type_changed.emit(1, self.type)
+                event.accept()
+                return
+        super().mouseReleaseEvent(event)
