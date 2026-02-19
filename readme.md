@@ -16,15 +16,14 @@ what's in a voice?
 * 3 sine, sawtooth, or pulse oscillators (+ PWM) with pitch, detune & level controls
 * 1 state-variable filter - using an oversampled Chamberlin topology with feedback, saturation & drive
 * 2 ADSR envelopes - one for amplitude, one for filter frequency (with bipolar depth control)
-* 4 modulators - 2 LFOs, 2 envelopes, with dedicated assignable attenuverters for every₁₂ parameter
+* 4 modulators - 2 LFOs, 2 envelopes, with dedicated assignable attenuverters for every₁ parameter
     * LFO shapes: sine, triangle, ramp, sawtooth, square, sample & hold
         * 0.01-10Hz w/ controllable phase shift
     * env. modes: attack-release, attack-hold-release, loop (attack-release)
         * .01-1s per stage
-    * __₁__ *slider-controlled (excluding radio buttons)*
-    * __₂__ *delay modulation currently disabled*
+    * __₁__ *slider-controlled (excludes radio buttons)*
 
-there's also a stereo delay effect on the master bus (voice output + recorder), and a stereo audio recorder/looper with continuous overdubbing.
+there's also a stereo tape delay effect on the master bus (voice output + recorder), and a stereo audio recorder/looper with continuous overdubbing.
 
 
 what's the midi like?
@@ -43,13 +42,14 @@ how's the modulation?
 
 
 is there anything else?
-* to reset a parameter, double click the parameter display (to the right of each slider)
+* to reset a parameter, *double click* the parameter display (to the right of each slider)
 * the keys A-' are mapped chromatically and can trigger note events (fixed velocity)
     * you can shift the pc keyboard octave range up/down using the +/- keys
+* to switch between oscillator types (BLIT/polyBLEP), *right click* the oscillator title box
 
 
 how can i play it?
-* [v0.1.8](https://github.com/rainbow-carrots/subsnake/releases/tag/v0.1.8) is the latest build
+* [v0.1.9](https://github.com/rainbow-carrots/subsnake/releases/tag/v0.1.9) is the latest build
 * click on the version that corresponds to your platform to download the zip, extract, & run! if it doesn't open:
     * __on linux__: right click the file, go to *Properties* -> *Permissions*, and make sure "Allow executing file as program" is checked 
     * __on macos__: you'll need to [authorize the app](https://support.apple.com/guide/mac-help/open-a-mac-app-from-an-unknown-developer-mh40616/mac) when running it for the first time. go to *System Settings* -> *Privacy & Security*, scroll down to the bottom, and choose *Open anyway* (under *Security*)
@@ -68,7 +68,6 @@ what's on the docket?
     * voice stacking & spread
     * filter key tracking
 * stereo delay
-    * connect mod dials for parameter modulation
     * add ping pong & dampening parameters
 * allow modulators to modulate themselves (and other modulators)
 * allow UI theming, saving/loading of themes & add stock themes (dark mode pending)
