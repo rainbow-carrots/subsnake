@@ -40,6 +40,8 @@ class AudioEngine():
         for n in range(0, 12):
             self.voices.append(Voice(self.mod_dial_values, self.mod_dial_modes))
         self.delay = StereoDelay(fs)
+        self.delay_modulators = [LFO(fs, 5, 0, 0), LFO(fs, 5, 0, 0), ModEnv(fs, 0.5, 0.5, 0), ModEnv(fs, 0.5, 0.5, 0)]
+        self.no_mod = np.zeros((2048), dtype=np.float32)
         self.recorder = AudioRecorder(fs)
         self.stopped_voice_indeces = []
         self.released_voice_indeces = []
@@ -125,7 +127,12 @@ class AudioEngine():
             outdata += self.voice_output[:frames]
         self.recorder.process_block(outdata, self.recorder_output)
         outdata += self.recorder_output[:frames]
-        self.delay.process_block(outdata, outdata)
+        del_mod_buffers = [self.assign_mod_buffer(self.mod_dial_modes["del_time"])]
+        del_mod_buffers.append(self.assign_mod_buffer(self.mod_dial_modes["del_feedback"]))
+        del_mod_buffers.append(self.assign_mod_buffer(self.mod_dial_modes["del_mix"]))
+        del_mod_values = [self.mod_dial_values["del_time"], self.mod_dial_values["del_feedback"],
+                           self.mod_dial_values["del_mix"]]
+        self.delay.process_block(outdata, outdata, del_mod_buffers, del_mod_values)
         outdata *= 0.288675
         outdata = np.tanh(outdata)
 
@@ -314,50 +321,65 @@ class AudioEngine():
     def update_lfo1_freq(self, newFreq):
         for voice in self.voices:
             voice.lfo1.set_frequency(newFreq)
+        self.delay_modulators[0].set_frequency(newFreq)
 
     def update_lfo1_offset(self, newPhase):
         for voice in self.voices:
             voice.lfo1.set_offset(newPhase)
+        self.delay_modulators[0].set_offset(newPhase)
 
     def update_lfo1_shape(self, newShape):
         for voice in self.voices:
             voice.lfo1.set_shape(newShape)
+        self.delay_modulators[0].set_shape(newShape)
+
     #  lfo 2
     def update_lfo2_freq(self, newFreq):
         for voice in self.voices:
             voice.lfo2.set_frequency(newFreq)
+        self.delay_modulators[1].set_frequency(newFreq)
 
     def update_lfo2_offset(self, newPhase):
         for voice in self.voices:
             voice.lfo2.set_offset(newPhase)
+        self.delay_modulators[1].set_offset(newPhase)
 
     def update_lfo2_shape(self, newShape):
         for voice in self.voices:
             voice.lfo2.set_shape(newShape)
+        self.delay_modulators[1].set_shape(newShape)
+
     #  menv 1
     def update_menv1_att(self, newAtt):
         for voice in self.voices:
             voice.menv1.set_attack(newAtt)
+        self.delay_modulators[2].set_attack(newAtt)
 
     def update_menv1_rel(self, newRel):
         for voice in self.voices:
             voice.menv1.set_release(newRel)
+        self.delay_modulators[2].set_release(newRel)
 
     def update_menv1_mode(self, newMode):
         for voice in self.voices:
             voice.menv1.set_mode(newMode)
+        self.delay_modulators[2].set_mode(newMode)
+
     #  menv 2
     def update_menv2_att(self, newAtt):
         for voice in self.voices:
             voice.menv2.set_attack(newAtt)
+        self.delay_modulators[3].set_attack(newAtt)
 
     def update_menv2_rel(self, newRel):
         for voice in self.voices:
             voice.menv2.set_release(newRel)
+        self.delay_modulators[3].set_release(newRel)
 
     def update_menv2_mode(self, newMode):
         for voice in self.voices:
             voice.menv2.set_mode(newMode)
+        self.delay_modulators[3].set_mode(newMode)
 
     #cc helpers
     #osc 1
@@ -519,6 +541,18 @@ class AudioEngine():
 
     def update_mod_mode(self, name, mode):
         self.mod_dial_modes.update({name: mode})
+
+    def assign_mod_buffer(self, mode):
+        if mode == 0:
+            return self.no_mod
+        elif mode == 1:
+            return self.delay_modulators[0].output
+        elif mode == 2:
+            return self.delay_modulators[1].output
+        elif mode == 3:
+            return self.delay_modulators[2].output
+        elif mode == 4:
+            return self.delay_modulators[3].output
 
 
 class Voice():
