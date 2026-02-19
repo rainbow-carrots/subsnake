@@ -178,6 +178,19 @@ class AudioEngine():
             voice.osc.update_drift(drift)
             voice.osc2.update_drift(drift)
             voice.osc3.update_drift(drift)
+    
+    # oscillator type (algorithm)
+    def update_osc_type(self, osc, new_type):
+        if osc == 0:
+            for voice in self.voices:
+                voice.osc.update_type(new_type)
+        elif osc == 1:
+            for voice in self.voices:
+                voice.osc2.update_type(new_type)
+        elif osc == 2:
+            for voice in self.voices:
+                voice.osc3.update_type(new_type)
+
 
     # oscillators
     def update_pitch_1(self, offset):
