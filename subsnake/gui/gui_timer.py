@@ -250,7 +250,7 @@ class UpdateGUI(QTimer):
                 display_val = 27.5 * 2**(float(value)/100.0)
                 display.display(f"{display_val:.1f}")
             elif (param == "feedback"):
-                display_val = 10.0 / (10.0**(value/100.0))
+                display_val = 5.0 / (10.0**(value/100.0))
                 display.display(f"{1.0/display_val:.2f}")
             elif (param == "drive"):
                 display_val = value/40.0

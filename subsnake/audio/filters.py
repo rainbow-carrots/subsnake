@@ -63,7 +63,7 @@ class HalSVF():
                 fenv_amount = max(-1.0, min(1.0, fenv_amount + fenv_mod[n]*fem_val))
                 new_cutoff = max(0.1, min(cutoff + 14080.0*freq_mod_amt + 14080.0*fenv[n, c]*fenv_amount, 14080.0))
                 freq_c = 2*math.sin(np.pi*(new_cutoff/(8*fs)))
-                res_c = max(.01, min(10.0, state[c, 3] + res_mod_amt))
+                res_c = max(.02, min(20.0, state[c, 3] + res_mod_amt))
                 substate = int(state[c, 4])
                 drive = max(.025, min(9.0, state[c, 5] + 4.5*drive_mod_amt))
                 saturate = max(1.0, min(12.0, state[c, 6] + 5.5*sat_mod_amt))

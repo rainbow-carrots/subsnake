@@ -448,7 +448,7 @@ class AudioEngine():
         self.update_cutoff(new_freq)
 
     def cc_change_resonance(self, value):
-        new_res = 10.0 / (10.0**((float(value)/127.0)*2.0))
+        new_res = 5.0 / (10.0**((float(value)/127.0)*2.0))
         self.update_resonance(new_res)
 
     def cc_change_drive(self, value):

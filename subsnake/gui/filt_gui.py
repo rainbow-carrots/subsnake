@@ -172,7 +172,7 @@ class FilterGUI(QGroupBox):
         self.freq_changed.emit(newFreq)
 
     def change_res(self, value):
-        newRes = 10.0 / (10.0**(value/100.0))
+        newRes = 5.0 / (10.0**(value/100.0))
         self.filt_fback_display.display(f"{1.0/newRes:.2f}")
         self.res_changed.emit(newRes)
 
