@@ -56,6 +56,7 @@ class KeyEventWorker(QRunnable):
             new_pitch = 440.0 * 2**((float(note))/12.0 + self.engine.pitch_offset_1)
             new_pitch2 = 440.0 * 2**((float(note))/12.0 + self.engine.pitch_offset_2) + self.engine.detune_2*new_voice.detune_offset_2
             new_pitch3 = 440.0 * 2**((float(note))/12.0 + self.engine.pitch_offset_3) + self.engine.detune_3*new_voice.detune_offset_3
+            new_voice.base_note = note
             new_voice.osc.update_pitch(new_pitch)
             new_voice.osc2.update_pitch(new_pitch2)
             new_voice.osc3.update_pitch(new_pitch3)
@@ -69,7 +70,8 @@ class KeyEventWorker(QRunnable):
             new_voice.menv2.update_attack_start(sample_offset)
             new_voice.menv2.update_gate(True)
             new_voice.status = 2
-            new_voice.base_note = note
+        self.engine.delay_modulators[2].update_gate(True)
+        self.engine.delay_modulators[3].update_gate(True)
 
     def key_released(self, release_event):
         note, sample_offset = release_event
@@ -84,6 +86,8 @@ class KeyEventWorker(QRunnable):
                 voice.menv2.update_release_start(sample_offset)
                 voice.menv2.update_gate(False)
                 voice.status = 1
+        self.engine.delay_modulators[2].update_gate(False)
+        self.engine.delay_modulators[3].update_gate(False)
         
 
     def assign_voice(self, note):
