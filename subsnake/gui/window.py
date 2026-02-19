@@ -184,19 +184,21 @@ class MainWindow(QMainWindow):
         self.osc_group.level_changed.connect(self.update_osc_amp)
         self.osc_group.width_changed.connect(self.update_osc_width)
         self.osc_group.alg_changed.connect(self.update_osc_alg)
+        self.osc_group.type_changed.connect(self.update_osc_type)
         #  2
         self.osc2_group.pitch_changed.connect(self.update_osc2_freq)
         self.osc2_group.detune_changed.connect(self.update_osc2_det)
         self.osc2_group.level_changed.connect(self.update_osc2_amp)
         self.osc2_group.width_changed.connect(self.update_osc2_width)
         self.osc2_group.alg_changed.connect(self.update_osc2_alg)
+        self.osc2_group.type_changed.connect(self.update_osc_type)
         #  3
         self.osc3_group.pitch_changed.connect(self.update_osc3_freq)
         self.osc3_group.detune_changed.connect(self.update_osc3_det)
         self.osc3_group.level_changed.connect(self.update_osc3_amp)
         self.osc3_group.width_changed.connect(self.update_osc3_width)
         self.osc3_group.alg_changed.connect(self.update_osc3_alg)
-
+        self.osc3_group.type_changed.connect(self.update_osc_type)
         # envelope
         self.env_group.attack_changed.connect(self.update_env_attack)
         self.env_group.decay_changed.connect(self.update_env_decay)
@@ -661,6 +663,15 @@ class MainWindow(QMainWindow):
     # oscillator drift
     def update_osc_drift(self, value):
         self.engine.update_osc_drift(value)
+
+    # oscillator type (algorithm)
+    def update_osc_type(self, osc, new_type):
+        self.engine.update_osc_type(osc, new_type)
+        print(f"DEBUG: osc {osc}, algorithm: {new_type}")
+        if new_type == 0:
+            print("BLIT")
+        elif new_type == 1:
+            print("polyBLEP")
         
     # oscillator 1
     def update_osc_freq(self, value):
