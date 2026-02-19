@@ -35,6 +35,7 @@ class WrappedOsc():
         self.smoothed_widths = np.zeros((1, 2), dtype=np.float32)
         self.freq = frequency
         self.amp = amplitude
+        self.type = 0
     
     def process_block(self, buffer, mod_buffers, mod_values):
         frames = len(buffer)
@@ -42,12 +43,18 @@ class WrappedOsc():
         if (self.alg == 0):
             self.generate_sine(self.state, buffer, self.random_walk[:frames], self.walk_amt, mod_buffers[0], mod_buffers[1], mod_buffers[2], mod_values[0], mod_values[1], mod_values[2], self.amp, self.freq)
         elif (self.alg == 1.0):
-            self.blit_saw(buffer, self.blit_buffer, self.blit_buffer_write, self.blit_states, self.blit_integrators, self.hermite_interpolate,  
+            if (self.type == 0):
+                self.blit_saw(buffer, self.blit_buffer, self.blit_buffer_write, self.blit_states, self.blit_integrators, self.hermite_interpolate,  
                           self.random_walk[:frames], self.walk_amt, mod_buffers[0], mod_buffers[1], mod_buffers[2], mod_values[0], mod_values[1], mod_values[2], self.amp, self.freq)
+            elif (self.type == 1):
+                self.polyblep_saw(self.state, buffer, self.random_walk, self.walk_amt, mod_buffers[0], mod_buffers[1], mod_buffers[2], mod_values[1], mod_values[2], mod_values[3], self.amp, self.freq)
         elif (self.alg == 2.0):
-            self.blit_pulse(buffer, self.blit_buffer, self.blit_buffer_write, self.blit_states, self.blit_integrators, self.hermite_interpolate, self.smoothed_widths,
+            if (self.type == 0):
+                self.blit_pulse(buffer, self.blit_buffer, self.blit_buffer_write, self.blit_states, self.blit_integrators, self.hermite_interpolate, self.smoothed_widths,
                           self.random_walk[:frames], self.walk_amt, mod_buffers[0], mod_buffers[1], mod_buffers[2], mod_buffers[3], mod_values[0], mod_values[1], mod_values[2], mod_values[3], self.amp, self.freq, self.pulsewidth)
-
+            elif (self.type == 1):
+                self.polyblep_pulse(self.state, buffer, self.state2, self.pulsewidth, self.random_walk, self.walk_amt,
+                                    mod_buffers[0], mod_buffers[1], mod_buffers[2], mod_buffers[3], mod_values[0], mod_values[1], mod_values[2], mod_values[3], self.amp, self.freq)
     def update_pitch(self, newPitch):
         self.freq = newPitch
         new_increment = twopi * (newPitch/fs)
@@ -67,6 +74,9 @@ class WrappedOsc():
 
     def update_drift(self, newDrift):
         self.walk_amt = newDrift
+
+    def update_type(self, newType):
+        self.type = newType
 
 
     #phase-wrapped sine wave
