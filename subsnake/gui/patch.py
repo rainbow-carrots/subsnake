@@ -29,6 +29,10 @@ class PatchManager(QGroupBox):
                             "env_att": 10, "env_dec": 500, "env_sus": 1000, "env_rel": 250,
                             "del_time": 100, "del_fback": 500, "del_mix": 0,
                             "lfo1_freq": 100, "lfo1_phase": 0, "lfo2_freq": 267, "lfo2_phase": 500,
+                            "lfo1_freq_ass": 0, "lfo1_freq_mod": 0, "lfo1_phase_ass": 0, "lfo1_phase_mod": 0,
+                            "lfo2_freq_ass": 0, "lfo2_freq_mod": 0, "lfo2_phase_ass": 0, "lfo2_phase_mod": 0,
+                            "menv1_att_ass": 0, "menv1_att_mod": 0, "menv1_rel_ass": 0, "menv1_rel_mod": 0,
+                            "menv2_att_ass": 0, "menv2_att_mod": 0, "menv2_rel_ass": 0, "menv2_rel_mod": 0,
                             "menv1_att": 500, "menv1_rel": 500, "menv2_att": 250, "menv2_rel": 250,
                             "osc_freq_mod": 0, "osc_freq_ass": 0, "osc_amp_mod": 0, "osc_amp_ass": 0, "osc_width_mod": 0, "osc_width_ass": 0,
                             "osc2_freq_mod": 0, "osc2_freq_ass": 0, "osc2_det_mod": 0, "osc2_det_ass": 0,
@@ -69,6 +73,7 @@ class PatchManager(QGroupBox):
         self.factory_patch_names = []
         self.user_patch_path = Path(user_data_dir("subsnake", "rainbow-carrots")) / "patches"
         self.user_patch_names = []
+        print(f"user path: {self.user_patch_path}")
 
         #ensure user patch directory exists
         self.check_user_dir()
