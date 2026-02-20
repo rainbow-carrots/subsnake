@@ -49,7 +49,7 @@ is there anything else?
 
 
 how can i play it?
-* [v0.1.9](https://github.com/rainbow-carrots/subsnake/releases/tag/v0.1.9) is the latest build
+* [v0.2.0](https://github.com/rainbow-carrots/subsnake/releases/tag/v0.2.0) is the latest build
 * click on the version that corresponds to your platform to download the zip, extract, & run! if it doesn't open:
     * __on linux__: right click the file, go to *Properties* -> *Permissions*, and make sure "Allow executing file as program" is checked 
     * __on macos__: you'll need to [authorize the app](https://support.apple.com/guide/mac-help/open-a-mac-app-from-an-unknown-developer-mh40616/mac) when running it for the first time. go to *System Settings* -> *Privacy & Security*, scroll down to the bottom, and choose *Open anyway* (under *Security*)
@@ -69,7 +69,6 @@ what's on the docket?
     * filter key tracking
 * stereo delay
     * add ping pong & dampening parameters
-* allow modulators to modulate themselves (and other modulators)
 * allow UI theming, saving/loading of themes & add stock themes (dark mode pending)
 * oscilloscope display
 * more "factory" patches
