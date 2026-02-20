@@ -254,8 +254,20 @@ class MainWindow(QMainWindow):
         self.del_group.del_time_mod_dial.value_changed.connect(self.update_mod_dial_value)
         self.del_group.del_feedback_mod_dial.value_changed.connect(self.update_mod_dial_value)
         self.del_group.del_mix_mod_dial.value_changed.connect(self.update_mod_dial_value)
+        #   lfo1
+        self.mod_group.lfo_freq_mod_dial_1.value_changed.connect(self.update_mod_dial_value)
+        self.mod_group.lfo_phase_mod_dial_1.value_changed.connect(self.update_mod_dial_value)
+        #   lfo2
+        self.mod_group.lfo_freq_mod_dial_2.value_changed.connect(self.update_mod_dial_value)
+        self.mod_group.lfo_phase_mod_dial_2.value_changed.connect(self.update_mod_dial_value)
+        #   menv1
+        self.mod_group.menv_att_mod_dial_1.value_changed.connect(self.update_mod_dial_value)
+        self.mod_group.menv_rel_mod_dial_1.value_changed.connect(self.update_mod_dial_value)
+        #   menv2
+        self.mod_group.menv_att_mod_dial_2.value_changed.connect(self.update_mod_dial_value)
+        self.mod_group.menv_rel_mod_dial_2.value_changed.connect(self.update_mod_dial_value)
 
-        #  modules
+        #  modes
         #   oscillator 1
         self.osc_group.osc_freq_mod_dial.mode_changed.connect(self.update_mod_dial_mode)
         self.osc_group.osc_amp_mod_dial.mode_changed.connect(self.update_mod_dial_mode)
@@ -290,6 +302,19 @@ class MainWindow(QMainWindow):
         self.del_group.del_time_mod_dial.mode_changed.connect(self.update_mod_dial_mode)
         self.del_group.del_feedback_mod_dial.mode_changed.connect(self.update_mod_dial_mode)
         self.del_group.del_mix_mod_dial.mode_changed.connect(self.update_mod_dial_mode)
+        #   lfo1
+        self.mod_group.lfo_freq_mod_dial_1.mode_changed.connect(self.update_mod_dial_mode)
+        self.mod_group.lfo_phase_mod_dial_1.mode_changed.connect(self.update_mod_dial_mode)
+        #   lfo2
+        self.mod_group.lfo_freq_mod_dial_2.mode_changed.connect(self.update_mod_dial_mode)
+        self.mod_group.lfo_phase_mod_dial_2.mode_changed.connect(self.update_mod_dial_mode)
+        #   menv1
+        self.mod_group.menv_att_mod_dial_1.mode_changed.connect(self.update_mod_dial_mode)
+        self.mod_group.menv_rel_mod_dial_1.mode_changed.connect(self.update_mod_dial_mode)
+        #   menv2
+        self.mod_group.menv_att_mod_dial_2.mode_changed.connect(self.update_mod_dial_mode)
+        self.mod_group.menv_rel_mod_dial_2.mode_changed.connect(self.update_mod_dial_mode)
+
         #   modulation
         #    lfo 1
         self.mod_group.lfo1_freq_changed.connect(self.update_lfo1_freq)
@@ -424,6 +449,19 @@ class MainWindow(QMainWindow):
         self.mod_dials.update({"del_time": self.del_group.del_time_mod_dial})
         self.mod_dials.update({"del_fback": self.del_group.del_feedback_mod_dial})
         self.mod_dials.update({"del_mix": self.del_group.del_mix_mod_dial})
+
+        self.mod_dials.update({"lfo1_freq": self.mod_group.lfo_freq_mod_dial_1})
+        self.mod_dials.update({"lfo1_phase": self.mod_group.lfo_phase_mod_dial_1})
+
+        self.mod_dials.update({"lfo2_freq": self.mod_group.lfo_freq_mod_dial_2})
+        self.mod_dials.update({"lfo2_phase": self.mod_group.lfo_phase_mod_dial_2})
+
+        self.mod_dials.update({"menv1_att": self.mod_group.menv_att_mod_dial_1})
+        self.mod_dials.update({"menv1_rel": self.mod_group.menv_rel_mod_dial_1})
+
+        self.mod_dials.update({"menv2_att": self.mod_group.menv_att_mod_dial_2})
+        self.mod_dials.update({"menv2_rel": self.mod_group.menv_rel_mod_dial_2})
+        
 
     def load_patch(self, patch):
         for param in patch:
