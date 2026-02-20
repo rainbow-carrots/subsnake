@@ -425,6 +425,14 @@ QPushButton#save_patch:hover {
     background-color: #1cb68d;
 }
 
+QPushButton#new_patch:pressed {
+    background-color: #c9465a;
+}
+
+QPushButton#save_patch:pressed {
+    background-color: #28d8a9;
+}
+
 RecorderGUI#recorder {
     border: 1px solid white;
     border-radius: 6px;
