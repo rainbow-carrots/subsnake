@@ -27,7 +27,9 @@ class AudioEngine():
                                 "filt_freq": 0.0, "filt_res": 0.0, "filt_drive": 0.0, "filt_sat": 0.0,
                                 "fenv_att": 0.0, "fenv_dec": 0.0, "fenv_sus": 0.0, "fenv_rel": 0.0, "fenv_amt": 0.0,
                                 "env_att": 0.0, "env_dec": 0.0, "env_sus": 0.0, "env_rel": 0.0,
-                                "del_time": 0.0, "del_feedback": 0.0, "del_mix": 0.0}
+                                "del_time": 0.0, "del_feedback": 0.0, "del_mix": 0.0,
+                                "lfo1_freq": 0.0, "lfo1_phase": 0.0, "lfo2_freq": 0.0, "lfo2_phase": 0.0,
+                                "menv1_att": 0.0, "menv1_rel": 0.0, "menv2_att": 0.0, "menv2_rel": 0.0}
         #mod dial mode states (int)
         self.mod_dial_modes =  {"osc_freq": 0, "osc_amp": 0, "osc_width": 0,
                                 "osc2_freq": 0, "osc2_det": 0, "osc2_amp": 0, "osc2_width": 0,
@@ -35,7 +37,9 @@ class AudioEngine():
                                 "filt_freq": 0, "filt_res": 0, "filt_drive": 0, "filt_sat": 0,
                                 "fenv_att": 0, "fenv_dec": 0, "fenv_sus": 0, "fenv_rel": 0, "fenv_amt": 0,
                                 "env_att": 0, "env_dec": 0, "env_sus": 0, "env_rel": 0,
-                                "del_time": 0, "del_feedback": 0, "del_mix": 0}
+                                "del_time": 0, "del_feedback": 0, "del_mix": 0,
+                                "lfo1_freq": 0, "lfo1_phase": 0, "lfo2_freq": 0, "lfo2_phase": 0,
+                                "menv1_att": 0, "menv1_rel": 0, "menv2_att": 0, "menv2_rel": 0}
         self.voices = []
         for n in range(0, 12):
             self.voices.append(Voice(self.mod_dial_values, self.mod_dial_modes))
@@ -598,10 +602,26 @@ class Voice():
 
     def callback(self, output, note_to_voice, stopped_voices, released_voices, frames):
         #modulators
-        self.lfo1.process_block(frames)
-        self.lfo2.process_block(frames)
-        self.menv1.process_block(frames)
-        self.menv2.process_block(frames)
+        # lfo 1
+        lfo1_mod_buffers = [self.assign_mod_buffer(self.mod_dial_modes["lfo1_freq"])]
+        lfo1_mod_buffers.append(self.assign_mod_buffer(self.mod_dial_modes["lfo1_phase"]))
+        lfo1_mod_values = [self.mod_dial_values["lfo1_freq"], self.mod_dial_values["lfo1_phase"]]
+        self.lfo1.process_block(frames, lfo1_mod_buffers, lfo1_mod_values)
+        # lfo 2
+        lfo2_mod_buffers = [self.assign_mod_buffer(self.mod_dial_modes["lfo2_freq"])]
+        lfo2_mod_buffers.append(self.assign_mod_buffer(self.mod_dial_modes["lfo2_phase"]))
+        lfo2_mod_values = [self.mod_dial_values["lfo2_freq"], self.mod_dial_values["lfo2_phase"]]
+        self.lfo2.process_block(frames, lfo2_mod_buffers, lfo2_mod_values)
+        # menv 1
+        menv1_mod_buffers = [self.assign_mod_buffer(self.mod_dial_modes["menv1_att"])]
+        menv1_mod_buffers.append(self.assign_mod_buffer(self.mod_dial_modes["menv1_rel"]))
+        menv1_mod_values = [self.mod_dial_values["menv1_att"], self.mod_dial_values["menv1_rel"]]
+        self.menv1.process_block(frames, menv1_mod_buffers, menv1_mod_values)
+        # menv 2
+        menv2_mod_buffers = [self.assign_mod_buffer(self.mod_dial_modes["menv2_att"])]
+        menv2_mod_buffers.append(self.assign_mod_buffer(self.mod_dial_modes["menv2_rel"]))
+        menv2_mod_values = [self.mod_dial_values["menv2_att"], self.mod_dial_values["menv2_rel"]]
+        self.menv2.process_block(frames, menv2_mod_buffers, menv2_mod_values)
 
         #oscillators
         # 1
