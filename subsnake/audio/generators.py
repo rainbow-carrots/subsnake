@@ -187,9 +187,10 @@ class WrappedOsc():
                  walk_mod, walk_amt, pitch_mod, det_mod, amp_mod, pm_amt, dm_amt, am_amt, amp=1.0, freq=440.0):
         frames = len(outdata)
         buffer_len = len(buffer)
+        base_inc = freq*oneoverfs
         for n in range(0, frames):
             for c in range(0, 2):
-                increment = freq*oneoverfs + max_det_inc*walk_mod[n]*walk_amt + max_det_inc*det_mod[n]*dm_amt
+                increment = base_inc + base_inc*pitch_mod[n]*pm_amt + max_det_inc*walk_mod[n]*walk_amt + max_det_inc*det_mod[n]*dm_amt
                 increment = max(1e-9, increment)
                 period = 1/increment
                 new_freq = increment*fs
@@ -208,7 +209,7 @@ class WrappedOsc():
 
                 buffer[write_heads[0, c], c] = integrators[0, c]
                 base_delay = period + 2.0
-                total_delay = base_delay + pm_amt*pitch_mod[n]*period
+                total_delay = base_delay
                 int_offset = np.floor(total_delay)
                 frac_offset = total_delay - int_offset
                 read_head = write_heads[0, c] - int(int_offset)
@@ -234,11 +235,12 @@ class WrappedOsc():
                     walk_mod, walk_amt, pitch_mod, det_mod, amp_mod, width_mod, pm_amt, dm_amt, am_amt, wm_amt, amp=1.0, freq=440.0, width=0.5):
         frames = len(outdata)
         buffer_len = len(buffer)
+        base_inc = freq*oneoverfs
         alpha = 1.0 - math.exp(-twopi*50.0*oneoverfs)
         leak_c = .9995
         for n in range(0, frames):
             for c in range(0, 2):
-                increment = freq*oneoverfs + max_det_inc*walk_mod[n]*walk_amt + max_det_inc*det_mod[n]*dm_amt
+                increment = base_inc + base_inc*pitch_mod[n]*pm_amt + max_det_inc*walk_mod[n]*walk_amt + max_det_inc*det_mod[n]*dm_amt
                 increment = max(1e-9, increment)
                 period = 1/increment
                 new_freq = increment*fs
@@ -268,7 +270,7 @@ class WrappedOsc():
 
                 buffer[write_heads[0, c], c] = integrators[0, c] - integrators[1, c]
                 base_delay = period + 2.0
-                total_delay = base_delay + pm_amt*pitch_mod[n]*period
+                total_delay = base_delay
                 int_offset = np.floor(total_delay)
                 frac_offset = total_delay - int_offset
                 read_head = write_heads[0, c] - int(int_offset)
