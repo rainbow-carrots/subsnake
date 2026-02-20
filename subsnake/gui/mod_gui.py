@@ -49,6 +49,11 @@ class ModulatorGUI(QWidget):
         self.mod_widget = QWidget()
 
         #lfo 1 module
+        #   dials
+        self.lfo_freq_mod_dial_1 = CoolDial(1, -500, 500, "lfo1_freq")
+        self.lfo_phase_mod_dial_1 = CoolDial(1, -500, 500, "lfo1_phase")
+
+        #   labels
         freq_label_1 = QLabel("speed:")
         phase_label_1 = QLabel("phase:")
         shape_label_1 = QLabel("shape:")
@@ -100,20 +105,28 @@ class ModulatorGUI(QWidget):
         self.set_palette(self.lfo_phase_display_1)
 
         #   layout config
-        lfo_layout_1.addWidget(freq_label_1, 0, 0)
-        lfo_layout_1.addWidget(phase_label_1, 1, 0)
-        lfo_layout_1.addWidget(shape_label_1, 2, 0)
+        lfo_layout_1.addWidget(self.lfo_freq_mod_dial_1, 0, 0)
+        lfo_layout_1.addWidget(self.lfo_phase_mod_dial_1, 1, 0)
 
-        lfo_layout_1.addWidget(self.lfo_freq_slider_1, 0, 1)
-        lfo_layout_1.addWidget(self.lfo_phase_slider_1, 1, 1)
-        lfo_layout_1.addLayout(self.lfo_shape_layout_1, 2, 1)
+        lfo_layout_1.addWidget(freq_label_1, 0, 1)
+        lfo_layout_1.addWidget(phase_label_1, 1, 1)
+        lfo_layout_1.addWidget(shape_label_1, 2, 1)
 
-        lfo_layout_1.addWidget(self.lfo_freq_display_1, 0, 2)
-        lfo_layout_1.addWidget(self.lfo_phase_display_1, 1, 2)
+        lfo_layout_1.addWidget(self.lfo_freq_slider_1, 0, 2)
+        lfo_layout_1.addWidget(self.lfo_phase_slider_1, 1, 2)
+        lfo_layout_1.addLayout(self.lfo_shape_layout_1, 2, 2)
+
+        lfo_layout_1.addWidget(self.lfo_freq_display_1, 0, 3)
+        lfo_layout_1.addWidget(self.lfo_phase_display_1, 1, 3)
 
         self.lfo_group_1.setObjectName("lfo1_group")
 
         #lfo 2 module
+        #   dials
+        self.lfo_freq_mod_dial_2 = CoolDial(1, -500, 500, "lfo2_freq")
+        self.lfo_phase_mod_dial_2 = CoolDial(1, -500, 500, "lfo2_phase")
+
+        #   labels
         freq_label_2 = QLabel("speed:")
         phase_label_2 = QLabel("phase:")
         shape_label_2 = QLabel("shape:")
@@ -165,20 +178,27 @@ class ModulatorGUI(QWidget):
         self.set_palette(self.lfo_phase_display_2)
 
         #   layout config
-        lfo_layout_2.addWidget(freq_label_2, 0, 0)
-        lfo_layout_2.addWidget(phase_label_2, 1, 0)
-        lfo_layout_2.addWidget(shape_label_2, 2, 0)
+        lfo_layout_2.addWidget(self.lfo_freq_mod_dial_2, 0, 0)
+        lfo_layout_2.addWidget(self.lfo_phase_mod_dial_2, 1, 0)
 
-        lfo_layout_2.addWidget(self.lfo_freq_slider_2, 0, 1)
-        lfo_layout_2.addWidget(self.lfo_phase_slider_2, 1, 1)
-        lfo_layout_2.addLayout(self.lfo_shape_layout_2, 2, 1)
+        lfo_layout_2.addWidget(freq_label_2, 0, 1)
+        lfo_layout_2.addWidget(phase_label_2, 1, 1)
+        lfo_layout_2.addWidget(shape_label_2, 2, 1)
 
-        lfo_layout_2.addWidget(self.lfo_freq_display_2, 0, 2)
-        lfo_layout_2.addWidget(self.lfo_phase_display_2, 1, 2)
+        lfo_layout_2.addWidget(self.lfo_freq_slider_2, 0, 2)
+        lfo_layout_2.addWidget(self.lfo_phase_slider_2, 1, 2)
+        lfo_layout_2.addLayout(self.lfo_shape_layout_2, 2, 2)
+
+        lfo_layout_2.addWidget(self.lfo_freq_display_2, 0, 3)
+        lfo_layout_2.addWidget(self.lfo_phase_display_2, 1, 3)
 
         self.lfo_group_2.setObjectName("lfo2_group")
 
         #envelope 1 module
+        #   dials
+        self.menv_att_mod_dial_1 = CoolDial(1, -500, 500, "menv1_att")
+        self.menv_rel_mod_dial_1 = CoolDial(1, -500, 500, "menv1_rel")
+
         #   labels
         attack_label_1 = QLabel("attack:")
         release_label_1 = QLabel("release:")
@@ -219,20 +239,27 @@ class ModulatorGUI(QWidget):
         self.set_palette(self.menv_rel_display_1)
 
         #   layout config
-        menv_layout_1.addWidget(attack_label_1, 0, 0)
-        menv_layout_1.addWidget(release_label_1, 1, 0)
-        menv_layout_1.addWidget(mode_label_1, 2, 0)
+        menv_layout_1.addWidget(self.menv_att_mod_dial_1, 0, 0)
+        menv_layout_1.addWidget(self.menv_rel_mod_dial_1, 1, 0)
 
-        menv_layout_1.addWidget(self.menv_att_slider_1, 0, 1)
-        menv_layout_1.addWidget(self.menv_rel_slider_1, 1, 1)
-        menv_layout_1.addLayout(self.menv_mode_layout_1, 2, 1)
+        menv_layout_1.addWidget(attack_label_1, 0, 1)
+        menv_layout_1.addWidget(release_label_1, 1, 1)
+        menv_layout_1.addWidget(mode_label_1, 2, 1)
 
-        menv_layout_1.addWidget(self.menv_att_display_1, 0, 2)
-        menv_layout_1.addWidget(self.menv_rel_display_1, 1, 2)
+        menv_layout_1.addWidget(self.menv_att_slider_1, 0, 2)
+        menv_layout_1.addWidget(self.menv_rel_slider_1, 1, 2)
+        menv_layout_1.addLayout(self.menv_mode_layout_1, 2, 2)
+
+        menv_layout_1.addWidget(self.menv_att_display_1, 0, 3)
+        menv_layout_1.addWidget(self.menv_rel_display_1, 1, 3)
 
         self.menv_group_1.setObjectName("menv1_group")
 
         #envelope 2 module
+        #   dials
+        self.menv_att_mod_dial_2 = CoolDial(1, -500, 500, "menv2_att")
+        self.menv_rel_mod_dial_2 = CoolDial(1, -500, 500, "menv2_rel")
+
         #   labels
         attack_label_2 = QLabel("attack:")
         release_label_2 = QLabel("release:")
@@ -273,16 +300,19 @@ class ModulatorGUI(QWidget):
         self.set_palette(self.menv_rel_display_2)
 
         #   layout config
-        menv_layout_2.addWidget(attack_label_2, 0, 0)
-        menv_layout_2.addWidget(release_label_2, 1, 0)
-        menv_layout_2.addWidget(mode_label_2, 2, 0)
+        menv_layout_2.addWidget(self.menv_att_mod_dial_2, 0, 0)
+        menv_layout_2.addWidget(self.menv_rel_mod_dial_2, 1, 0)
 
-        menv_layout_2.addWidget(self.menv_att_slider_2, 0, 1)
-        menv_layout_2.addWidget(self.menv_rel_slider_2, 1, 1)
-        menv_layout_2.addLayout(self.menv_mode_layout_2, 2, 1)
+        menv_layout_2.addWidget(attack_label_2, 0, 1)
+        menv_layout_2.addWidget(release_label_2, 1, 1)
+        menv_layout_2.addWidget(mode_label_2, 2, 1)
 
-        menv_layout_2.addWidget(self.menv_att_display_2, 0, 2)
-        menv_layout_2.addWidget(self.menv_rel_display_2, 1, 2)
+        menv_layout_2.addWidget(self.menv_att_slider_2, 0, 2)
+        menv_layout_2.addWidget(self.menv_rel_slider_2, 1, 2)
+        menv_layout_2.addLayout(self.menv_mode_layout_2, 2, 2)
+
+        menv_layout_2.addWidget(self.menv_att_display_2, 0, 3)
+        menv_layout_2.addWidget(self.menv_rel_display_2, 1, 3)
 
         self.menv_group_2.setObjectName("menv2_group")
 
