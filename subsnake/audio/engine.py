@@ -595,7 +595,7 @@ class Voice():
         self.menv2 = ModEnv(fs, 0.5, 0.5, 1)
         self.base_note = 0
         self.velocity = 0.0
-        self.status = 0
+        self.status = 1
         self.index = 0
         self.detune_offset_2 = 0.0
         self.detune_offset_3 = 0.0
