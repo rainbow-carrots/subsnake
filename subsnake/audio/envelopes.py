@@ -69,12 +69,12 @@ class ADSR():
                     state[1] = 1.0
                 elif (state[1] == 1.0): #attack
                     state[0] = state[0] + state[2]*(1.0 - state[0])
-                    if (state[0] + .01 >= 1.0):
+                    if (state[0] + .001 >= 1.0):
                         state[0] = 1.0
                         state[1] = 2.0
                 elif (state[1] == 2.0): #decay
                     state[0] = state[0] + state[3]*(state[4] - state[0])
-                    if (state[0] - .01 <= state[4]):
+                    if (state[0] - .001 <= state[4]):
                         state[0] = state[4]
                         state[1] = 3.0
                 elif (state[1] == 3.0): #sustain
@@ -89,7 +89,7 @@ class ADSR():
                         state[1] = 4.0
                 else:                   #release
                     state[0] = state[0] + state[5]*(0.0 - state[0])
-                    if (state[0] - .01 <= 0.0):
+                    if (state[0] - .001 <= 0.0):
                         state[0] = 0.0
                         state[1] = 0.0  #stop envelope
 
