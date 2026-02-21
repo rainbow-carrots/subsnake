@@ -123,15 +123,15 @@ with resources.as_file(resources.files("subsnake").joinpath("images/icon.png")) 
     app.setWindowIcon(app_icon)
     window.setWindowIcon(app_icon)
 
+#show window
+window.show()
+
 #autodetect theme
 style_hints = app.styleHints()
 if style_hints.colorScheme() == Qt.ColorScheme.Dark:
     window.toggle_dark.setChecked(True)
 else:
     window.toggle_dark.setChecked(False)
-
-#show window
-window.show()
 
 #start app
 app.exec()
