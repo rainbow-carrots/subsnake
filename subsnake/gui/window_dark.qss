@@ -461,18 +461,22 @@ PatchManager QPushButton {
 
 QPushButton#new_patch:hover {
     background-color: #c96171;
+    color: black;
 }
 
 QPushButton#save_patch:hover {
     background-color: #1cb68d;
+    color: black;
 }
 
 QPushButton#new_patch:pressed {
     background-color: #c9465a;
+    color: black;
 }
 
 QPushButton#save_patch:pressed {
     background-color: #28d8a9;
+    color: black;
 }
 
 RecorderGUI#recorder {
