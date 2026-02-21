@@ -2,14 +2,15 @@
 
 subsnake is a polyphonic virtual analog subtractive synthesizer, written in python.
 
+![](./subsnake/images/subsnake_dark.png)
 ![](./subsnake/images/subsnake.png)
 
 
 what does it do? well, i'm very glad you asked.
-* it generates sound (yay!)
-* it has 12 voices of polyphony
+* it has 16 voices of polyphony
 * it supports midi (input)
 * it can save & load patches
+* it can make a fine espresso
 
 
 what's in a voice?
@@ -49,11 +50,11 @@ is there anything else?
 
 
 how can i play it?
-* [v0.2.0](https://github.com/rainbow-carrots/subsnake/releases/tag/v0.2.0) is the latest build
+* [v0.2.1](https://github.com/rainbow-carrots/subsnake/releases/tag/v0.2.1) is the latest build
 * click on the version that corresponds to your platform to download the zip, extract, & run! if it doesn't open:
     * __on linux__: right click the file, go to *Properties* -> *Permissions*, and make sure "Allow executing file as program" is checked 
     * __on macos__: you'll need to [authorize the app](https://support.apple.com/guide/mac-help/open-a-mac-app-from-an-unknown-developer-mh40616/mac) when running it for the first time. go to *System Settings* -> *Privacy & Security*, scroll down to the bottom, and choose *Open anyway* (under *Security*)
-    * __on windows__: click *More info* and choose *Run anyway* 
+    * __on windows__: click *More info* on the smartscreen popup and choose *Run anyway* 
 * **note**: this project is in active development. you probably will encounter bugs.
     * if you do spot something, [let me know](https://github.com/rainbow-carrots/subsnake/issues)
 
@@ -69,6 +70,6 @@ what's on the docket?
     * filter key tracking
 * stereo delay
     * add ping pong & dampening parameters
-* allow UI theming, saving/loading of themes & add stock themes (dark mode pending)
+* allow UI theming & saving/loading of themes
 * oscilloscope display
 * more "factory" patches
