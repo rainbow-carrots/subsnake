@@ -352,6 +352,10 @@ QPushButton#midi_refresh, QGroupBox#cc_group QPushButton {
     max-height: 28px;
 }
 
+QPushButton#midi_refresh:hover, QGroupBox#cc_group QPushButton:hover {
+    color: black;
+}
+
 QPushButton#midi_refresh {
     background-color: transparent;
 }
