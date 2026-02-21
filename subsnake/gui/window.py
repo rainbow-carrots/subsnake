@@ -687,6 +687,8 @@ class MainWindow(QMainWindow):
         self.set_palette(self.mod_group.menv_att_display_2)
         self.set_palette(self.mod_group.menv_rel_display_1)
         self.set_palette(self.mod_group.menv_rel_display_2)
+        #synth settings
+        self.set_palette(self.synth_group.drift_display)
 
     #slots
     # toggle dark mode
