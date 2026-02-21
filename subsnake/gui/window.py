@@ -13,12 +13,13 @@ from subsnake.gui.patch import PatchManager
 from subsnake.gui.record import RecorderGUI
 from subsnake.gui.mod_gui import ModulatorGUI
 from PySide6.QtCore import Qt
-from PySide6.QtGui import QColor
+from PySide6.QtGui import QColor, QPalette
 from PySide6.QtWidgets import (
     QMainWindow, QGridLayout,
-    QFrame, QWidget,
-    QPushButton, QHBoxLayout,
-    QStackedLayout, QButtonGroup)
+    QFrame, QWidget, QGraphicsDropShadowEffect,
+    QPushButton, QHBoxLayout, 
+    QStackedLayout, QButtonGroup, QGroupBox)
+from importlib import resources
 
 key_conv = Keys()
 
@@ -40,32 +41,46 @@ class MainWindow(QMainWindow):
         self.engine = engine
         self.display_color = QColor("black")
         self.key_to_note = {}
+        self.osc_drop_shadow = self.configure_drop_shadow(QGraphicsDropShadowEffect(), QColor("#1c0627"))
+        self.osc2_drop_shadow = self.configure_drop_shadow(QGraphicsDropShadowEffect(), QColor("#1c0627"))
+        self.osc3_drop_shadow = self.configure_drop_shadow(QGraphicsDropShadowEffect(), QColor("#1c0627"))
+        self.filt_drop_shadow = self.configure_drop_shadow(QGraphicsDropShadowEffect(), QColor("#1c0627"))
+        self.fenv_drop_shadow = self.configure_drop_shadow(QGraphicsDropShadowEffect(), QColor("#1c0627"))
+        self.env_drop_shadow = self.configure_drop_shadow(QGraphicsDropShadowEffect(), QColor("#1c0627"))
+        self.del_drop_shadow = self.configure_drop_shadow(QGraphicsDropShadowEffect(), QColor("#1c0627"))
+        self.mod_drop_shadow = self.configure_drop_shadow(QGraphicsDropShadowEffect(), QColor("#1c0627"))
+        self.settings_drop_shadow = self.configure_drop_shadow(QGraphicsDropShadowEffect(), QColor("#1c0627"))
+        self.options_drop_shadow = self.configure_drop_shadow(QGraphicsDropShadowEffect(), QColor("#1c0627"))
+        self.patch_drop_shadow = self.configure_drop_shadow(QGraphicsDropShadowEffect(), QColor("#1c0627"))
+        self.record_drop_shadow = self.configure_drop_shadow(QGraphicsDropShadowEffect(), QColor("#1c0627"))
 
         #toolbar
         self.patch_manager = PatchManager(self.param_sliders, self.param_button_groups, self.mod_dials)
         self.recorder = RecorderGUI()
         settings_layout = QHBoxLayout()
-        self.settings_group = QWidget()
+        self.settings_group = QGroupBox("settings")
         self.settings_group.setAttribute(Qt.WA_StyledBackground, True)
 
+        self.toggle_dark = QPushButton("dark")
+        self.toggle_dark.setCheckable(True)
+        self.toggle_dark.setChecked(False)
         self.toggle_midi = QPushButton("midi")
-        self.toggle_midi.setToolTip("show/hide midi menu")
         self.toggle_midi.setCheckable(True)
         self.toggle_midi.setChecked(True)
         self.toggle_synth = QPushButton("synth")
-        self.toggle_synth.setToolTip("show/hide synth menu")
         self.toggle_synth.setCheckable(True)
         self.toggle_synth.setChecked(False)
         self.toggle_record = QPushButton("recorder")
-        self.toggle_record.setToolTip("show/hide recorder menu")
         self.toggle_record.setCheckable(True)
         self.toggle_record.setChecked(False)
 
+        settings_layout.addWidget(self.toggle_dark)
         settings_layout.addWidget(self.toggle_midi)
         settings_layout.addWidget(self.toggle_synth)
         settings_layout.addWidget(self.toggle_record)
         self.settings_group.setLayout(settings_layout)
 
+        self.toggle_dark.setObjectName("toggle_dark")
         self.toggle_midi.setObjectName("toggle_midi")
         self.toggle_synth.setObjectName("toggle_synth")
         self.toggle_record.setObjectName("toggle_record")
@@ -101,6 +116,20 @@ class MainWindow(QMainWindow):
         self.fenv_group = FilterEnvGUI(self.display_color)
         self.del_group = DelayGUI(self.display_color)
         self.mod_group = ModulatorGUI(self.display_color)
+
+        #module drop shadows
+        self.osc_group.setGraphicsEffect(self.osc_drop_shadow)
+        self.osc2_group.setGraphicsEffect(self.osc2_drop_shadow)
+        self.osc3_group.setGraphicsEffect(self.osc3_drop_shadow)
+        self.filt_group.setGraphicsEffect(self.filt_drop_shadow)
+        self.env_group.setGraphicsEffect(self.env_drop_shadow)
+        self.fenv_group.setGraphicsEffect(self.fenv_drop_shadow)
+        self.del_group.setGraphicsEffect(self.del_drop_shadow)
+        self.mod_group.setGraphicsEffect(self.mod_drop_shadow)
+        self.settings_view.setGraphicsEffect(self.settings_drop_shadow)
+        self.settings_group.setGraphicsEffect(self.options_drop_shadow)
+        self.patch_manager.setGraphicsEffect(self.patch_drop_shadow)
+        self.recorder.setGraphicsEffect(self.record_drop_shadow)
 
         #init slider, button group & mod dial dictionaries
         self.init_sliders_dict()
@@ -170,6 +199,7 @@ class MainWindow(QMainWindow):
 
         # settings
         self.toggle_button_group.buttonClicked.connect(self.update_active_settings)
+        self.toggle_dark.toggled.connect(self.update_dark_mode)
 
         # filter
         self.filt_group.freq_changed.connect(self.update_filt_freq)
@@ -341,6 +371,13 @@ class MainWindow(QMainWindow):
 
         self.setCentralWidget(window_widget)
 
+        #load stylesheets
+        light_style_file = resources.files() / 'window.qss'
+        self.light_style = light_style_file.read_text(encoding='utf-8')
+        dark_style_file = resources.files() / 'window_dark.qss'
+        self.dark_style = dark_style_file.read_text(encoding='utf-8')
+        self.setStyleSheet(self.light_style)
+
         #start slider cc update timer
         self.slider_timer = UpdateGUI(self.engine, self)
         self.slider_timer.start()
@@ -356,6 +393,27 @@ class MainWindow(QMainWindow):
         display.setSegmentStyle(dig_style)
         display.setSmallDecimalPoint(small_dec)
         return display
+    
+    def configure_drop_shadow(self, drop_shadow, color):
+        drop_shadow.setColor(color)
+        drop_shadow.setBlurRadius(12)
+        drop_shadow.setXOffset(3)
+        drop_shadow.setYOffset(3)
+        return drop_shadow
+    
+    def update_drop_shadow_colors(self, color):
+        self.osc_drop_shadow.setColor(color)
+        self.osc2_drop_shadow.setColor(color)
+        self.osc3_drop_shadow.setColor(color)
+        self.filt_drop_shadow.setColor(color)
+        self.fenv_drop_shadow.setColor(color)
+        self.env_drop_shadow.setColor(color)
+        self.del_drop_shadow.setColor(color)
+        self.mod_drop_shadow.setColor(color)
+        self.settings_drop_shadow.setColor(color)
+        self.options_drop_shadow.setColor(color)
+        self.patch_drop_shadow.setColor(color)
+        self.record_drop_shadow.setColor(color)
     
     def init_sliders_dict(self):
         self.param_sliders.update({"osc_drift": self.synth_group.drift_slider})
@@ -576,8 +634,75 @@ class MainWindow(QMainWindow):
             elif (param == "release"):
                 cc_function = self.engine.cc_change_menv2_release
         return cc_function
+    
+    def set_palette(self, display):
+        text_color = self.display_color
+        display_palette = display.palette()
+        display_palette.setColor(QPalette.ColorRole.WindowText, text_color)
+        display.setAutoFillBackground(False)
+        display.setPalette(display_palette)
+    
+    def set_display_colors(self):
+        #osc 1
+        self.set_palette(self.osc_group.osc_freq_display)
+        self.set_palette(self.osc_group.osc_amp_display)
+        self.set_palette(self.osc_group.osc_width_display)
+        #osc 2
+        self.set_palette(self.osc2_group.osc2_freq_display)
+        self.set_palette(self.osc2_group.osc2_det_display)
+        self.set_palette(self.osc2_group.osc2_amp_display)
+        self.set_palette(self.osc2_group.osc2_width_display)
+        #osc 3
+        self.set_palette(self.osc3_group.osc3_freq_display)
+        self.set_palette(self.osc3_group.osc3_det_display)
+        self.set_palette(self.osc3_group.osc3_amp_display)
+        self.set_palette(self.osc3_group.osc3_width_display)
+        #filter
+        self.set_palette(self.filt_group.filt_freq_display)
+        self.set_palette(self.filt_group.filt_fback_display)
+        self.set_palette(self.filt_group.filt_drive_display)
+        self.set_palette(self.filt_group.filt_sat_display)
+        #filter envelope
+        self.set_palette(self.fenv_group.fenv_att_display)
+        self.set_palette(self.fenv_group.fenv_dec_display)
+        self.set_palette(self.fenv_group.fenv_sus_display)
+        self.set_palette(self.fenv_group.fenv_rel_display)
+        self.set_palette(self.fenv_group.fenv_amt_display)
+        #amp envelope
+        self.set_palette(self.env_group.adsr_att_display)
+        self.set_palette(self.env_group.adsr_dec_display)
+        self.set_palette(self.env_group.adsr_sus_display)
+        self.set_palette(self.env_group.adsr_rel_display)
+        #delay
+        self.set_palette(self.del_group.del_time_display)
+        self.set_palette(self.del_group.del_feedback_display)
+        self.set_palette(self.del_group.del_mix_display)
+        #lfos
+        self.set_palette(self.mod_group.lfo_freq_display_1)
+        self.set_palette(self.mod_group.lfo_freq_display_2)
+        self.set_palette(self.mod_group.lfo_phase_display_1)
+        self.set_palette(self.mod_group.lfo_phase_display_2)
+        #menvs
+        self.set_palette(self.mod_group.menv_att_display_1)
+        self.set_palette(self.mod_group.menv_att_display_2)
+        self.set_palette(self.mod_group.menv_rel_display_1)
+        self.set_palette(self.mod_group.menv_rel_display_2)
 
     #slots
+    # toggle dark mode
+    def update_dark_mode(self, checked):
+        if checked:
+            self.setStyleSheet(self.dark_style)
+            self.display_color = QColor("white")
+            self.update_drop_shadow_colors(QColor("#b4b4d2"))
+            self.toggle_dark.setText("lite")
+        else:
+            self.setStyleSheet(self.light_style)
+            self.display_color = QColor("black")
+            self.update_drop_shadow_colors(QColor("#1c0627"))
+            self.toggle_dark.setText("dark")
+        self.set_display_colors()
+        
     # settings toggles
     def update_active_settings(self, button):
         text = button.text()
