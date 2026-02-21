@@ -105,10 +105,6 @@ with resources.as_file(resources.files("subsnake").joinpath("gui/fonts/dogica/do
         font_family = QFontDatabase.applicationFontFamilies(font_id)[0]
         print(f"success! loaded font {font_family}")
 
-#load stylesheet
-style_file = resources.files(gui) / 'window.qss'
-style = style_file.read_text(encoding='utf-8')
-app.setStyleSheet(style)
 app.setApplicationName("subsnake")
 app.setApplicationDisplayName("subsnake")
 app.setDesktopFileName("subsnake")
@@ -126,6 +122,13 @@ with resources.as_file(resources.files("subsnake").joinpath("images/icon.png")) 
         app_icon.addPixmap(smooth_pixmap)
     app.setWindowIcon(app_icon)
     window.setWindowIcon(app_icon)
+
+#autodetect theme
+style_hints = app.styleHints()
+if style_hints.colorScheme() == Qt.ColorScheme.Dark:
+    window.toggle_dark.setChecked(True)
+else:
+    window.toggle_dark.setChecked(False)
 
 #show window
 window.show()
