@@ -1,5 +1,10 @@
 MainWindow#main_window {
     background-color: #1c0627;
+    background: qlineargradient(
+        x1: 1, y1: 0, x2: 0, y2: 1,
+        stop: 0 #1c0627,
+        stop: 1 #490747
+    );
 }
 
 QLCDNumber {
@@ -9,18 +14,32 @@ QLCDNumber {
 }
 
 CoolDial {
-    max-width: 24px;
-    max-height: 24px;
-    background-color: gray;
+    max-width: 20px;
+    max-height: 20px;
+    background-color: #bbbbbb;
+}
+
+QGroupBox {
+    font-family: "Dogica Pixel";
+    font-size: 10px;
+    margin-top: 12px;
+    background-color: #380f4d;
+    border
 }
 
 QGroupBox QLabel {
-    color: #00fbff;
-    margin-top: -4.5px;
+    color: #ffffff;
+    font-family: "Dogica Pixel";
+    font-size: 9px;
 }
 
 QWidget QLabel {
-    color: #6aff00;
+    color: #ffffff;
+}
+
+QGroupBox#recorder QLabel {
+    margin-top: 0px;
+    font-size: 12px;
 }
 
 MainWindow QGroupBox {
@@ -33,31 +52,24 @@ MainWindow QGroupBox {
 }
 
 QScrollArea {
-    background-color: #ac9ab8;
+    background-color: transparent;
+    border-radius: 6px;
     border: 1px solid white;
-    border-radius: 3px;
 }
 
 QGroupBox#cc_group {
-    background-color: #ac9ab8;
-    min-width: 320px;
+    background-color: none;
+    min-width: 280px;
     max-width: 460px;
-    border: 1px solid white;
-    border-radius: 3px;
+    border: 0px;
 }
 
 QRadioButton {
-    color: #000000;
+    color: #ffffff;
     font-size: 12px;
     spacing: 6px;
-}
-
-QToolBar {
-    background-color: #333333;
-    border: 2px groove gray;
-    border-top: none;
-    border-bottom-left-radius: 3px;
-    border-bottom-right-radius: 3px;
+    font-family: "Dogica Pixel";
+    font-size: 7px;
 }
 
 QGroupBox QSlider {
@@ -77,7 +89,7 @@ QRadioButton::indicator {
 }
 
 QGroupBox#filt_group QRadioButton::indicator:checked {
-    background-color: #4be372;
+    background-color: #78ff9a;
 }
 
 QGroupBox#osc_group QRadioButton::indicator:checked {
@@ -92,33 +104,33 @@ QGroupBox#osc3_group QRadioButton::indicator:checked {
     background-color: #2bd6ae;
 }
 
-QGroupBox#mod_group QGroupBox#lfo1_group QRadioButton::indicator:checked {
-    background-color: #6f7cf7;
+QWidget#mod_group QGroupBox#lfo1_group QRadioButton::indicator:checked {
+    background-color: #6fabff;
 }
 
-QGroupBox#mod_group QGroupBox#lfo2_group QRadioButton::indicator:checked {
-    background-color: #867efc;
+QWidget#mod_group QGroupBox#lfo2_group QRadioButton::indicator:checked {
+    background-color: #7686ff;
 }
 
-QGroupBox#mod_group QGroupBox#menv1_group QRadioButton::indicator:checked {
-    background-color: #957cfc;
+QWidget#mod_group QGroupBox#menv1_group QRadioButton::indicator:checked {
+    background-color: #b770ff;
 }
 
-QGroupBox#mod_group QGroupBox#menv2_group QRadioButton::indicator:checked {
-    background-color: #9268fc;
+QWidget#mod_group QGroupBox#menv2_group QRadioButton::indicator:checked {
+    background-color: #ce73ff;
 }
 
 QGroupBox QSlider::handle {
     width: 16px;
     height: 16px;
     border-radius: 3px;
-    border: 1px solid white;
+    border: 1px solid #555555;
     margin: -4px 0px;
 }
 
 QGroupBox QSlider::groove {
     height: 8px;
-    background-color: #333333;
+    background-color: #555555;
     border: 1px solid white;
     border-radius: 3px;
 }
@@ -136,7 +148,7 @@ QGroupBox#osc3_group QSlider::sub-page {
 }
 
 QGroupBox#filt_group QSlider::sub-page {
-    background-color: #68d985;
+    background-color: #8ff8a9;
 }
 
 QGroupBox#env_group QSlider::sub-page {
@@ -144,27 +156,31 @@ QGroupBox#env_group QSlider::sub-page {
 }
 
 QGroupBox#fenv_group QSlider::sub-page {
-    background-color: #80e866;
+    background-color: #b1f6a0;
 }
 
 QGroupBox#del_group QSlider::sub-page {
     background-color: #fab055;
 }
 
-QGroupBox#mod_group QGroupBox#lfo1_group QSlider::sub-page {
-    background-color: #6f7cf7;
+QGroupBox#synth_group QSlider::sub-page {
+    background-color: #ff8d8d;
 }
 
-QGroupBox#mod_group QGroupBox#lfo2_group QSlider::sub-page {
-    background-color: #867efc;
+QWidget#mod_group QGroupBox#lfo1_group QSlider::sub-page {
+    background-color: #88b7f9;
 }
 
-QGroupBox#mod_group QGroupBox#menv1_group QSlider::sub-page {
-    background-color: #957cfc;
+QWidget#mod_group QGroupBox#lfo2_group QSlider::sub-page {
+    background-color: #8996fb;
 }
 
-QGroupBox#mod_group QGroupBox#menv2_group QSlider::sub-page {
-    background-color: #9268fc;
+QWidget#mod_group QGroupBox#menv1_group QSlider::sub-page {
+    background-color: #c084fd;
+}
+
+QWidget#mod_group QGroupBox#menv2_group QSlider::sub-page {
+    background-color: #d489fc;
 }
 
 QGroupBox#osc_group QSlider::handle {
@@ -180,120 +196,105 @@ QGroupBox#osc3_group QSlider::handle {
 }
 
 QGroupBox#filt_group QSlider::handle {
-    background-color: #4be372;
+    background-color: #6be68a;
 }
 
 QGroupBox#env_group QSlider::handle {
-    background-color: #f7599a;
+    background-color: #ed79a9;
 }
 
 QGroupBox#fenv_group QSlider::handle {
-    background-color: #52e62e;
+    background-color: #94e77f;
 }
 
 QGroupBox#del_group QSlider::handle {
     background-color: #fa9f2f;
 }
 
-QGroupBox#mod_group QGroupBox#lfo1_group QSlider::handle {
-    background-color: #5a67e0;
+QGroupBox#synth_group QSlider::handle {
+    background-color: #f66767;
 }
 
-QGroupBox#mod_group QGroupBox#lfo2_group QSlider::handle {
-    background-color: #7168e8;
+QWidget#mod_group QGroupBox#lfo1_group QSlider::handle {
+    background-color: #6fabff;
 }
 
-QGroupBox#mod_group QGroupBox#menv1_group QSlider::handle {
-    background-color: #836aeb;
+QWidget#mod_group QGroupBox#lfo2_group QSlider::handle {
+    background-color: #7686ff;
 }
 
-QGroupBox#mod_group QGroupBox#menv2_group QSlider::handle {
-    background-color: #8758fc;
+QWidget#mod_group QGroupBox#menv1_group QSlider::handle {
+    background-color: #b770ff;
+}
+
+QWidget#mod_group QGroupBox#menv2_group QSlider::handle {
+    background-color: #ce73ff;
 }
 
 QGroupBox::title {
-    subcontrol-origin: margin;
+    subcontrol-origin: padding;
     subcontrol-position: top center;
-    padding: 1px;
-    color: #11d4c1;
+    color: #ffffff;
+    top: -9px;
+    min-height: 16px;
+    border-radius: 4px;
+    border: .5px solid white;
+    background-color: #380f4d;
 }
 
-QGroupBox#filt_group, QGroupBox#osc_group, QGroupBox#osc2_group, QGroupBox#osc3_group, QGroupBox#env_group, QGroupBox#fenv_group, QGroupBox#del_group, QGroupBox#mod_group {
+QGroupBox::title#recorder, QGroupBox:title#patch_manager {
+    background-color: #380f4d;
+}
+
+QGroupBox#filt_group, QGroupBox#osc_group, QGroupBox#osc2_group, QGroupBox#osc3_group, QGroupBox#env_group, QGroupBox#fenv_group, QGroupBox#del_group, QWidget#mod_group, QGroupBox#midi_group {
     min-height: 200px;
     max-height: 200px;
 }
 
-QGroupBox#mod_subgroup {
-    height: 180px;
-    min-width: 200px;
+ModulatorGUI QGroupBox {
+    max-height: 180px;
+    min-width: 360px;
 }
 
-QGroupBox#filt_group {
-    background-color: #0b5a37;
+ModulatorGUI QPushButton {
+    font-family: "Dogica Pixel";
+    font-size: 9px;
 }
 
-QGroupBox#osc_group {
-    background-color: #032240;
+QPushButton#lfo1_button {
+    background-color: #6fabff;
 }
 
-QGroupBox#osc2_group {
-    background-color: #064b45;
+QPushButton#lfo2_button {
+    background-color: #7686ff;
 }
 
-QGroupBox#osc3_group {
-    background-color: #03383e;
+QPushButton#menv1_button {
+    background-color: #b770ff;
 }
 
-QGroupBox#env_group {
-    background-color: #42051f;
+QPushButton#menv2_button {
+    background-color: #ce73ff;
 }
 
-QGroupBox#fenv_group {
-    background-color: #114404;
-}
-
-QGroupBox#del_group {
-    background-color: #4b2b04;
-}
-
-QGroupBox#mod_group {
-    background-color: #0c1043
-}
-
-QGroupBox#lfo1_group, QPushButton#lfo1_button {
-    background-color: #9ba4fa;
-}
-
-QGroupBox#lfo2_group, QPushButton#lfo2_button {
-    background-color: #a19bfa;
-}
-
-QGroupBox#menv1_group, QPushButton#menv1_button {
-    background-color: #ae9bfa;
-}
-
-QGroupBox#menv2_group, QPushButton#menv2_button {
-    background-color: #b69bfa;
-}
-
-QPushButton#lfo1_button::checked, QPushButton#lfo2_button::checked, QPushButton#menv1_button::checked, QPushButton#menv2_button::checked {
+QPushButton#lfo1_button:checked, QPushButton#lfo2_button:checked, QPushButton#menv1_button:checked, QPushButton#menv2_button:checked {
     border-color: black;
 }
 
-QPushButton#lfo1_button::hover {
-    background-color: #929dfd;
+QPushButton#lfo1_button:hover {
+    background-color: #5c9df9;
 }
 
-QPushButton#lfo2_button::hover {
-    background-color: #9a93ff;
+QPushButton#lfo2_button:hover {
+    background-color: #6677fb;
 }
 
-QPushButton#menv1_button::hover {
-    background-color: #a691fa;
+QPushButton#menv1_button:hover {
+    background-color: #ae61fc;
 }
 
-QPushButton#menv2_button::hover {
-    background-color: #b093f9;
+QPushButton#menv2_button:hover {
+    background-color: #c664fb;
 }
 
 QGroupBox#midi_group, QGroupBox#synth_group {
@@ -302,32 +303,34 @@ QGroupBox#midi_group, QGroupBox#synth_group {
 }
 
 QGroupBox#midi_group {
-    background-color: #ab8ebe;
+    min-width:360px;
 }
 
-QGroupBox#synth_group QLabel {
-    max-width: 60px;
+QGroupBox#midi_group QComboBox {
+    max-width: 120px;
 }
 
-QGroupBox#synth_group {
-    background-color: #8eb2be;
+QWidget#mod_group {
+    min-width: 380px;
+    max-width: 480px;
 }
 
-QGroupBox#mod_group QPushButton {
+QWidget#mod_group QPushButton {
     width: 48px;
     height: 16px;
-    color: #000000;
+    color: #ffffff;
     border: 1px solid white;
     border-radius: 6px;
 }
 
 QPushButton#env_gate {
-    color: #000000;
-    background-color: #bd91a4;
+    color: #ffffff;
     border: 1px solid white;
     border-radius: 6px;
     height: 24px;
     text-align: center;
+    font-family: "Dogica Pixel";
+    font-size: 9px;
 }
 
 QPushButton#env_gate:hover {
@@ -335,13 +338,14 @@ QPushButton#env_gate:hover {
 }
 
 QPushButton#env_gate:checked {
-    color: #000000;
+    color: #ffffff;
     background-color: #eeb6ce;
 }
 
 QPushButton#midi_refresh, QGroupBox#cc_group QPushButton {
+    color: black;
     border: 1px solid white;
-    color: #000000;
+    border-radius: 6px;
     font-size: 18px;
     font-style: bold;
     max-width: 28px;
@@ -349,77 +353,123 @@ QPushButton#midi_refresh, QGroupBox#cc_group QPushButton {
 }
 
 QPushButton#midi_refresh {
-    background-color: #ab8ebe;
+    background-color: transparent;
 }
 
 QPushButton#cc_add {
-    background-color: #9fc983;
+    background-color: transparent;
 }
 
 QPushButton#cc_delete {
+    background-color: transparent;
+}
+
+QPushButton#midi_refresh:hover {
+    background-color: #ab8ebe;
+}
+
+QPushButton#cc_add:hover {
+    background-color: #9fc983;
+}
+
+QPushButton#cc_delete:hover {
     background-color: #c77581;
 }
 
-QPushButton#toggle_midi, QPushButton#toggle_synth, QPushButton#toggle_record {
-    max-width: 100px;
-    min-width: 100px;
-    height:36px;
-    color: #000000;
+QPushButton#toggle_midi, QPushButton#toggle_synth, QPushButton#toggle_record, QPushButton#toggle_dark {
+    max-height: 36px;
+    color: #ffffff;
     border: 1px solid white;
     border-radius: 6px;
+    font-family: "Dogica Pixel";
+    font-size: 12px;
+    background-color: #380f4d;
 }
 
-QPushButton#toggle_midi {
-    background-color: #857093;
+QPushButton#toggle_midi, QPushButton#toggle_dark {
+    max-width: 56px;
+    min-width: 56px;
+}
+
+QPushButton#toggle_synth {
+    max-width: 64px;
+    min-width: 64px;
+}
+
+QPushButton#toggle_record {
+    max-width: 96px;
+    min-width: 96px;
 }
 
 QPushButton#toggle_midi:hover {
-    background-color: #a086b1;
+    background-color: #c38ee6;
 }
 
 QPushButton#toggle_midi:checked {
     background-color: #c1a1d6;
 }
 
-QPushButton#toggle_synth {
-    background-color: #708b93;
-}
-
 QPushButton#toggle_synth:hover {
-    background-color: #87a5ad;
+    background-color: #ff70c8e1;
 }
 
 QPushButton#toggle_synth:checked {
-    background-color: #a3c7d1;
+    background-color: #88c6d7;
+}
+
+QPushButton#toggle_record:hover {
+    background-color: #82eaaa;
+}
+
+QPushButton#toggle_record:checked {
+    background-color: #a3e4bc;
+}
+
+QPushButton#toggle_dark:hover {
+    background-color: #b4b4d2;
+    color: black;
 }
 
 PatchManager#patch_manager {
-    background-color: #f2999f;
     border: 1px solid white;
     border-radius: 6px;
-    min-width: 360px;
     max-height: 40px;
+    min-width: 380px;
+    max-width: 480px;
 }
 
 PatchManager QPushButton {
-    background-color: #e86f77;
+    background-color: none;
     width: 60px;
     height: 20px;
-    color: #000000;
+    color: #ffffff;
     border: 1px solid white;
     border-radius: 6px;
+    font-family: "Dogica Pixel";
+    font-size: 9px;
 }
 
-PatchManager QPushButton:hover {
-    background-color: #b55056;
+QPushButton#new_patch:hover {
+    background-color: #c96171;
 }
 
+QPushButton#save_patch:hover {
+    background-color: #1cb68d;
+}
+
+QPushButton#new_patch:pressed {
+    background-color: #c9465a;
+}
+
+QPushButton#save_patch:pressed {
+    background-color: #28d8a9;
+}
 
 RecorderGUI#recorder {
-    background-color: #99f2da;
     border: 1px solid white;
     border-radius: 6px;
-    min-width: 360px;
+    min-width: 380px;
+    max-width: 480px;
     max-height: 40px;
 }
 
@@ -427,13 +477,14 @@ RecorderGUI QPushButton {
     max-width: 30px;
     min-width: 30px;
     height: 30px;
-    color: #000000;
+    color: #ffffff;
     border: 1px solid white;
     border-radius: 6px;
 }
 
 QWidget#settings_group {
-    min-width:360px;
+    min-width: 380px;
+    max-width: 480px;
     max-height: 40px;
 }
 
@@ -447,30 +498,30 @@ QFrame#record_spacer {
 }
 
 QPushButton#record_button, QPushButton#play_button, QPushButton#stop_button, QPushButton#delete_button {
-    background-color: #34cea5;
+    background-color: none;
     padding-top: -4px;
 }
 
 QPushButton#delete_button {
-    background-color: #34cea5;
-    padding-top: 4px;
+    font-family: "Dogica Pixel";
+    padding-top: -2px; 
 }
 
 QPushButton#loop_button {
-    background-color: #34cea5;
+    background-color: none;
     font-style: bold;
     font-size: 21px;
 }
 
-QPushButton#record_button:hover, QPushButton#play_button:hover, QPushButton#stop_button:hover, QPushButton#loop_button:hover, QPushButton#delete_button:hover {
+QPushButton#stop_button:hover,  QPushButton#delete_button:hover {
+    background-color: #c96171;
+}
+
+QPushButton#play_button:hover, QPushButton#record_button:hover, QPushButton#loop_button:hover {
     background-color: #1cb68d;
 }
 
 QPushButton#record_button:checked, QPushButton#loop_button:checked, QPushButton#play_button:checked {
     color: #e6e6e6;
     background-color: #158668;
-}
-
-QPushButton#delete_button:disabled {
-    background-color: #8534cea5;
 }
