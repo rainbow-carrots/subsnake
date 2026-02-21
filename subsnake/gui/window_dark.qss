@@ -28,13 +28,13 @@ QGroupBox {
 }
 
 QGroupBox QLabel {
-    color: #d6d6f1;
+    color: #dfdfef;
     font-family: "Dogica Pixel";
     font-size: 9px;
 }
 
 QWidget QLabel {
-    color: #d6d6f1;
+    color: #dfdfef;
 }
 
 QGroupBox#recorder QLabel {
@@ -65,7 +65,7 @@ QGroupBox#cc_group {
 }
 
 QRadioButton {
-    color: #d6d6f1;
+    color: #dfdfef;
     font-size: 12px;
     spacing: 6px;
     font-family: "Dogica Pixel";
@@ -234,7 +234,7 @@ QWidget#mod_group QGroupBox#menv2_group QSlider::handle {
 QGroupBox::title {
     subcontrol-origin: padding;
     subcontrol-position: top center;
-    color: #d6d6f1;
+    color: #dfdfef;
     top: -9px;
     min-height: 16px;
     border-radius: 4px;
@@ -318,13 +318,13 @@ QWidget#mod_group {
 QWidget#mod_group QPushButton {
     width: 48px;
     height: 16px;
-    color: #d6d6f1;
+    color: #dfdfef;
     border: 1px solid white;
     border-radius: 6px;
 }
 
 QPushButton#env_gate {
-    color: #d6d6f1;
+    color: #dfdfef;
     border: 1px solid white;
     border-radius: 6px;
     height: 24px;
@@ -338,12 +338,12 @@ QPushButton#env_gate:hover {
 }
 
 QPushButton#env_gate:checked {
-    color: #d6d6f1;
+    color: #dfdfef;
     background-color: #eeb6ce;
 }
 
 QPushButton#midi_refresh, QGroupBox#cc_group QPushButton {
-    color: #d6d6f1;
+    color: #dfdfef;
     border: 1px solid white;
     border-radius: 6px;
     font-size: 18px;
@@ -378,7 +378,7 @@ QPushButton#cc_delete:hover {
 
 QPushButton#toggle_midi, QPushButton#toggle_synth, QPushButton#toggle_record, QPushButton#toggle_dark {
     max-height: 36px;
-    color: #d6d6f1;
+    color: #dfdfef;
     border: 1px solid white;
     border-radius: 6px;
     font-family: "Dogica Pixel";
@@ -403,26 +403,32 @@ QPushButton#toggle_record {
 
 QPushButton#toggle_midi:hover {
     background-color: #c38ee6;
+    color: black;
 }
 
 QPushButton#toggle_midi:checked {
     background-color: #c1a1d6;
+    color: black;
 }
 
 QPushButton#toggle_synth:hover {
-    background-color: #ff70c8e1;
+    background-color: #64c1db;
+    color: black;
 }
 
 QPushButton#toggle_synth:checked {
     background-color: #88c6d7;
+    color: black;
 }
 
 QPushButton#toggle_record:hover {
     background-color: #82eaaa;
+    color: black;
 }
 
 QPushButton#toggle_record:checked {
     background-color: #a3e4bc;
+    color: black;
 }
 
 QPushButton#toggle_dark:hover {
@@ -442,7 +448,7 @@ PatchManager QPushButton {
     background-color: none;
     width: 60px;
     height: 20px;
-    color: #d6d6f1;
+    color: #dfdfef;
     border: 1px solid white;
     border-radius: 6px;
     font-family: "Dogica Pixel";
@@ -477,7 +483,7 @@ RecorderGUI QPushButton {
     max-width: 30px;
     min-width: 30px;
     height: 30px;
-    color: #d6d6f1;
+    color: #dfdfef;
     border: 1px solid white;
     border-radius: 6px;
 }

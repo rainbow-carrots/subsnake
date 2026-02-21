@@ -693,7 +693,7 @@ class MainWindow(QMainWindow):
     def update_dark_mode(self, checked):
         if checked:
             self.setStyleSheet(self.dark_style)
-            self.display_color = QColor("#d6d6f1")
+            self.display_color = QColor("#dfdfef")
             self.update_drop_shadow_colors(QColor("#b4b4d2"))
             self.toggle_dark.setText("lite")
         else:

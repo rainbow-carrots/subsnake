@@ -402,26 +402,32 @@ QPushButton#toggle_record {
 
 QPushButton#toggle_midi:hover {
     background-color: #c38ee6;
+    color: black;
 }
 
 QPushButton#toggle_midi:checked {
     background-color: #c1a1d6;
+    color: black;
 }
 
 QPushButton#toggle_synth:hover {
-    background-color: #ff70c8e1;
+    background-color: #64c1db;
+    color: black;
 }
 
 QPushButton#toggle_synth:checked {
     background-color: #88c6d7;
+    color: black;
 }
 
 QPushButton#toggle_record:hover {
     background-color: #82eaaa;
+    color: black;
 }
 
 QPushButton#toggle_record:checked {
     background-color: #a3e4bc;
+    color: black;
 }
 
 QPushButton#toggle_dark:hover {
