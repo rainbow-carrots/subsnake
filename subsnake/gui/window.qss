@@ -1,5 +1,10 @@
 MainWindow#main_window {
     background-color: #b4b4d2;
+    background: qlineargradient(
+        x1: 0, y1: 0, x2: 1, y2: 1,
+        stop: 0 #b2b2e4,
+        stop: 1 #c2b2e0
+    );
 }
 
 QLCDNumber {
@@ -370,10 +375,8 @@ QPushButton#cc_delete:hover {
     background-color: #c77581;
 }
 
-QPushButton#toggle_midi, QPushButton#toggle_synth, QPushButton#toggle_record {
-    max-width: 100px;
-    min-width: 100px;
-    height:36px;
+QPushButton#toggle_midi, QPushButton#toggle_synth, QPushButton#toggle_record, QPushButton#toggle_dark {
+    max-height: 36px;
     color: #000000;
     border: 1px solid white;
     border-radius: 6px;
@@ -382,8 +385,23 @@ QPushButton#toggle_midi, QPushButton#toggle_synth, QPushButton#toggle_record {
     background-color: #c1c1e3;
 }
 
+QPushButton#toggle_midi, QPushButton#toggle_dark {
+    max-width: 56px;
+    min-width: 56px;
+}
+
+QPushButton#toggle_synth {
+    max-width: 64px;
+    min-width: 64px;
+}
+
+QPushButton#toggle_record {
+    max-width: 96px;
+    min-width: 96px;
+}
+
 QPushButton#toggle_midi:hover {
-    background-color: #a086b1;
+    background-color: #c38ee6;
 }
 
 QPushButton#toggle_midi:checked {
@@ -391,11 +409,24 @@ QPushButton#toggle_midi:checked {
 }
 
 QPushButton#toggle_synth:hover {
-    background-color: #87a5ad;
+    background-color: #ff70c8e1;
 }
 
 QPushButton#toggle_synth:checked {
-    background-color: #a3c7d1;
+    background-color: #88c6d7;
+}
+
+QPushButton#toggle_record:hover {
+    background-color: #82eaaa;
+}
+
+QPushButton#toggle_record:checked {
+    background-color: #a3e4bc;
+}
+
+QPushButton#toggle_dark:hover {
+    background-color: #1c0627;
+    color: white;
 }
 
 PatchManager#patch_manager {
