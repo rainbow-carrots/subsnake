@@ -3,7 +3,6 @@
 subsnake is a polyphonic virtual analog subtractive synthesizer, written in python.
 
 ![](./subsnake/images/subsnake_dark.png)
-![](./subsnake/images/subsnake.png)
 
 
 what does it do? well, i'm very glad you asked.
