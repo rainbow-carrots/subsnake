@@ -28,13 +28,13 @@ QGroupBox {
 }
 
 QGroupBox QLabel {
-    color: #ffffff;
+    color: #d6d6f1;
     font-family: "Dogica Pixel";
     font-size: 9px;
 }
 
 QWidget QLabel {
-    color: #ffffff;
+    color: #d6d6f1;
 }
 
 QGroupBox#recorder QLabel {
@@ -65,7 +65,7 @@ QGroupBox#cc_group {
 }
 
 QRadioButton {
-    color: #ffffff;
+    color: #d6d6f1;
     font-size: 12px;
     spacing: 6px;
     font-family: "Dogica Pixel";
@@ -234,7 +234,7 @@ QWidget#mod_group QGroupBox#menv2_group QSlider::handle {
 QGroupBox::title {
     subcontrol-origin: padding;
     subcontrol-position: top center;
-    color: #ffffff;
+    color: #d6d6f1;
     top: -9px;
     min-height: 16px;
     border-radius: 4px;
@@ -318,13 +318,13 @@ QWidget#mod_group {
 QWidget#mod_group QPushButton {
     width: 48px;
     height: 16px;
-    color: #ffffff;
+    color: #d6d6f1;
     border: 1px solid white;
     border-radius: 6px;
 }
 
 QPushButton#env_gate {
-    color: #ffffff;
+    color: #d6d6f1;
     border: 1px solid white;
     border-radius: 6px;
     height: 24px;
@@ -338,12 +338,12 @@ QPushButton#env_gate:hover {
 }
 
 QPushButton#env_gate:checked {
-    color: #ffffff;
+    color: #d6d6f1;
     background-color: #eeb6ce;
 }
 
 QPushButton#midi_refresh, QGroupBox#cc_group QPushButton {
-    color: black;
+    color: #d6d6f1;
     border: 1px solid white;
     border-radius: 6px;
     font-size: 18px;
@@ -378,7 +378,7 @@ QPushButton#cc_delete:hover {
 
 QPushButton#toggle_midi, QPushButton#toggle_synth, QPushButton#toggle_record, QPushButton#toggle_dark {
     max-height: 36px;
-    color: #ffffff;
+    color: #d6d6f1;
     border: 1px solid white;
     border-radius: 6px;
     font-family: "Dogica Pixel";
@@ -442,7 +442,7 @@ PatchManager QPushButton {
     background-color: none;
     width: 60px;
     height: 20px;
-    color: #ffffff;
+    color: #d6d6f1;
     border: 1px solid white;
     border-radius: 6px;
     font-family: "Dogica Pixel";
@@ -477,7 +477,7 @@ RecorderGUI QPushButton {
     max-width: 30px;
     min-width: 30px;
     height: 30px;
-    color: #ffffff;
+    color: #d6d6f1;
     border: 1px solid white;
     border-radius: 6px;
 }
