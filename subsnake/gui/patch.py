@@ -73,7 +73,6 @@ class PatchManager(QGroupBox):
         self.factory_patch_names = []
         self.user_patch_path = Path(user_data_dir("subsnake", "rainbow-carrots")) / "patches"
         self.user_patch_names = []
-        print(f"user path: {self.user_patch_path}")
 
         #ensure user patch directory exists
         self.check_user_dir()
