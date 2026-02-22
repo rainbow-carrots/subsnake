@@ -70,7 +70,7 @@ class MainWindow(QMainWindow):
         self.toggle_synth = QPushButton("synth")
         self.toggle_synth.setCheckable(True)
         self.toggle_synth.setChecked(False)
-        self.toggle_record = QPushButton("recorder")
+        self.toggle_record = QPushButton("record")
         self.toggle_record.setCheckable(True)
         self.toggle_record.setChecked(False)
 
