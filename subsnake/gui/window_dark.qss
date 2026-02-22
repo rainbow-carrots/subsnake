@@ -124,15 +124,21 @@ QGroupBox QSlider::handle {
     width: 16px;
     height: 16px;
     border-radius: 3px;
-    border: 1px solid #555555;
+    border: .5px solid #555555;
     margin: -4px 0px;
 }
 
 QGroupBox QSlider::groove {
     height: 8px;
-    background-color: #555555;
+    background-color: #666666;
     border: 1px solid white;
     border-radius: 3px;
+}
+
+QSlider::sub-page {
+    border-radius: 3px;
+    subcontrol-origin: margin;
+    subcontrol-position: center center;
 }
 
 QGroupBox#osc_group QSlider::sub-page {
@@ -148,15 +154,15 @@ QGroupBox#osc3_group QSlider::sub-page {
 }
 
 QGroupBox#filt_group QSlider::sub-page {
-    background-color: #8ff8a9;
+    background-color: #93dea7;
 }
 
 QGroupBox#env_group QSlider::sub-page {
-    background-color: #f57fb0;
+    background-color: #f398be;
 }
 
 QGroupBox#fenv_group QSlider::sub-page {
-    background-color: #b1f6a0;
+    background-color: #e9d44b;
 }
 
 QGroupBox#del_group QSlider::sub-page {
@@ -184,7 +190,7 @@ QWidget#mod_group QGroupBox#menv2_group QSlider::sub-page {
 }
 
 QGroupBox#osc_group QSlider::handle {
-    background-color: #479ef5;
+    background-color: #56a6f6;
 }
 
 QGroupBox#osc2_group QSlider::handle {
@@ -196,7 +202,7 @@ QGroupBox#osc3_group QSlider::handle {
 }
 
 QGroupBox#filt_group QSlider::handle {
-    background-color: #6be68a;
+    background-color: #65da84;
 }
 
 QGroupBox#env_group QSlider::handle {
@@ -204,7 +210,7 @@ QGroupBox#env_group QSlider::handle {
 }
 
 QGroupBox#fenv_group QSlider::handle {
-    background-color: #94e77f;
+    background-color: #ebcf17;
 }
 
 QGroupBox#del_group QSlider::handle {
@@ -279,6 +285,7 @@ QPushButton#menv2_button {
 
 QPushButton#lfo1_button:checked, QPushButton#lfo2_button:checked, QPushButton#menv1_button:checked, QPushButton#menv2_button:checked {
     border-color: black;
+    color: black;
 }
 
 QPushButton#lfo1_button:hover {
@@ -390,7 +397,12 @@ QPushButton#toggle_midi, QPushButton#toggle_synth, QPushButton#toggle_record, QP
     background-color: #380f4d;
 }
 
-QPushButton#toggle_midi, QPushButton#toggle_dark {
+QPushButton#toggle_dark {
+    max-width: 48px;
+    min-width: 48px;
+}
+
+QPushButton#toggle_midi{
     max-width: 56px;
     min-width: 56px;
 }
@@ -401,8 +413,8 @@ QPushButton#toggle_synth {
 }
 
 QPushButton#toggle_record {
-    max-width: 96px;
-    min-width: 96px;
+    max-width: 72px;
+    min-width: 72px;
 }
 
 QPushButton#toggle_midi:hover {
