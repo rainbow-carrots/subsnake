@@ -5,7 +5,6 @@ from PySide6.QtWidgets import QApplication
 from PySide6.QtGui import QIcon, QPixmap, QFontDatabase
 from PySide6.QtCore import Qt
 from subsnake.gui import MainWindow
-import subsnake.gui as gui
 from subsnake.audio import WrappedOsc, HalSVF, ADSR, AudioEngine
 from subsnake.audio.effects import AudioRecorder, StereoDelay
 from subsnake.audio.modulators import LFO, ModEnv
