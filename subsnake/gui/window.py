@@ -6,7 +6,7 @@ from subsnake.gui.filt_gui import FilterGUI
 from subsnake.gui.env_gui import EnvelopeGUI
 from subsnake.gui.fenv_gui import FilterEnvGUI
 from subsnake.gui.midi import MIDISettings
-from subsnake.gui.settings import SynthSettings
+from subsnake.gui.settings import SynthSettings, RecorderSettings
 from subsnake.gui.gui_timer import UpdateGUI
 from subsnake.gui.delay_gui import DelayGUI
 from subsnake.gui.patch import PatchManager
@@ -100,10 +100,14 @@ class MainWindow(QMainWindow):
         self.synth_group = SynthSettings()
         self.synth_group.setFocusPolicy(Qt.NoFocus)
 
+        self.record_group = RecorderSettings()
+        self.record_group.setFocusPolicy(Qt.NoFocus)
+
         self.settings_view = QWidget()
         self.settings_stack = QStackedLayout()
         self.settings_stack.addWidget(self.midi_group)
         self.settings_stack.addWidget(self.synth_group)
+        self.settings_stack.addWidget(self.record_group)
         self.settings_stack.setCurrentIndex(0)
         self.settings_view.setLayout(self.settings_stack)
 
@@ -187,6 +191,7 @@ class MainWindow(QMainWindow):
         self.recorder.pause.connect(self.update_rec_pause)
         self.recorder.stop.connect(self.update_rec_stop)
         self.recorder.loop.connect(self.update_rec_loop)
+        self.record_group.save_rec_buffer.connect(self.save_rec_buffer)
 
         # midi
         self.midi_group.input_changed.connect(self.update_midi_in)
@@ -712,8 +717,8 @@ class MainWindow(QMainWindow):
             self.settings_stack.setCurrentIndex(0)
         elif text == "synth":
             self.settings_stack.setCurrentIndex(1)
-        elif text == "recorder":
-            print("DEBUG: recorder settings")
+        elif text == "record":
+            self.settings_stack.setCurrentIndex(2)
 
     # modulator dials
     def update_mod_dial_value(self, name, value):
@@ -800,6 +805,9 @@ class MainWindow(QMainWindow):
 
     def update_rec_loop(self, state):
         self.engine.update_loop(state)
+
+    def save_rec_buffer(self, filename):
+        self.engine.save_rec_buffer(filename)
 
     # filter
     def update_filt_freq(self, newFreq):
