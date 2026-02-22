@@ -2,6 +2,7 @@ import numpy as np
 import mido
 import queue
 import sounddevice as sd
+import soundfile as sf
 import random
 import time as pytime
 from PySide6.QtCore import QMutex, QThreadPool
@@ -174,6 +175,11 @@ class AudioEngine():
 
     def update_loop(self, state):
         self.recorder.set_loop(state)
+
+    def save_rec_buffer(self, filename):
+        frames = max(self.recorder.end_heads[0], self.recorder.end_heads[1])
+        sf.write(filename, self.recorder.record_buffer[:frames], fs)
+        print(f"audio saved to: {filename}")
 
     #voice helper functions
     # oscillator drift
