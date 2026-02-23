@@ -44,13 +44,13 @@ class WrappedOsc():
             self.generate_sine(self.state, buffer, self.random_walk[:frames], self.walk_amt, mod_buffers[0], mod_buffers[1], mod_buffers[2], mod_values[0], mod_values[1], mod_values[2], self.amp, self.freq)
         elif (self.alg == 1.0):
             if (self.alg_type == 0):
-                self.blit_saw(buffer, self.blit_buffer, self.blit_buffer_write, self.blit_states, self.blit_integrators, self.hermite_interpolate,  
+                self.blit_saw(buffer, self.blit_states, self.blit_integrators,
                           self.random_walk[:frames], self.walk_amt, mod_buffers[0], mod_buffers[1], mod_buffers[2], mod_values[0], mod_values[1], mod_values[2], self.amp, self.freq)
             elif (self.alg_type == 1):
                 self.polyblep_saw(self.state, buffer, self.random_walk, self.walk_amt, mod_buffers[0], mod_buffers[1], mod_buffers[2], mod_values[1], mod_values[2], mod_values[3], self.amp, self.freq)
         elif (self.alg == 2.0):
             if (self.alg_type == 0):
-                self.blit_pulse(buffer, self.blit_buffer, self.blit_buffer_write, self.blit_states, self.blit_integrators, self.hermite_interpolate, self.smoothed_widths,
+                self.blit_pulse(buffer, self.blit_states, self.blit_integrators, self.smoothed_widths,
                           self.random_walk[:frames], self.walk_amt, mod_buffers[0], mod_buffers[1], mod_buffers[2], mod_buffers[3], mod_values[0], mod_values[1], mod_values[2], mod_values[3], self.amp, self.freq, self.pulsewidth)
             elif (self.alg_type == 1):
                 self.polyblep_pulse(self.state, buffer, self.state2, self.pulsewidth, self.random_walk, self.walk_amt,
@@ -183,67 +183,43 @@ class WrappedOsc():
 
     @staticmethod
     @njit(nogil=True, fastmath=True)
-    def blit_saw(outdata, buffer, write_heads, states, integrators, hermite_interpolate,
+    def blit_saw(outdata, states, integrators,
                  walk_mod, walk_amt, pitch_mod, det_mod, amp_mod, pm_amt, dm_amt, am_amt, amp=1.0, freq=440.0):
         frames = len(outdata)
-        buffer_len = len(buffer)
         base_inc = freq*oneoverfs
         for n in range(0, frames):
             for c in range(0, 2):
-                increment = base_inc + base_inc*pitch_mod[n]*pm_amt + max_det_inc*walk_mod[n]*walk_amt + max_det_inc*det_mod[n]*dm_amt
-                increment = max(1e-9, increment)
-                period = 1/increment
-                new_freq = increment*fs
+                mod_inc = base_inc + base_inc*pitch_mod[n]*pm_amt + max_det_inc*walk_mod[n]*walk_amt + max_det_inc*det_mod[n]*dm_amt
+                new_freq = max(1e-9, mod_inc)*fs
                 harmonics = 2*int(nyquist/new_freq) + 1
                 phase = states[c, 0]
-                leak_c = 1.0 - twopi*increment*.1
+                leak_c = 1.0 - twopi*mod_inc*.1
                 kernel_den = math.sin(np.pi*phase)
                 if phase < .0000001:
                     slope = 1.0-harmonics
                 else:
                     slope = 1.0-math.sin(np.pi*harmonics*phase)/kernel_den
-                slope *= increment*2
+                slope *= mod_inc*2
                 integrators[0, c] = integrators[0, c]*leak_c + slope
-                states[c, 0] += increment
+                states[c, 0] += mod_inc
                 states[c, 0] -= np.floor(states[c, 0])
 
-                buffer[write_heads[0, c], c] = integrators[0, c]
-                base_delay = period + 2.0
-                total_delay = base_delay
-                int_offset = np.floor(total_delay)
-                frac_offset = total_delay - int_offset
-                read_head = write_heads[0, c] - int(int_offset)
-                read_head = read_head % buffer_len
-                y0_index = read_head-1
-                if y0_index < 0:
-                    y0_index += buffer_len
-                y2_index = read_head+1
-                if y2_index >= buffer_len:
-                    y2_index -= buffer_len
-                y3_index = read_head+2
-                if y3_index >= buffer_len:
-                    y3_index -= buffer_len
+                output_sample = integrators[0, c]
                 mod_amp = max(-1.0, min(1.0, amp + amp_mod[n]*am_amt))
-                outdata[n, c] = hermite_interpolate(buffer[y0_index, c], buffer[read_head, c], buffer[y2_index, c], buffer[y3_index, c], frac_offset)*mod_amp
-                write_heads[0, c] += 1
-                if write_heads[0, c] >= buffer_len:
-                    write_heads[0, c] -= buffer_len
+                outdata[n, c] = output_sample*mod_amp
 
     @staticmethod
     @njit(nogil=True, fastmath=True)
-    def blit_pulse(outdata, buffer, write_heads, states, integrators, hermite_interpolate, smoothed_widths,
+    def blit_pulse(outdata, states, integrators, smoothed_widths,
                     walk_mod, walk_amt, pitch_mod, det_mod, amp_mod, width_mod, pm_amt, dm_amt, am_amt, wm_amt, amp=1.0, freq=440.0, width=0.5):
         frames = len(outdata)
-        buffer_len = len(buffer)
         base_inc = freq*oneoverfs
         alpha = 1.0 - math.exp(-twopi*50.0*oneoverfs)
         leak_c = .9995
         for n in range(0, frames):
             for c in range(0, 2):
-                increment = base_inc + base_inc*pitch_mod[n]*pm_amt + max_det_inc*walk_mod[n]*walk_amt + max_det_inc*det_mod[n]*dm_amt
-                increment = max(1e-9, increment)
-                period = 1/increment
-                new_freq = increment*fs
+                mod_inc = base_inc + base_inc*pitch_mod[n]*pm_amt + max_det_inc*walk_mod[n]*walk_amt + max_det_inc*det_mod[n]*dm_amt
+                new_freq = max(1e-9, mod_inc)*fs
                 harmonics = 2*int(nyquist/new_freq) + 1
                 new_width = max(0.0, min(1.0, width + width_mod[n]*wm_amt))
                 smoothed_widths[0, c] += alpha*(new_width - smoothed_widths[0, c])
@@ -253,42 +229,25 @@ class WrappedOsc():
                 phase2 -= np.floor(phase2)
                 kernel_den_1 = math.sin(np.pi*phase1)
                 kernel_den_2 = math.sin(np.pi*phase2)
-                if phase1 < .0000001:
+                if phase1 < 1e-9:
                     slope1 = 1.0-harmonics
                 else:
                     slope1 = 1.0-math.sin(np.pi*harmonics*phase1)/kernel_den_1
-                if phase2 < .0000001:
+                if phase2 < 1e-9:
                     slope2 = 1.0-harmonics
                 else:
                     slope2 = 1.0-math.sin(np.pi*harmonics*phase2)/kernel_den_2
-                slope1 *= increment*2
-                slope2 *= increment*2
+                slope1 *= mod_inc*2
+                slope2 *= mod_inc*2
                 integrators[0, c] = integrators[0, c]*leak_c + slope1
                 integrators[1, c] = integrators[1, c]*leak_c + slope2
-                states[c, 0] += increment
+                states[c, 0] += mod_inc
                 states[c, 0] -= np.floor(states[c, 0])
 
-                buffer[write_heads[0, c], c] = integrators[0, c] - integrators[1, c]
-                base_delay = period + 2.0
-                total_delay = base_delay
-                int_offset = np.floor(total_delay)
-                frac_offset = total_delay - int_offset
-                read_head = write_heads[0, c] - int(int_offset)
-                read_head = read_head % buffer_len
-                y0_index = read_head-1
-                if y0_index < 0:
-                    y0_index += buffer_len
-                y2_index = read_head+1
-                if y2_index >= buffer_len:
-                    y2_index -= buffer_len
-                y3_index = read_head+2
-                if y3_index >= buffer_len:
-                    y3_index -= buffer_len
+                output_sample = integrators[0, c] - integrators[1, c]
                 mod_amp = max(-1.0, min(1.0, amp + amp_mod[n]*am_amt))
-                outdata[n, c] = hermite_interpolate(buffer[y0_index, c], buffer[read_head, c], buffer[y2_index, c], buffer[y3_index, c], frac_offset)*mod_amp
-                write_heads[0, c] += 1
-                if write_heads[0, c] >= buffer_len:
-                    write_heads[0, c] -= buffer_len
+                outdata[n, c] = output_sample*mod_amp
+                
 
     @staticmethod
     @njit(nogil=True, fastmath=True)
