@@ -27,8 +27,6 @@ test_out = np.zeros((128), dtype=np.float32)
 test_blit_integrators = np.zeros((1, 2), dtype=np.float32)
 test_blit_states = np.array([[0.0, 0.5, .001], [0.0, 0.5, .001]], dtype=np.float32)
 test_blit_out = np.zeros((16, 2), dtype=np.float32)
-test_blit_buffer = np.zeros((8192, 2))
-test_blit_buffer_write = np.zeros((1, 2), dtype=np.int32)
 test_smoothed_widths = np.zeros((1, 2), dtype=np.float32)
 f32_increment = np.float32(0.1)
 f32_offset = np.float32(0.0)
@@ -39,9 +37,9 @@ WrappedOsc.generate_walk(walk_test, walk_test_state)
 WrappedOsc.generate_sine(osc_test, np.zeros((16, 2), dtype=np.float32), walk_test, 1.0, mod_test, mod_test, mod_test, 0, 0, 0)
 WrappedOsc.polyblep_saw(osc_test, np.zeros((16, 2), dtype=np.float32), walk_test, 1.0, mod_test, mod_test, mod_test, 0, 0, 0)
 WrappedOsc.polyblep_pulse(osc_test, np.zeros((16, 2), dtype=np.float32), osc2_test, 0.5, walk_test, 1.0, mod_test, mod_test, mod_test, mod_test, 0, 0, 0, 0)
-WrappedOsc.blit_saw(test_blit_out, test_blit_buffer, test_blit_buffer_write, test_blit_states, test_blit_integrators, WrappedOsc.hermite_interpolate, 
+WrappedOsc.blit_saw(test_blit_out, test_blit_states, test_blit_integrators,
                     walk_test, 1.0, mod_test, mod_test, mod_test, 0, 0, 0, 0.5, 440.0)
-WrappedOsc.blit_pulse(test_blit_out, test_blit_buffer, test_blit_buffer_write, test_blit_states, test_blit_integrators, WrappedOsc.hermite_interpolate, test_smoothed_widths,
+WrappedOsc.blit_pulse(test_blit_out, test_blit_states, test_blit_integrators, test_smoothed_widths,
                     walk_test, 1.0, mod_test, mod_test, mod_test, mod_test, 0, 0, 0, 0, 0.5, 440.0, 0.5)
 HalSVF.filter_block(filt_test, np.zeros((16, 2), dtype=np.float32), np.zeros((16, 2), dtype=np.float32), np.ones((16, 2), dtype=np.float32), 0.0, HalSVF.clip_sample, 100,
                     mod_test, mod_test, mod_test, mod_test, mod_test, 0, 0, 0, 0, 0)
