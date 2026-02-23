@@ -49,7 +49,7 @@ is there anything else?
 
 
 how can i play it?
-* [v0.2.1](https://github.com/rainbow-carrots/subsnake/releases/tag/v0.2.1) is the latest build
+* [v0.2.2](https://github.com/rainbow-carrots/subsnake/releases/tag/v0.2.2) is the latest build
 * click on the version that corresponds to your platform to download the zip, extract, & run! if it doesn't open:
     * __on linux__: right click the file, go to *Properties* -> *Permissions*, and make sure "Allow executing file as program" is checked 
     * __on macos__: you'll need to [authorize the app](https://support.apple.com/guide/mac-help/open-a-mac-app-from-an-unknown-developer-mh40616/mac) when running it for the first time. go to *System Settings* -> *Privacy & Security*, scroll down to the bottom, and choose *Open anyway* (under *Security*)
@@ -63,7 +63,6 @@ what's on the docket?
 * configurable velocity for PC keyboard note events (currently fixed at 127)
 * recorder settings panel
     * interface for fine tuning loop start/end points
-    * allow saving of recorder buffer to (wav) file
 * synth settings panel
     * voice stacking & spread
     * filter key tracking
