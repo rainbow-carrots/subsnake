@@ -73,6 +73,8 @@ class PatchManager(QGroupBox):
         self.factory_patch_names = []
         self.user_patch_path = Path(user_data_dir("subsnake", "rainbow-carrots")) / "patches"
         self.user_patch_names = []
+        self.dev_patch_path = self.factory_patch_path
+        self.dev_patch_mode = True
 
         #ensure user patch directory exists
         self.check_user_dir()
@@ -83,10 +85,11 @@ class PatchManager(QGroupBox):
                 filename = patch.name.removesuffix(".json")
                 self.factory_patch_names.append(filename)
 
-        for patch in self.user_patch_path.iterdir():
-            if patch.is_file() and patch.name.endswith(".json"):
-                filename = patch.name.removesuffix(".json")
-                self.user_patch_names.append(filename)
+        if not self.dev_patch_mode:
+            for patch in self.user_patch_path.iterdir():
+                if patch.is_file() and patch.name.endswith(".json"):
+                    filename = patch.name.removesuffix(".json")
+                    self.user_patch_names.append(filename)
         
         sorted_patches = sorted(list(set(self.factory_patch_names + self.user_patch_names)))
         self.patch_select.addItems(sorted_patches)
@@ -97,7 +100,7 @@ class PatchManager(QGroupBox):
 
     def load_patch(self, patch_name):
         patch_file = patch_name + ".json"
-        if patch_name in self.user_patch_names:
+        if patch_name in self.user_patch_names and not self.dev_patch_mode:
             patch_path = self.user_patch_path / patch_file
         else:
             patch_path = Path(self.factory_patch_path / patch_file)
@@ -108,11 +111,14 @@ class PatchManager(QGroupBox):
     def create_patch(self):
         if self.patch_dialog.exec():
             new_name = self.patch_dialog.get_name()
-            if new_name not in self.user_patch_names:
+            if new_name not in self.user_patch_names and not self.dev_patch_mode:
                     self.user_patch_names.append(new_name)
             if (new_name != ""):
                 new_filename = new_name + ".json"
-                new_path = self.user_patch_path / new_filename
+                if not self.dev_patch_mode:
+                    new_path = self.user_patch_path / new_filename
+                else :
+                    new_path = self.dev_patch_path / new_filename
                 with new_path.open("w") as f:
                     json.dump(self.default_patch, f, indent=4)
                 self.patch_select.blockSignals(True)
@@ -124,10 +130,13 @@ class PatchManager(QGroupBox):
 
     def save_patch_data(self):
         new_name = self.patch_select.currentText()
-        if new_name not in self.user_patch_names:
+        if new_name not in self.user_patch_names and not self.dev_patch_mode:
             self.user_patch_names.append(new_name)
         new_filename = new_name + ".json"
-        new_path = self.user_patch_path / new_filename
+        if not self.dev_patch_mode:
+            new_path = self.user_patch_path / new_filename
+        else:
+            new_path = self.dev_patch_path / new_filename
         self.update_patch()
         with new_path.open("w") as f:
             json.dump(self.current_patch, f, indent=4)
