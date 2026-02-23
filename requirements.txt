@@ -12,3 +12,4 @@ python-rtmidi==1.5.8
 shiboken6==6.10.1
 sounddevice==0.5.3
 platformdirs==4.5.1
+soundfile==0.13.1
