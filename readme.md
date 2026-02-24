@@ -9,11 +9,12 @@ what does it do? well, i'm very glad you asked.
 * it has 16 voices of polyphony
 * it supports midi (input)
 * it can save & load patches
+* it can record, overdub, play, loop, & save audio
 * it can make a fine espresso
 
 
 what's in a voice?
-* 3 sine, sawtooth, or pulse oscillators (+ PWM) with pitch, detune & level controls
+* 3 sine, triangle (+ PWM), sawtooth, or pulse (+ PWM) oscillators with pitch, detune & level controls
 * 1 state-variable filter - using an oversampled Chamberlin topology with feedback, saturation & drive
 * 2 ADSR envelopes - one for amplitude, one for filter frequency (with bipolar depth control)
 * 4 modulators - 2 LFOs, 2 envelopes, with dedicated assignable attenuverters for every₁ parameter
@@ -46,10 +47,12 @@ is there anything else?
 * the keys A-' are mapped chromatically and can trigger note events (fixed velocity)
     * you can shift the pc keyboard octave range up/down using the +/- keys
 * to switch between oscillator types (BLIT/polyBLEP), *right click* the oscillator title box
+    * currently only applies to sawtooth & pulse wave selections (triangle is BLIT-only; sine is a sine)
+* changing the width of the triangle wave morphs the waveform from a sawtooth (w≈0.0), through a triangle (w=0.5), to a ramp (w≈1.0)
 
 
 how can i play it?
-* [v0.2.2](https://github.com/rainbow-carrots/subsnake/releases/tag/v0.2.2) is the latest build
+* [v0.2.3](https://github.com/rainbow-carrots/subsnake/releases/tag/v0.2.3) is the latest build
 * click on the version that corresponds to your platform to download the zip, extract, & run! if it doesn't open:
     * __on linux__: right click the file, go to *Properties* -> *Permissions*, and make sure "Allow executing file as program" is checked 
     * __on macos__: you'll need to [authorize the app](https://support.apple.com/guide/mac-help/open-a-mac-app-from-an-unknown-developer-mh40616/mac) when running it for the first time. go to *System Settings* -> *Privacy & Security*, scroll down to the bottom, and choose *Open anyway* (under *Security*)
@@ -60,12 +63,11 @@ how can i play it?
 
 what's on the docket?
 * save & auto-restore midi settings on load (channel, cc's, parameter mappings)
-* configurable velocity for PC keyboard note events (currently fixed at 127)
 * recorder settings panel
     * interface for fine tuning loop start/end points
 * synth settings panel
+    * pc keyboard velocity
     * voice stacking & spread
-    * filter key tracking
 * stereo delay
     * add ping pong & dampening parameters
 * allow UI theming & saving/loading of themes
