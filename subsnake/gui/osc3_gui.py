@@ -75,6 +75,7 @@ class Oscillator3GUI(QGroupBox):
 
         #radio buttons
         self.osc3_alg_sin = QRadioButton("sine")
+        self.osc3_alg_tri = QRadioButton("triangle")
         self.osc3_alg_saw = QRadioButton("saw")
         self.osc3_alg_pulse = QRadioButton("pulse")
         self.osc3_alg_pulse.setChecked(True)
@@ -82,6 +83,7 @@ class Oscillator3GUI(QGroupBox):
         #button groups
         self.osc3_alg_group = QButtonGroup()
         self.osc3_alg_group.addButton(self.osc3_alg_sin)
+        self.osc3_alg_group.addButton(self.osc3_alg_tri)
         self.osc3_alg_group.addButton(self.osc3_alg_saw)
         self.osc3_alg_group.addButton(self.osc3_alg_pulse)
 
@@ -113,6 +115,8 @@ class Oscillator3GUI(QGroupBox):
         #add radio buttons
         osc3_buttons.addStretch()
         osc3_buttons.addWidget(self.osc3_alg_sin)
+        osc3_buttons.addStretch()
+        osc3_buttons.addWidget(self.osc3_alg_tri)
         osc3_buttons.addStretch()
         osc3_buttons.addWidget(self.osc3_alg_saw)
         osc3_buttons.addStretch()
@@ -156,6 +160,8 @@ class Oscillator3GUI(QGroupBox):
     def update_wave(self, new_wave):
         if new_wave == "sine":
             self.osc3_alg_sin.setChecked(True)
+        elif new_wave == "triangle":
+            self.osc3_alg_tri.setChecked(True)
         elif new_wave == "saw":
             self.osc3_alg_saw.setChecked(True)
         elif new_wave == "pulse":
