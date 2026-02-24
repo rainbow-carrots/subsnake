@@ -287,6 +287,10 @@ class AudioEngine():
         for voice in self.voices:
               voice.filt.update_saturate(newSat)
 
+    def update_key_tracking(self, newTrack):
+        for voice in self.voices:
+            voice.filt.update_key_tracking(newTrack)
+
     # envelope
     def update_gate(self, newGate):
         for voice in self.voices:
