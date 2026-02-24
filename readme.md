@@ -57,7 +57,7 @@ how can i play it?
     * __on linux__: right click the file, go to *Properties* -> *Permissions*, and make sure "Allow executing file as program" is checked 
     * __on macos__: you'll need to [authorize the app](https://support.apple.com/guide/mac-help/open-a-mac-app-from-an-unknown-developer-mh40616/mac) when running it for the first time. go to *System Settings* -> *Privacy & Security*, scroll down to the bottom, and choose *Open anyway* (under *Security*)
     * __on windows__: click *More info* on the smartscreen popup and choose *Run anyway* 
-* **note**: this project is in active development. you probably will encounter bugs.
+* **note**: this project is in active development. though i test every build prior to release, you may still encounter bugs.
     * if you do spot something, [let me know](https://github.com/rainbow-carrots/subsnake/issues)
 
 
