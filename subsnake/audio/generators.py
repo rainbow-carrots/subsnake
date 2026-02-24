@@ -23,7 +23,7 @@ class WrappedOsc():
         self.random_walk = np.zeros((2048), dtype=np.float32)
         self.walk_state = np.zeros((1), dtype=np.float32)
         self.walk_amt = 0.0
-        self.blit_integrators = np.zeros((2, 2), dtype=np.float32)
+        self.blit_integrators = np.zeros((3, 2), dtype=np.float32)
         self.blit_states = np.array([[0.0, amplitude, phase_increment], [0.0, amplitude, phase_increment]], dtype=np.float32)
         self.blit_buffer = np.zeros((8192, 2))
         self.blit_buffer_read = np.zeros((1, 2), dtype=np.float32)
@@ -55,6 +55,9 @@ class WrappedOsc():
             elif (self.alg_type == 1):
                 self.polyblep_pulse(self.state, buffer, self.state2, self.pulsewidth, self.random_walk, self.walk_amt,
                                     mod_buffers[0], mod_buffers[1], mod_buffers[2], mod_buffers[3], mod_values[0], mod_values[1], mod_values[2], mod_values[3], self.amp, self.freq)
+        elif (self.alg == 3.0):
+            self.blit_triangle(buffer, self.blit_states, self.blit_integrators, self.smoothed_widths,
+                          self.random_walk[:frames], self.walk_amt, mod_buffers[0], mod_buffers[1], mod_buffers[2], mod_buffers[3], mod_values[0], mod_values[1], mod_values[2], mod_values[3], self.amp, self.freq, self.pulsewidth)
 
 
     def update_pitch(self, newPitch):
@@ -95,7 +98,7 @@ class WrappedOsc():
             if (state[0] > twopi):
                 state[0] -= twopi
 
-    #anti-aliased sawtooth
+    #anti-aliased sawtooth (polyBLEP)
     @staticmethod
     @njit(nogil=True, fastmath=True)
     def polyblep_saw(state, outdata, walk_mod, walk_amt, pitch_mod, det_mod, amp_mod, pm_amt, dm_amt, am_amt, amp=1.0, freq=440.0):
@@ -126,7 +129,7 @@ class WrappedOsc():
             outdata[n, 0] = sample*(amp - amp_mod[n]*am_amt)
             outdata[n, 1] = sample*(amp - amp_mod[n]*am_amt)
 
-    #anti-aliased pulse
+    #anti-aliased pulse (polyBLEP)
     @staticmethod
     @njit(nogil=True, fastmath=True)
     def polyblep_pulse(state, outdata, state2, width, walk_mod, walk_amt, pitch_mod, det_mod, amp_mod, width_mod, pm_amt, dm_amt, am_amt, wm_amt, amp=1.0, freq=440.0):
@@ -172,6 +175,7 @@ class WrappedOsc():
             outdata[n, 0] = sample*(amp - amp_mod[n]*am_amt)
             outdata[n, 1] = sample*(amp - amp_mod[n]*am_amt)
 
+    #random walk generator
     @staticmethod
     @njit(nogil=True, fastmath=True)
     def generate_walk(output, walk_state):
@@ -181,6 +185,7 @@ class WrappedOsc():
             walk_state[0] = walk_state[0]*.99999 + .00001*walk_offset
             output[n] = walk_state[0]
 
+    #anti-aliased sawtooth (BLIT)
     @staticmethod
     @njit(nogil=True, fastmath=True)
     def blit_saw(outdata, states, integrators,
@@ -208,6 +213,7 @@ class WrappedOsc():
                 mod_amp = max(-1.0, min(1.0, amp + amp_mod[n]*am_amt))
                 outdata[n, c] = output_sample*mod_amp
 
+    #anti-aliased pulse (BLIT)
     @staticmethod
     @njit(nogil=True, fastmath=True)
     def blit_pulse(outdata, states, integrators, smoothed_widths,
@@ -247,8 +253,53 @@ class WrappedOsc():
                 output_sample = integrators[0, c] - integrators[1, c]
                 mod_amp = max(-1.0, min(1.0, amp + amp_mod[n]*am_amt))
                 outdata[n, c] = output_sample*mod_amp
-                
 
+    #anti-aliased trisaw (BLIT)
+    # (width=0.5: triangle, width≈0.0: sawtooth, width≈1.0: ramp)
+    @staticmethod
+    @njit(nogil=True, fastmath=True)
+    def blit_triangle(outdata, states, integrators, smoothed_widths,
+                    walk_mod, walk_amt, pitch_mod, det_mod, amp_mod, width_mod, pm_amt, dm_amt, am_amt, wm_amt, amp=1.0, freq=440.0, width=0.5):
+        frames = len(outdata)
+        base_inc = freq*oneoverfs
+        alpha = 1.0 - math.exp(-twopi*50.0*oneoverfs)
+        for n in range(0, frames):
+            for c in range(0, 2):
+                mod_inc = base_inc + base_inc*pitch_mod[n]*pm_amt + max_det_inc*walk_mod[n]*walk_amt + max_det_inc*det_mod[n]*dm_amt
+                new_freq = max(1e-9, mod_inc)*fs
+                harmonics = 2*int(nyquist/new_freq) + 1
+                new_width = max(.001, min(.999, width + width_mod[n]*wm_amt))
+                smoothed_widths[0, c] += alpha*(new_width - smoothed_widths[0, c])
+                smoothed_width = smoothed_widths[0, c]
+                phase1 = states[c, 0]
+                phase2 = phase1 + smoothed_width
+                phase2 -= np.floor(phase2)
+                leak_c = 1.0 - twopi*mod_inc*.1
+                kernel_den_1 = math.sin(np.pi*phase1)
+                kernel_den_2 = math.sin(np.pi*phase2)
+                if phase1 < 1e-9:
+                    slope1 = 1.0-harmonics
+                else:
+                    slope1 = 1.0-math.sin(np.pi*harmonics*phase1)/kernel_den_1
+                if phase2 < 1e-9:
+                    slope2 = 1.0-harmonics
+                else:
+                    slope2 = 1.0-math.sin(np.pi*harmonics*phase2)/kernel_den_2
+                slope1 *= mod_inc*2
+                slope2 *= mod_inc*2
+                integrators[0, c] = integrators[0, c]*leak_c + slope1
+                integrators[1, c] = integrators[1, c]*leak_c + slope2
+                states[c, 0] += mod_inc
+                states[c, 0] -= np.floor(states[c, 0])
+
+                blit_pulse = (integrators[0, c] - integrators[1, c])
+                integrators[2, c] = integrators[2, c]*leak_c + blit_pulse
+                scale = (mod_inc)/(smoothed_width*(1.0 - smoothed_width))
+                output_sample = integrators[2, c]*scale
+                mod_amp = max(-1.0, min(1.0, amp + amp_mod[n]*am_amt))
+                outdata[n, c] = output_sample*mod_amp
+                
+    #interpolation (catmull-rom)
     @staticmethod
     @njit(nogil=True, fastmath=True)
     def hermite_interpolate(y0, y1, y2, y3, frac):
