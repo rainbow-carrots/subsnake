@@ -859,6 +859,8 @@ class MainWindow(QMainWindow):
     def update_osc_alg(self, text):
         if (text == "sine"):
             newAlg = 0.0
+        elif (text == "triangle"):
+            newAlg = 3.0
         elif (text == "saw"):
             newAlg = 1.0
         elif (text == "pulse"):
@@ -881,6 +883,8 @@ class MainWindow(QMainWindow):
     def update_osc2_alg(self, text):
         if (text == "sine"):
             newAlg = 0.0
+        elif (text == "triangle"):
+            newAlg = 3.0
         elif (text == "saw"):
             newAlg = 1.0
         elif (text == "pulse"):
@@ -903,6 +907,8 @@ class MainWindow(QMainWindow):
     def update_osc3_alg(self, text):
         if (text == "sine"):
             newAlg = 0.0
+        elif (text == "triangle"):
+            newAlg = 3.0
         elif (text == "saw"):
             newAlg = 1.0
         elif (text == "pulse"):
