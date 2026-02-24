@@ -24,7 +24,7 @@ filt_test = np.array([[0.0, 0.0, 1.0, 2.0, 0.0, 1.0, 8.0], [0.0, 0.0, 1.0, 2.0, 
 env_test = np.array([0.0, 0.0, 1.0, 1.0, 0.5, 1.0], dtype=np.float32)
 phase_test = np.zeros((1), dtype=np.float32)
 test_out = np.zeros((128), dtype=np.float32)
-test_blit_integrators = np.zeros((1, 2), dtype=np.float32)
+test_blit_integrators = np.zeros((3, 2), dtype=np.float32)
 test_blit_states = np.array([[0.0, 0.5, .001], [0.0, 0.5, .001]], dtype=np.float32)
 test_blit_out = np.zeros((16, 2), dtype=np.float32)
 test_smoothed_widths = np.zeros((1, 2), dtype=np.float32)
@@ -40,6 +40,8 @@ WrappedOsc.polyblep_pulse(osc_test, np.zeros((16, 2), dtype=np.float32), osc2_te
 WrappedOsc.blit_saw(test_blit_out, test_blit_states, test_blit_integrators,
                     walk_test, 1.0, mod_test, mod_test, mod_test, 0, 0, 0, 0.5, 440.0)
 WrappedOsc.blit_pulse(test_blit_out, test_blit_states, test_blit_integrators, test_smoothed_widths,
+                    walk_test, 1.0, mod_test, mod_test, mod_test, mod_test, 0, 0, 0, 0, 0.5, 440.0, 0.5)
+WrappedOsc.blit_triangle(test_blit_out, test_blit_states, test_blit_integrators, test_smoothed_widths,
                     walk_test, 1.0, mod_test, mod_test, mod_test, mod_test, 0, 0, 0, 0, 0.5, 440.0, 0.5)
 HalSVF.filter_block(filt_test, np.zeros((16, 2), dtype=np.float32), np.zeros((16, 2), dtype=np.float32), np.ones((16, 2), dtype=np.float32), 0.0, HalSVF.clip_sample, 100,
                     mod_test, mod_test, mod_test, mod_test, mod_test, 0, 0, 0, 0, 0)
