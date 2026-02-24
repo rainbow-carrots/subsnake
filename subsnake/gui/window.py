@@ -373,6 +373,7 @@ class MainWindow(QMainWindow):
 
         # synth settings
         self.synth_group.drift_changed.connect(self.update_osc_drift)
+        self.synth_group.key_tracking_changed.connect(self.update_key_tracking)
 
         self.setCentralWidget(window_widget)
 
@@ -440,6 +441,7 @@ class MainWindow(QMainWindow):
         self.param_sliders.update({"filt_res": self.filt_group.filt_res_slider})
         self.param_sliders.update({"filt_drive": self.filt_group.filt_drive_slider})
         self.param_sliders.update({"filt_sat": self.filt_group.filt_sat_slider})
+        self.param_sliders.update({"filt_track": self.synth_group.key_tracking_slider})
 
         self.param_sliders.update({"fenv_att": self.fenv_group.fenv_att_slider})
         self.param_sliders.update({"fenv_dec": self.fenv_group.fenv_dec_slider})
@@ -694,6 +696,7 @@ class MainWindow(QMainWindow):
         self.set_palette(self.mod_group.menv_rel_display_2)
         #synth settings
         self.set_palette(self.synth_group.drift_display)
+        self.set_palette(self.synth_group.key_tracking_display)
 
     #slots
     # toggle dark mode
@@ -832,6 +835,9 @@ class MainWindow(QMainWindow):
         elif (text == "notch"):
             newAlg = 3.0
         self.engine.update_type(newAlg)
+
+    def update_key_tracking(self, value):
+        self.engine.update_key_tracking(value)
 
     # oscillator drift
     def update_osc_drift(self, value):
