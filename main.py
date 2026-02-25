@@ -30,19 +30,19 @@ test_blit_out = np.zeros((16, 2), dtype=np.float32)
 test_smoothed_widths = np.zeros((1, 2), dtype=np.float32)
 f32_increment = np.float32(0.1)
 f32_offset = np.float32(0.0)
-f32_attack_c = np.float32(0.1)
-f32_release_c = np.float32(0.1)
+f64_attack_c = 0.1
+f64_release_c = 0.1
 f32_threshold = np.float32(.001)
 WrappedOsc.generate_walk(walk_test, walk_test_state)
-WrappedOsc.generate_sine(osc_test, np.zeros((16, 2), dtype=np.float32), walk_test, 1.0, mod_test, mod_test, mod_test, 0, 0, 0)
-WrappedOsc.polyblep_saw(osc_test, np.zeros((16, 2), dtype=np.float32), walk_test, 1.0, mod_test, mod_test, mod_test, 0, 0, 0)
-WrappedOsc.polyblep_pulse(osc_test, np.zeros((16, 2), dtype=np.float32), osc2_test, 0.5, walk_test, 1.0, mod_test, mod_test, mod_test, mod_test, 0, 0, 0, 0)
+WrappedOsc.generate_sine(osc_test, np.zeros((16, 2), dtype=np.float32), walk_test, 1.0, mod_test, mod_test, mod_test, 0.0, 0.0, 0.0, 1.0, 440.0)
+WrappedOsc.polyblep_saw(osc_test, np.zeros((16, 2), dtype=np.float32), walk_test, 1.0, mod_test, mod_test, mod_test, 0.0, 0.0, 0.0, 1.0, 440.0)
+WrappedOsc.polyblep_pulse(osc_test, np.zeros((16, 2), dtype=np.float32), osc2_test, 0.5, walk_test, 1.0, mod_test, mod_test, mod_test, mod_test, 0.0, 0.0, 0.0, 0.0, 1.0, 440.0)
 WrappedOsc.blit_saw(test_blit_out, test_blit_states, test_blit_integrators,
-                    walk_test, 1.0, mod_test, mod_test, mod_test, 0, 0, 0, 0.5, 440.0)
+                    walk_test, 1.0, mod_test, mod_test, mod_test, 0.0, 0.0, 0.0, 0.5, 440.0)
 WrappedOsc.blit_pulse(test_blit_out, test_blit_states, test_blit_integrators, test_smoothed_widths,
-                    walk_test, 1.0, mod_test, mod_test, mod_test, mod_test, 0, 0, 0, 0, 0.5, 440.0, 0.5)
+                    walk_test, 1.0, mod_test, mod_test, mod_test, mod_test, 0.0, 0.0, 0.0, 0.0, 0.5, 440.0, 0.5)
 WrappedOsc.blit_triangle(test_blit_out, test_blit_states, test_blit_integrators, test_smoothed_widths,
-                    walk_test, 1.0, mod_test, mod_test, mod_test, mod_test, 0, 0, 0, 0, 0.5, 440.0, 0.5)
+                    walk_test, 1.0, mod_test, mod_test, mod_test, mod_test, 0.0, 0.0, 0.0, 0.0, 0.5, 440.0, 0.5)
 HalSVF.filter_block(filt_test, np.zeros((16, 2), dtype=np.float32), np.zeros((16, 2), dtype=np.float32), np.ones((16, 2), dtype=np.float32), 0.0, HalSVF.clip_sample, 100.0, 100.0, 0.0,
                     mod_test, mod_test, mod_test, mod_test, mod_test, 0, 0, 0, 0, 0)
 ADSR.envelope_block(env_test, False, np.zeros((16, 2), dtype=np.float32), np.zeros((16, 2), dtype=np.float32), 0, 0, mod_test, mod_test, mod_test, mod_test, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1)
@@ -57,11 +57,11 @@ LFO.generate_sawtooth(phase_test, f32_increment, f32_offset, test_out, mod_test,
 LFO.generate_square(phase_test, f32_increment, f32_offset, test_out, 0.5, mod_test, mod_test, 0.0, 0.0)
 LFO.sample_and_hold(phase_test, f32_increment, test_out, np.zeros((1), dtype=np.float32), mod_test, 0.0)
 ModEnv.gen_AR_oneshot(np.zeros((1), dtype=np.float32), np.zeros((1), dtype=np.int32), True, np.zeros((1), dtype=np.int32),
-                      f32_attack_c, f32_release_c, f32_threshold, np.zeros((16), dtype=np.float32), 0, 0, mod_test, mod_test, 0.0, 0.0)
+                      f64_attack_c, f64_release_c, f32_threshold, np.zeros((16), dtype=np.float32), 0, 0, mod_test, mod_test, 0.0, 0.0)
 ModEnv.gen_AR_loop(np.zeros((1), dtype=np.float32), np.zeros((1), dtype=np.int32), True,
-                   f32_attack_c, f32_release_c, f32_threshold, np.zeros((16), dtype=np.float32), 0, 0, mod_test, mod_test, 0.0, 0.0)
-ModEnv.gen_AHR(np.zeros((1), dtype=np.float32), np.zeros((1), dtype=np.float32), True,
-               f32_attack_c, f32_release_c, f32_threshold, np.zeros((16), dtype=np.float32), 0, 0, mod_test, mod_test, 0.0, 0.0)
+                   f64_attack_c, f64_release_c, f32_threshold, np.zeros((16), dtype=np.float32), 0, 0, mod_test, mod_test, 0.0, 0.0)
+ModEnv.gen_AHR(np.zeros((1), dtype=np.float32), np.zeros((1), dtype=np.int32), True,
+               f64_attack_c, f64_release_c, f32_threshold, np.zeros((16), dtype=np.float32), 0, 0, mod_test, mod_test, 0.0, 0.0)
 
 
 #get midi inputs & channels
