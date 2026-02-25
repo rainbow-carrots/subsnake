@@ -132,6 +132,30 @@ class AudioEngine():
             outdata += self.voice_output[:frames]
         self.recorder.process_block(outdata, self.recorder_output)
         outdata += self.recorder_output[:frames]
+
+        # delay modulators (self/cross modulated)
+        #  lfo 1
+        lfo1_mod_buffers = [self.assign_mod_buffer(self.mod_dial_modes["lfo1_freq"])]
+        lfo1_mod_buffers.append(self.assign_mod_buffer(self.mod_dial_modes["lfo1_phase"]))
+        lfo1_mod_values = [self.mod_dial_values["lfo1_freq"], self.mod_dial_values["lfo1_phase"]]
+        self.delay_modulators[0].process_block(frames, lfo1_mod_buffers, lfo1_mod_values)
+        # lfo 2
+        lfo2_mod_buffers = [self.assign_mod_buffer(self.mod_dial_modes["lfo2_freq"])]
+        lfo2_mod_buffers.append(self.assign_mod_buffer(self.mod_dial_modes["lfo2_phase"]))
+        lfo2_mod_values = [self.mod_dial_values["lfo2_freq"], self.mod_dial_values["lfo2_phase"]]
+        self.delay_modulators[1].process_block(frames, lfo2_mod_buffers, lfo2_mod_values)
+        # menv 1
+        menv1_mod_buffers = [self.assign_mod_buffer(self.mod_dial_modes["menv1_att"])]
+        menv1_mod_buffers.append(self.assign_mod_buffer(self.mod_dial_modes["menv1_rel"]))
+        menv1_mod_values = [self.mod_dial_values["menv1_att"], self.mod_dial_values["menv1_rel"]]
+        self.delay_modulators[2].process_block(frames, menv1_mod_buffers, menv1_mod_values)
+        # menv 2
+        menv2_mod_buffers = [self.assign_mod_buffer(self.mod_dial_modes["menv2_att"])]
+        menv2_mod_buffers.append(self.assign_mod_buffer(self.mod_dial_modes["menv2_rel"]))
+        menv2_mod_values = [self.mod_dial_values["menv2_att"], self.mod_dial_values["menv2_rel"]]
+        self.delay_modulators[3].process_block(frames, menv2_mod_buffers, menv2_mod_values)
+
+        # delay mod buffers
         del_mod_buffers = [self.assign_mod_buffer(self.mod_dial_modes["del_time"])]
         del_mod_buffers.append(self.assign_mod_buffer(self.mod_dial_modes["del_feedback"]))
         del_mod_buffers.append(self.assign_mod_buffer(self.mod_dial_modes["del_mix"]))
