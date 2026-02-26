@@ -53,7 +53,7 @@ there's also a stereo tape delay effect on the master bus (voice output + record
 
 
 ### how can i play it?
-* [v0.2.3](https://github.com/rainbow-carrots/subsnake/releases/tag/v0.2.3) is the latest build
+* [v0.2.4](https://github.com/rainbow-carrots/subsnake/releases/tag/v0.2.4) is the latest build
 * click on the version that corresponds to your platform to download the zip, extract, & run! if it doesn't open:
     * __on linux__: right click the file, go to *Properties* -> *Permissions*, and make sure "Allow executing file as program" is checked 
     * __on macos__: you'll need to [authorize the app](https://support.apple.com/guide/mac-help/open-a-mac-app-from-an-unknown-developer-mh40616/mac) when running it for the first time. go to *System Settings* -> *Privacy & Security*, scroll down to the bottom, and choose *Open anyway* (under *Security*)
@@ -66,7 +66,8 @@ there's also a stereo tape delay effect on the master bus (voice output + record
 * save & auto-restore midi settings (channel, cc's, parameter mappings)
 * recorder settings panel:
     * controls for adjusting loop start/end points
-    * control to adjust input level
+    * control to change input level (currently fixed)
+    * playback speed control
 * synth settings panel:
     * pc keyboard velocity control
     * voice stacking & spread settings
