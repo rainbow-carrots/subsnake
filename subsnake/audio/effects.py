@@ -6,9 +6,11 @@ import math
 oneoverfs = 1.0/float(44100.0)
 twopi = 2*np.pi
 
+#stereo tape delay
+# 2s circular buffer | single head, single tap
 class StereoDelay():
     def __init__(self, fs, delay_time=0.5, delay_feedback=0.5, mix=.5):
-        samples = fs*2      #2s delay buffer
+        samples = fs*2
         self.fs = fs
         self.buffer = np.zeros((samples, 2), dtype=np.float32)
         self.delay_time = delay_time
@@ -33,7 +35,7 @@ class StereoDelay():
             for n in range(0, frames):
                 #smooth offset
                 offset_smooth[c] = offset_smooth[c]*(1.0 - alpha) + offset_raw*alpha
-                offset_mod = offset_smooth[c] + 44100.0*time_mod[n]*tm_amt
+                offset_mod = offset_smooth[c] + 22050.0*time_mod[n]*tm_amt
                 offset_mod = max(0.0, min(44100.0, offset_mod))
 
                 #calculate read head position & wrap
@@ -77,6 +79,7 @@ class StereoDelay():
     def update_mix(self, new_mix):
         self.mix_level = new_mix
 
+    #interpolator (catmull-rom)
     @staticmethod
     @njit(nogil=True, fastmath=True)
     def hermite_interpolate(y0, y1, y2, y3, frac):
@@ -87,7 +90,8 @@ class StereoDelay():
 
         return ((c3*frac + c2)*frac + c1)*frac + c0
 
-
+#stereo audio recorder/looper
+# 5m rec buffer | 
 class AudioRecorder():
     def __init__(self, fs):
         self.fs = fs
@@ -102,6 +106,10 @@ class AudioRecorder():
         self.event_queue = SimpleQueue()
         self.delete_queue = SimpleQueue()
         self.put_stop = [False]
+        self.input_level = np.float32(1.0)
+        self.input_level_smooth = np.zeros((1, 2), dtype=np.float32)
+        self.output_level_smooth = np.zeros((1, 2), dtype=np.float32)
+        self.rec_gate_smooth = np.zeros((1, 2), dtype=np.float32)
 
     def delete(self):
         self.delete_queue.put("delete")
@@ -123,6 +131,9 @@ class AudioRecorder():
     
     def set_loop(self, loop_flag):
         self.loop = loop_flag
+
+    def set_input_level(self, new_level):
+        self.input_level = np.float32(new_level)
 
     def get_status(self):
         status = (self.stopped, self.paused, self.record)
@@ -161,30 +172,33 @@ class AudioRecorder():
                         self.record[0] = False
                     self.play_heads[:] = 0
             self.process_samples(self.record_buffer, indata, outdata, frames, self.paused, self.stopped,
-                                self.record, self.loop, self.play_heads, self.end_heads, self.put_stop)
+                                self.record, self.loop, self.play_heads, self.end_heads, self.put_stop, self.input_level, self.input_level_smooth, self.output_level_smooth, self.rec_gate_smooth)
         if self.put_stop[0]:
             self.put_stop[0] = False
             self.event_queue.put_nowait("stop")
 
     @staticmethod
     @njit(nogil=True, fastmath=True)
-    def process_samples(rec_buffer, indata, outdata, frames, paused, stopped, record, loop, play_heads, end_heads, put_stop):
+    def process_samples(rec_buffer, indata, outdata, frames, paused, stopped, record, loop, play_heads, end_heads, put_stop, input_level, input_level_smooth, output_level_smooth, rec_gate_smooth):
+        alpha = .001
         for c in range(0, 2):
             for n in range(0, frames):
+                input_level_smooth[0, c] = input_level_smooth[0, c]*(1.0 - alpha) + input_level*alpha
+                output_level_smooth[0, c] = max(0.0, min(1.0, output_level_smooth[0, c]*(1.0 - alpha) + alpha*np.float32(~stopped[0] & ~paused[0])))
+                rec_gate_smooth[0, c] = max(0.0, min(1.0, rec_gate_smooth[0, c]*(1.0 - alpha) + alpha*np.float32(record[0] & ~stopped[0])))
                 if not paused[0] and not stopped[0]:
                     read_sample = rec_buffer[play_heads[c], c]
                     if record[0]:
-                        rec_buffer[play_heads[c], c] += indata[n, c]
+                        rec_buffer[play_heads[c], c] += indata[n, c]*input_level_smooth[0, c]*rec_gate_smooth[0, c]
                     if play_heads[c] < end_heads[c]:
                         play_heads[c] += 1
                     else:
-                        play_heads[0] = 0
-                        play_heads[1] = 0
+                        play_heads[:] = 0
                         if not loop:
                             put_stop[0] = True
                             stopped[0] = True
                             record[0] = False
-                    outdata[n, c] = read_sample
+                    outdata[n, c] = read_sample*output_level_smooth[0, c]
 
 
 
