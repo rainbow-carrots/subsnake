@@ -47,7 +47,7 @@ HalSVF.filter_block(filt_test, np.zeros((16, 2), dtype=np.float32), np.zeros((16
                     mod_test, mod_test, mod_test, mod_test, mod_test, 0, 0, 0, 0, 0)
 ADSR.envelope_block(env_test, False, np.zeros((16, 2), dtype=np.float32), np.zeros((16, 2), dtype=np.float32), 0, 0, mod_test, mod_test, mod_test, mod_test, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1)
 AudioRecorder.process_samples(np.zeros((32, 2), dtype=np.float32), np.zeros((16, 2), dtype=np.float32), np.zeros((16, 2), dtype=np.float32), 0,
-                              [False], [True], [False], False, np.zeros((2), dtype=np.int32), np.zeros((2), dtype=np.int32), [False])
+                              [False], [True], [False], False, np.zeros((2), dtype=np.int32), np.zeros((2), dtype=np.int32), [False], np.float32(1.0), test_smoothed_widths, test_smoothed_widths, test_smoothed_widths)
 StereoDelay.delay_block(np.zeros((32, 2), dtype=np.float32), np.zeros((32, 2), dtype=np.float32), np.zeros((32, 2), dtype=np.float32), 0,
                         np.zeros((2), dtype=np.float32), np.zeros((2), dtype=np.int32), 0.5, 0.5, StereoDelay.hermite_interpolate, mod_test, mod_test, mod_test, 0.0, 0.0, 0.0)
 LFO.generate_sine(phase_test, f32_increment, f32_offset, test_out, mod_test, mod_test, 0.0, 0.0)
