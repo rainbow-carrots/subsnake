@@ -110,7 +110,8 @@ class MainWindow(QMainWindow):
         self.record_group = RecorderSettings()
         self.record_group.setFocusPolicy(Qt.NoFocus)
 
-        self.scope_group = ScopeGUI(self.engine.scope_mutex, self.engine.scope_buffer, self.engine.scope_frames)
+        self.scope_group = ScopeGUI(self.engine.scope_mutex, self.engine.scope_buffer,
+                                    self.engine.scope_frames, self.engine.scope_head)
         self.scope_group.setFocusPolicy(Qt.NoFocus)
 
         self.settings_view = QWidget()
@@ -431,6 +432,7 @@ class MainWindow(QMainWindow):
         self.options_drop_shadow.setColor(color)
         self.patch_drop_shadow.setColor(color)
         self.record_drop_shadow.setColor(color)
+        self.scope_group.scope_glow.setColor(color)
     
     def init_sliders_dict(self):
         self.param_sliders.update({"osc_drift": self.synth_group.drift_slider})
@@ -716,13 +718,17 @@ class MainWindow(QMainWindow):
             self.setStyleSheet(self.dark_style)
             self.display_color = QColor("#dfdfef")
             self.update_drop_shadow_colors(QColor("#b4b4d2"))
-            self.scope_group.scope_pen.setColor(QColor("#b4b4d2"))
+            scope_pen = self.scope_group.scope_path.pen()
+            scope_pen.setColor(QColor("#b4b4d2"))
+            self.scope_group.scope_path.setPen(scope_pen)
             self.toggle_dark.setText("lite")
         else:
             self.setStyleSheet(self.light_style)
             self.display_color = QColor("black")
             self.update_drop_shadow_colors(QColor("#1c0627"))
-            self.scope_group.scope_pen.setColor(QColor("#1c0627"))
+            scope_pen = self.scope_group.scope_path.pen()
+            scope_pen.setColor(QColor("#1c0627"))
+            self.scope_group.scope_path.setPen(scope_pen)
             self.toggle_dark.setText("dark")
         self.set_display_colors()
         
