@@ -80,7 +80,7 @@ class AudioEngine():
         self.midi_channel = None
         self.previous_buffer_dac_time = pytime.perf_counter()
         self.scope_mutex = QMutex()
-        self.scope_buffer = np.zeros((8192, 2), dtype=np.float32)
+        self.scope_buffer = np.zeros((16384, 2), dtype=np.float32)
         self.scope_frames = [0]
         self.scope_head = [0]
         self.scope_buffer_length = len(self.scope_buffer)
