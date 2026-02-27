@@ -382,7 +382,7 @@ QPushButton#cc_delete:hover {
     background-color: #c77581;
 }
 
-QPushButton#toggle_midi, QPushButton#toggle_synth, QPushButton#toggle_record, QPushButton#toggle_dark {
+QPushButton#toggle_midi, QPushButton#toggle_synth, QPushButton#toggle_record, QPushButton#toggle_dark, QPushButton#toggle_scope {
     max-height: 36px;
     color: #000000;
     border: 1px solid white;
@@ -412,6 +412,11 @@ QPushButton#toggle_record {
     min-width: 72px;
 }
 
+QPushButton#toggle_scope {
+    max-width: 56px;
+    min-width: 56px;
+}
+
 QPushButton#toggle_midi:hover {
     background-color: #c1a1d6;
     color: black;
@@ -439,6 +444,16 @@ QPushButton#toggle_record:hover {
 
 QPushButton#toggle_record:checked {
     background-color: #82eaaa;
+    color: black;
+}
+
+QPushButton#toggle_scope:hover {
+    background-color: #a3b1e4;
+    color: black;
+}
+
+QPushButton#toggle_scope:checked {
+    background-color: #889ff1;
     color: black;
 }
 
