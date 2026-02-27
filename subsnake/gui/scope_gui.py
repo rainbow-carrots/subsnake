@@ -71,19 +71,28 @@ class ScopeGUI(QGroupBox):
     def update_display(self):
         with QMutexLocker(self.scope_mutex):
             head_pos = self.scope_head[0]
-            x_coords = np.arange(2048, dtype=np.float32)
 
             scope_flat = np.roll(self.scope_buffer, -head_pos)
-            search_start = len(scope_flat) - 4096
+            search_start = len(scope_flat) - 6144
             search_end = len(scope_flat) - 2048
-            search_window = scope_flat[search_start:search_end]
+            search_window = np.sum(scope_flat[search_start:search_end], axis=1)
+
+            kernel_size = 15.0
+            kernel = np.ones(15, dtype=np.float32) / kernel_size
+            crossing_smooth = np.convolve(search_window, kernel, mode="same")
                 
-            zero_crossings = np.where((search_window[:-1] <= 0) & (search_window[1:] > 0))[0]
+            zero_crossings = np.where((crossing_smooth[:-1] <= 0) & (crossing_smooth[1:] > 0))[0]
             if len(zero_crossings) > 0:
-                last_crossing_index = zero_crossings[-1] + search_start
-                stable_scope = scope_flat[last_crossing_index:last_crossing_index + 2048]
+                last_crossing_index = zero_crossings[-1]
+                y1 = crossing_smooth[last_crossing_index]
+                y2 = crossing_smooth[last_crossing_index + 1]
+                fraction = (0.0 - y1) / (y2 - y1) if y2 != y1 else 0.0
+                trigger_index = last_crossing_index + search_start
+                stable_scope = scope_flat[trigger_index:trigger_index + 2048]
+                x_coords = np.arange(2048, dtype=np.float32) - fraction
             else:
                 stable_scope = scope_flat[-2048:]
+                x_coords = np.arange(2048, dtype=np.float32)
             self.scope_points_list[0] = x_coords[:2048]
             self.scope_points_list[1] = np.sum(stable_scope, axis=1)
             self.scope_points_buffer = np.column_stack(self.scope_points_list)
