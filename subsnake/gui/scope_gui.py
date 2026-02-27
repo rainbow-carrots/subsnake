@@ -1,7 +1,7 @@
 from PySide6.QtCore import QPointF, Qt, QTimer, QMutexLocker
 from PySide6.QtWidgets import (
-    QGroupBox, QGraphicsScene, QSizePolicy,
-    QGraphicsView, QGraphicsPathItem, QGridLayout,
+    QGroupBox, QGraphicsScene, QSizePolicy, QGraphicsDropShadowEffect,
+    QGraphicsView, QGraphicsPathItem, QGridLayout, QGraphicsItem
 )
 from PySide6.QtGui import (
     QPolygonF, QPainterPath, QPen,
@@ -10,11 +10,12 @@ from PySide6.QtGui import (
 import numpy as np
 
 class ScopeGUI(QGroupBox):
-    def __init__(self, scope_mutex, scope_buffer, scope_frames):
+    def __init__(self, scope_mutex, scope_buffer, scope_frames, scope_head):
         super().__init__()
         self.scope_mutex = scope_mutex
         self.scope_buffer = scope_buffer
         self.scope_frames = scope_frames
+        self.scope_head = scope_head
 
         self.test_data_x = np.arange(4096)
         self.test_data_y = np.arange(4096) / 2048.0
@@ -24,13 +25,14 @@ class ScopeGUI(QGroupBox):
         self.scope_timer.timeout.connect(self.update_display)
 
         self.scope_scene = QGraphicsScene()
-        self.scope_scene.setSceneRect(0.0, 0.0, 4096.0, 2.0)
+        self.scope_scene.setSceneRect(0.0, 0.0, 2048.0, 2.0)
         self.scope_scene.setBackgroundBrush(Qt.GlobalColor.transparent)
         self.scope_view = QGraphicsView(self.scope_scene)
         self.scope_view.setRenderHint(QPainter.Antialiasing)
         self.scope_view.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.scope_view.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.scope_view.viewport().setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
+        self.scope_view.setViewportUpdateMode(QGraphicsView.ViewportUpdateMode.FullViewportUpdate)
 
         scope_size_policy = QSizePolicy(QSizePolicy.Ignored, QSizePolicy.Ignored)
         self.scope_view.setSizePolicy(scope_size_policy)
@@ -43,9 +45,18 @@ class ScopeGUI(QGroupBox):
         self.scope_painter_path.addPolygon(self.scope_polygon)
 
         self.scope_pen = QPen(QColor("#b4b4d2"))
-        self.scope_pen.setWidth(0)
+        self.scope_pen.setWidth(2)
+        self.scope_pen.setCosmetic(True)
+        self.scope_pen.setJoinStyle(Qt.PenJoinStyle.RoundJoin)
         self.scope_path = QGraphicsPathItem(self.scope_painter_path)
         self.scope_path.setPen(self.scope_pen)
+
+        self.scope_glow = QGraphicsDropShadowEffect()
+        self.scope_glow.setOffset(0.0, 0.0)
+        self.scope_glow.setBlurRadius(12)
+        self.scope_glow.setColor(QColor("#b4b4d2"))
+        self.scope_path.setGraphicsEffect(self.scope_glow)
+        self.scope_path.setCacheMode(QGraphicsItem.CacheMode.DeviceCoordinateCache)
 
         self.scope_scene.addItem(self.scope_path)
 
@@ -59,10 +70,22 @@ class ScopeGUI(QGroupBox):
 
     def update_display(self):
         with QMutexLocker(self.scope_mutex):
-            frames = self.scope_frames[0]
-            x_coords = np.linspace(0, 4096, frames, dtype=np.float32)
-            self.scope_points_list[0] = x_coords
-            self.scope_points_list[1] = np.sum(self.scope_buffer[:frames], axis=1)
+            head_pos = self.scope_head[0]
+            x_coords = np.arange(2048, dtype=np.float32)
+
+            scope_flat = np.roll(self.scope_buffer, -head_pos)
+            search_start = len(scope_flat) - 4096
+            search_end = len(scope_flat) - 2048
+            search_window = scope_flat[search_start:search_end]
+                
+            zero_crossings = np.where((search_window[:-1] <= 0) & (search_window[1:] > 0))[0]
+            if len(zero_crossings) > 0:
+                last_crossing_index = zero_crossings[-1] + search_start
+                stable_scope = scope_flat[last_crossing_index:last_crossing_index + 2048]
+            else:
+                stable_scope = scope_flat[-2048:]
+            self.scope_points_list[0] = x_coords[:2048]
+            self.scope_points_list[1] = np.sum(stable_scope, axis=1)
             self.scope_points_buffer = np.column_stack(self.scope_points_list)
             self.scope_points = [QPointF(x, y+1.0) for x, y in self.scope_points_buffer]
             self.scope_polygon = QPolygonF(self.scope_points)
