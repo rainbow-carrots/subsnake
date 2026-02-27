@@ -79,7 +79,9 @@ class AudioEngine():
         self.midi_input = None
         self.midi_channel = None
         self.previous_buffer_dac_time = pytime.perf_counter()
-        self.mutex = QMutex()
+        self.scope_mutex = QMutex()
+        self.scope_buffer = np.zeros((4096, 2), dtype=np.float32)
+        self.scope_frames = [0]
         self.threadpool = QThreadPool()
         self.key_event_worker = KeyEventWorker(self)
         self.threadpool.start(self.key_event_worker)
@@ -164,6 +166,15 @@ class AudioEngine():
         self.delay.process_block(outdata, outdata, del_mod_buffers, del_mod_values)
         outdata *= 0.288675
         outdata = np.tanh(outdata)
+
+        if self.scope_mutex.tryLock():
+            try:
+                self.scope_buffer[:frames] = outdata[:frames]
+                self.scope_frames[0] = frames
+            finally:
+                self.scope_mutex.unlock()
+        else:
+            pass
 
     #midi callback
     def midi_callback(self, message):
