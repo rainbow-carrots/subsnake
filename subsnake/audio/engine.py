@@ -80,8 +80,10 @@ class AudioEngine():
         self.midi_channel = None
         self.previous_buffer_dac_time = pytime.perf_counter()
         self.scope_mutex = QMutex()
-        self.scope_buffer = np.zeros((4096, 2), dtype=np.float32)
+        self.scope_buffer = np.zeros((8192, 2), dtype=np.float32)
         self.scope_frames = [0]
+        self.scope_head = [0]
+        self.scope_buffer_length = len(self.scope_buffer)
         self.threadpool = QThreadPool()
         self.key_event_worker = KeyEventWorker(self)
         self.threadpool.start(self.key_event_worker)
@@ -169,7 +171,17 @@ class AudioEngine():
 
         if self.scope_mutex.tryLock():
             try:
-                self.scope_buffer[:frames] = outdata[:frames]
+                head_pos = self.scope_head[0]
+                new_pos = head_pos + frames
+                if new_pos >= self.scope_buffer_length:
+                    overflow = new_pos - self.scope_buffer_length
+                    first_chunk_size = frames - overflow
+                    self.scope_buffer[head_pos:] = outdata[:first_chunk_size]
+                    self.scope_buffer[:overflow] = outdata[first_chunk_size:frames]
+                    self.scope_head[0] = overflow
+                else:
+                    self.scope_buffer[head_pos:new_pos] = outdata[:frames]
+                    self.scope_head[0] = new_pos
                 self.scope_frames[0] = frames
             finally:
                 self.scope_mutex.unlock()
