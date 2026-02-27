@@ -12,6 +12,7 @@ from subsnake.gui.delay_gui import DelayGUI
 from subsnake.gui.patch import PatchManager
 from subsnake.gui.record import RecorderGUI
 from subsnake.gui.mod_gui import ModulatorGUI
+from subsnake.gui.scope_gui import ScopeGUI
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QColor, QPalette
 from PySide6.QtWidgets import (
@@ -73,22 +74,28 @@ class MainWindow(QMainWindow):
         self.toggle_record = QPushButton("record")
         self.toggle_record.setCheckable(True)
         self.toggle_record.setChecked(False)
+        self.toggle_scope = QPushButton("scope")
+        self.toggle_scope.setCheckable(True)
+        self.toggle_scope.setChecked(False)
 
         settings_layout.addWidget(self.toggle_dark)
         settings_layout.addWidget(self.toggle_midi)
         settings_layout.addWidget(self.toggle_synth)
         settings_layout.addWidget(self.toggle_record)
+        settings_layout.addWidget(self.toggle_scope)
         self.settings_group.setLayout(settings_layout)
 
         self.toggle_dark.setObjectName("toggle_dark")
         self.toggle_midi.setObjectName("toggle_midi")
         self.toggle_synth.setObjectName("toggle_synth")
         self.toggle_record.setObjectName("toggle_record")
+        self.toggle_scope.setObjectName("toggle_scope")
 
         self.toggle_button_group = QButtonGroup()
         self.toggle_button_group.addButton(self.toggle_midi)
         self.toggle_button_group.addButton(self.toggle_synth)
         self.toggle_button_group.addButton(self.toggle_record)
+        self.toggle_button_group.addButton(self.toggle_scope)
 
         #layouts
         self.window_grid = QGridLayout()
@@ -103,11 +110,15 @@ class MainWindow(QMainWindow):
         self.record_group = RecorderSettings()
         self.record_group.setFocusPolicy(Qt.NoFocus)
 
+        self.scope_group = ScopeGUI(self.engine.scope_mutex, self.engine.scope_buffer, self.engine.scope_frames)
+        self.scope_group.setFocusPolicy(Qt.NoFocus)
+
         self.settings_view = QWidget()
         self.settings_stack = QStackedLayout()
         self.settings_stack.addWidget(self.midi_group)
         self.settings_stack.addWidget(self.synth_group)
         self.settings_stack.addWidget(self.record_group)
+        self.settings_stack.addWidget(self.scope_group)
         self.settings_stack.setCurrentIndex(0)
         self.settings_view.setLayout(self.settings_stack)
 
@@ -705,11 +716,13 @@ class MainWindow(QMainWindow):
             self.setStyleSheet(self.dark_style)
             self.display_color = QColor("#dfdfef")
             self.update_drop_shadow_colors(QColor("#b4b4d2"))
+            self.scope_group.scope_pen.setColor(QColor("#b4b4d2"))
             self.toggle_dark.setText("lite")
         else:
             self.setStyleSheet(self.light_style)
             self.display_color = QColor("black")
             self.update_drop_shadow_colors(QColor("#1c0627"))
+            self.scope_group.scope_pen.setColor(QColor("#1c0627"))
             self.toggle_dark.setText("dark")
         self.set_display_colors()
         
@@ -722,6 +735,8 @@ class MainWindow(QMainWindow):
             self.settings_stack.setCurrentIndex(1)
         elif text == "record":
             self.settings_stack.setCurrentIndex(2)
+        elif text == "scope":
+            self.settings_stack.setCurrentIndex(3)
 
     # modulator dials
     def update_mod_dial_value(self, name, value):
