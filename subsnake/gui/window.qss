@@ -571,3 +571,9 @@ QGroupBox#record_group QPushButton {
 QGroupBox#record_group QPushButton:hover {
     background-color: #82eaaa;
 }
+
+QGraphicsView {
+    background-color: none;
+    background: transparent;
+    border: none;
+}
