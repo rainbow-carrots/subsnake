@@ -69,7 +69,6 @@ class ScopeGUI(QGroupBox):
         self.scope_timer.start()
 
     def update_display(self):
-        with QMutexLocker(self.scope_mutex):
             head_pos = self.scope_head[0]
 
             scope_flat = np.roll(self.scope_buffer, -head_pos)
@@ -109,7 +108,6 @@ class ScopeGUI(QGroupBox):
             self.scope_painter_path = QPainterPath()
             self.scope_painter_path.addPolygon(self.scope_polygon)
             self.scope_path.setPath(self.scope_painter_path)
-            pass
 
     def resizeEvent(self, event):
         super().resizeEvent(event)

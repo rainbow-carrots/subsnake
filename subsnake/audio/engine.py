@@ -169,24 +169,18 @@ class AudioEngine():
         outdata *= 0.288675
         outdata = np.tanh(outdata)
 
-        if self.scope_mutex.tryLock():
-            try:
-                head_pos = self.scope_head[0]
-                new_pos = head_pos + frames
-                if new_pos >= self.scope_buffer_length:
-                    overflow = new_pos - self.scope_buffer_length
-                    first_chunk_size = frames - overflow
-                    self.scope_buffer[head_pos:] = outdata[:first_chunk_size]
-                    self.scope_buffer[:overflow] = outdata[first_chunk_size:frames]
-                    self.scope_head[0] = overflow
-                else:
-                    self.scope_buffer[head_pos:new_pos] = outdata[:frames]
-                    self.scope_head[0] = new_pos
-                self.scope_frames[0] = frames
-            finally:
-                self.scope_mutex.unlock()
+        head_pos = self.scope_head[0]
+        new_pos = head_pos + frames
+        if new_pos >= self.scope_buffer_length:
+            overflow = new_pos - self.scope_buffer_length
+            first_chunk_size = frames - overflow
+            self.scope_buffer[head_pos:] = outdata[:first_chunk_size]
+            self.scope_buffer[:overflow] = outdata[first_chunk_size:frames]
+            self.scope_head[0] = overflow
         else:
-            pass
+            self.scope_buffer[head_pos:new_pos] = outdata[:frames]
+            self.scope_head[0] = new_pos
+        self.scope_frames[0] = frames
 
     #midi callback
     def midi_callback(self, message):
