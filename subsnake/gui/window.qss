@@ -413,8 +413,8 @@ QPushButton#toggle_record {
 }
 
 QPushButton#toggle_scope {
-    max-width: 56px;
-    min-width: 56px;
+    max-width: 64px;
+    min-width: 64px;
 }
 
 QPushButton#toggle_midi:hover {
