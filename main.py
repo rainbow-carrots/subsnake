@@ -8,6 +8,7 @@ from subsnake.gui import MainWindow
 from subsnake.audio import WrappedOsc, HalSVF, ADSR, AudioEngine
 from subsnake.audio.effects import AudioRecorder, StereoDelay
 from subsnake.audio.modulators import LFO, ModEnv
+from subsnake.gui.scope_gui import ScopeGUI
 from importlib import resources
 
 fs = 44100
@@ -31,6 +32,13 @@ test_blit_out = np.zeros((16, 2), dtype=np.float32)
 test_smoothed_widths = np.zeros((1, 2), dtype=np.float32)
 test_smoothed_width = np.zeros((1), dtype=np.float32)
 test_output_hpf = np.zeros((2), dtype=np.float32)
+test_stable_scope = np.zeros((2048, 2), dtype=np.float32)
+test_x_coords = np.arange(2048, dtype=np.float32)
+test_base_x_coords = np.arange(2048, dtype=np.float32)
+test_valid_crossings = np.zeros((2048), dtype=np.int32)
+test_valid_crossings_count = np.zeros((1), dtype=np.int32)
+test_scope_buffer = np.zeros((16384, 2), dtype=np.float32)
+test_scope_head = [0]
 f32_increment = np.float32(0.1)
 f32_offset = np.float32(0.0)
 f64_attack_c = 0.1
@@ -66,7 +74,7 @@ ModEnv.gen_AR_loop(np.zeros((1), dtype=np.float32), np.zeros((1), dtype=np.int32
                    f64_attack_c, f64_release_c, f32_threshold, np.zeros((16), dtype=np.float32), 0, 0, mod_test, mod_test, 0.0, 0.0)
 ModEnv.gen_AHR(np.zeros((1), dtype=np.float32), np.zeros((1), dtype=np.int32), True,
                f64_attack_c, f64_release_c, f32_threshold, np.zeros((16), dtype=np.float32), 0, 0, mod_test, mod_test, 0.0, 0.0)
-
+ScopeGUI.update_display_math(test_scope_head, test_scope_buffer, test_base_x_coords, test_stable_scope, test_x_coords, test_valid_crossings, test_valid_crossings_count)
 
 #get midi inputs & channels
 input_list = mido.get_input_names()
