@@ -53,7 +53,7 @@ ADSR.envelope_block(env_test, False, np.zeros((16, 2), dtype=np.float32), np.zer
 AudioRecorder.process_samples(np.zeros((32, 2), dtype=np.float32), np.zeros((16, 2), dtype=np.float32), np.zeros((16, 2), dtype=np.float32), 0,
                               [False], [True], [False], False, np.zeros((2), dtype=np.int32), np.zeros((2), dtype=np.int32), [False], np.float32(1.0), test_smoothed_widths, test_smoothed_widths, test_smoothed_widths)
 StereoDelay.delay_block(np.zeros((32, 2), dtype=np.float32), np.zeros((32, 2), dtype=np.float32), np.zeros((32, 2), dtype=np.float32), 0,
-                        np.zeros((2), dtype=np.float32), np.zeros((2), dtype=np.int32), 0.5, 0.5, StereoDelay.hermite_interpolate, mod_test, mod_test, mod_test, 0.0, 0.0, 0.0)
+                        np.zeros((2), dtype=np.float32), np.zeros((2), dtype=np.int32), 0.5, 0.5, StereoDelay.hermite_interpolate, mod_test, mod_test, mod_test, 0.0, 0.0, 0.0, test_smoothed_widths)
 LFO.generate_sine(phase_test, f32_increment, f32_offset, test_out, mod_test, mod_test, 0.0, 0.0)
 LFO.generate_triangle(phase_test, f32_increment, f32_offset, test_out, mod_test, mod_test, 0.0, 0.0)
 LFO.generate_ramp(phase_test, f32_increment, f32_offset, test_out, mod_test, mod_test, 0.0, 0.0)
