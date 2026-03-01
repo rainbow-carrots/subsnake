@@ -8,6 +8,7 @@ from PySide6.QtGui import (
     QColor, QPainter
 )
 import numpy as np
+from numba import njit
 
 class ScopeGUI(QGroupBox):
     def __init__(self, scope_mutex, scope_buffer, scope_frames, scope_head):
@@ -16,6 +17,11 @@ class ScopeGUI(QGroupBox):
         self.scope_buffer = scope_buffer
         self.scope_frames = scope_frames
         self.scope_head = scope_head
+        self.stable_scope = np.zeros((2048, 2), dtype=np.float32)
+        self.x_coords = np.arange(2048, dtype=np.float32)
+        self.base_x_coords = np.arange(2048, dtype=np.float32)
+        self.valid_crossings = np.zeros((2048), dtype=np.int32)
+        self.valid_crossings_count = np.zeros((1), dtype=np.int32)
 
         self.test_data_x = np.arange(4096)
         self.test_data_y = np.arange(4096) / 2048.0
@@ -69,39 +75,10 @@ class ScopeGUI(QGroupBox):
         self.scope_timer.start()
 
     def update_display(self):
-            head_pos = self.scope_head[0]
-
-            scope_flat = np.roll(self.scope_buffer, -head_pos)
-            search_start = max(0, len(scope_flat) - 6144)
-            search_end = len(scope_flat) - 2048
-            search_window = np.sum(scope_flat[search_start:search_end], axis=1)
-
-            kernel = np.ones(15, dtype=np.float32) / 15.0
-            smoothed_window = np.convolve(search_window, kernel, mode="same")
-
-            peak_amp = np.max(np.abs(smoothed_window))
-            hysteresis_thresh = -0.1*peak_amp if peak_amp > 0 else -.01
-                
-            zero_crossings = np.where((smoothed_window[:-1] <= 0) & (smoothed_window[1:] > 0))[0]
-            valid_crossings = []
-            for c in zero_crossings:
-                lookback = smoothed_window[max(0, c - 1000):c]
-                if len(lookback) > 0 and np.min(lookback) < hysteresis_thresh:
-                    valid_crossings.append(c)
-
-            if len(valid_crossings) > 0:
-                last_crossing_index = valid_crossings[-1]
-                y1 = smoothed_window[last_crossing_index]
-                y2 = smoothed_window[last_crossing_index + 1]
-                fraction = (0.0 - y1) / (y2 - y1) if y2 != y1 else 0.0
-                trigger_index = last_crossing_index + search_start
-                stable_scope = scope_flat[trigger_index:trigger_index + 2048]
-                x_coords = np.arange(2048, dtype=np.float32) - fraction
-            else:
-                stable_scope = scope_flat[-2048:]
-                x_coords = np.arange(2048, dtype=np.float32)
-            self.scope_points_list[0] = x_coords
-            self.scope_points_list[1] = np.mean(stable_scope, axis=1)
+            self.update_display_math(self.scope_head, self.scope_buffer, self.base_x_coords,
+                                     self.stable_scope, self.x_coords, self.valid_crossings, self.valid_crossings_count)
+            self.scope_points_list[0] = self.x_coords
+            self.scope_points_list[1] = np.mean(self.stable_scope, axis=1)
             self.scope_points_buffer = np.column_stack(self.scope_points_list)
             self.scope_points = [QPointF(x, y+1.0) for x, y in self.scope_points_buffer]
             self.scope_polygon = QPolygonF(self.scope_points)
@@ -116,4 +93,42 @@ class ScopeGUI(QGroupBox):
     def showEvent(self, event):
         super().showEvent(event)
         self.scope_view.fitInView(self.scope_scene.sceneRect(), Qt.IgnoreAspectRatio)
+
+    @staticmethod
+    @njit(nogil=True, fastmath=True, cache=True)
+    def update_display_math(scope_head, scope_buffer, base_x_coords, stable_scope, x_coords, valid_crossings, vc_count):
+        head_pos = scope_head[0]
+
+        scope_flat = np.roll(scope_buffer, -head_pos)
+        search_start = max(0, len(scope_flat) - 6144)
+        search_end = len(scope_flat) - 2048
+        search_window = np.sum(scope_flat[search_start:search_end], axis=1)
+
+        kernel = np.ones(15, dtype=np.float32) / 15.0
+        smoothed_window = np.convolve(search_window, kernel, mode="same")
+
+        peak_amp = np.max(np.abs(smoothed_window))
+        hysteresis_thresh = -0.1*peak_amp if peak_amp > 0 else -.01
+            
+        zero_crossings = np.where((smoothed_window[:-1] <= 0) & (smoothed_window[1:] > 0))[0]
+        vc_count[0] = 0
+        for c in zero_crossings:
+            lookback = smoothed_window[max(0, c - 1000):c]
+            if len(lookback) > 0 and np.min(lookback) < hysteresis_thresh:
+                valid_crossings[vc_count[0]] = c
+                vc_count[0] += 1
+
+        if vc_count[0] > 0:
+            last_crossing_index = valid_crossings[vc_count[0]-1]
+            y1 = smoothed_window[last_crossing_index]
+            y2 = smoothed_window[last_crossing_index + 1]
+            fraction = (0.0 - y1) / (y2 - y1) if y2 != y1 else 0.0
+            trigger_index = last_crossing_index + search_start
+            stable_scope[:] = scope_flat[trigger_index:trigger_index + 2048]
+            x_coords[:] = base_x_coords[:] - fraction
+        else:
+            stable_scope[:] = scope_flat[-2048:]
+            x_coords[:] = base_x_coords[:]
+        
+
         
