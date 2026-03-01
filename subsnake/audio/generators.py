@@ -24,6 +24,7 @@ class WrappedOsc():
         self.walk_state = np.zeros((1), dtype=np.float32)
         self.walk_amt = 0.0
         self.blit_integrators = np.zeros((3, 2), dtype=np.float32)
+        self.blep_integrator = np.zeros((1), dtype=np.float32)
         self.blit_states = np.array([[0.0, amplitude, phase_increment], [0.0, amplitude, phase_increment]], dtype=np.float32)
         self.blit_buffer = np.zeros((8192, 2))
         self.blit_buffer_read = np.zeros((1, 2), dtype=np.float32)
@@ -33,6 +34,8 @@ class WrappedOsc():
         self.alg = alg
         self.pulsewidth = width
         self.smoothed_widths = np.zeros((1, 2), dtype=np.float32)
+        self.smoothed_blep_width = np.zeros((1), dtype=np.float32)
+        self.output_hpf = np.zeros((2), dtype=np.float32)
         self.freq = frequency
         self.amp = amplitude
         self.alg_type = 0
@@ -46,19 +49,22 @@ class WrappedOsc():
             if (self.alg_type == 0):
                 self.blit_saw(buffer, self.blit_states, self.blit_integrators,
                           self.random_walk[:frames], self.walk_amt, mod_buffers[0], mod_buffers[1], mod_buffers[2], mod_values[0], mod_values[1], mod_values[2], self.amp, self.freq)
-            elif (self.alg_type == 1):
+            else:
                 self.polyblep_saw(self.state, buffer, self.random_walk, self.walk_amt, mod_buffers[0], mod_buffers[1], mod_buffers[2], mod_values[1], mod_values[2], mod_values[3], self.amp, self.freq)
         elif (self.alg == 2.0):
             if (self.alg_type == 0):
                 self.blit_pulse(buffer, self.blit_states, self.blit_integrators, self.smoothed_widths,
                           self.random_walk[:frames], self.walk_amt, mod_buffers[0], mod_buffers[1], mod_buffers[2], mod_buffers[3], mod_values[0], mod_values[1], mod_values[2], mod_values[3], self.amp, self.freq, self.pulsewidth)
-            elif (self.alg_type == 1):
+            else:
                 self.polyblep_pulse(self.state, buffer, self.state2, self.pulsewidth, self.random_walk, self.walk_amt,
                                     mod_buffers[0], mod_buffers[1], mod_buffers[2], mod_buffers[3], mod_values[0], mod_values[1], mod_values[2], mod_values[3], self.amp, self.freq)
         elif (self.alg == 3.0):
-            self.blit_triangle(buffer, self.blit_states, self.blit_integrators, self.smoothed_widths,
+            if (self.alg_type == 0):
+                self.blit_triangle(buffer, self.blit_states, self.blit_integrators, self.smoothed_widths,
                           self.random_walk[:frames], self.walk_amt, mod_buffers[0], mod_buffers[1], mod_buffers[2], mod_buffers[3], mod_values[0], mod_values[1], mod_values[2], mod_values[3], self.amp, self.freq, self.pulsewidth)
-
+            else:
+                self.polyblep_triangle(self.state, self.blep_integrator, self.smoothed_blep_width, self.output_hpf, buffer, self.state2, self.pulsewidth, self.random_walk, self.walk_amt,
+                                    mod_buffers[0], mod_buffers[1], mod_buffers[2], mod_buffers[3], mod_values[0], mod_values[1], mod_values[2], mod_values[3], self.amp, self.freq)
 
     def update_pitch(self, newPitch):
         self.freq = newPitch
@@ -175,6 +181,68 @@ class WrappedOsc():
             outdata[n, 0] = sample*(amp - amp_mod[n]*am_amt)
             outdata[n, 1] = sample*(amp - amp_mod[n]*am_amt)
 
+    @staticmethod
+    @njit(nogil=True, fastmath=True)
+    def polyblep_triangle(state, integrator, smoothed_width, hpf, outdata, state2, width, walk_mod, walk_amt, pitch_mod, det_mod, amp_mod, width_mod, pm_amt, dm_amt, am_amt, wm_amt, amp=1.0, freq=440.0):
+        frames = len(outdata)
+        base_inc = twopi*freq*oneoverfs
+        alpha = 1.0 - math.exp(-twopi*50.0*oneoverfs)
+        for n in range(frames):
+            #modulate phase increment
+            state[2] = base_inc + base_inc*pitch_mod[n]*pm_amt + max_det_inc*det_mod[n]*dm_amt + max_det_inc*walk_mod[n]*walk_amt
+
+            #smooth width
+            new_width = max(.01, min(.99, width + width_mod[n]*wm_amt))
+            smoothed_width[0] += alpha*(new_width - smoothed_width[0])
+
+            #generate naive saws
+            sample = (state[0] * oneoverpi) - 1.0
+            sample2 = (state2[0]* oneoverpi) - 1.0
+            
+            #apply polyblep corrections
+            # main osc
+            if (state[0] < state[2]):           #phase just wrapped
+                t = state[0]/state[2]
+                sample += (t - 1.0)**2
+            elif (state[0] + state[2] > twopi):   #phase about to wrap
+                t = (twopi - state[0])/state[2]
+                sample -= (t - 1.0)**2
+            
+            # sync osc
+            if (state2[0] < state2[2]):           #phase just wrapped
+                t2 = state2[0]/state2[2]
+                sample2 += (t2 - 1.0)**2
+            elif (state2[0] + state2[2] > twopi):   #phase about to wrap
+                t2 = (twopi - state2[0])/state2[2]
+                sample2 -= (t2 - 1.0)**2
+
+            #increment phases & wrap
+            state[0] += state[2]
+
+            state2[0] = state[0] + twopi*smoothed_width[0]
+            norm_phase = state2[0]*oneovertwopi
+            wrapped_phase = norm_phase - np.floor(norm_phase)
+            state2[0] = twopi*wrapped_phase
+            if (state[0] > twopi):
+                state[0] -= twopi
+
+            #generate pulse
+            slope = sample - sample2
+
+            #integrate pulse -> triangle
+            leak_c = 1.0 - state[2]*.1
+            integrator[0] = integrator[0]*leak_c + slope
+            hpf_out = integrator[0] - hpf[0] + .995*hpf[1]
+            hpf[0] = integrator[0]
+            hpf[1] = hpf_out
+
+            #output
+            scale = (state[2]*oneovertwopi)/(smoothed_width[0]*(1.0 - smoothed_width[0]))
+            output_sample = hpf_out*scale*(amp - amp_mod[n]*am_amt)
+
+            outdata[n, 0] = output_sample
+            outdata[n, 1] = output_sample
+
     #random walk generator
     @staticmethod
     @njit(nogil=True, fastmath=True)
@@ -268,7 +336,7 @@ class WrappedOsc():
                 mod_inc = base_inc + base_inc*pitch_mod[n]*pm_amt + max_det_inc*walk_mod[n]*walk_amt + max_det_inc*det_mod[n]*dm_amt
                 new_freq = max(1e-9, mod_inc)*fs
                 harmonics = 2*int(nyquist/new_freq) + 1
-                new_width = max(.001, min(.999, width + width_mod[n]*wm_amt))
+                new_width = max(.01, min(.99, width + width_mod[n]*wm_amt))
                 smoothed_widths[0, c] += alpha*(new_width - smoothed_widths[0, c])
                 smoothed_width = smoothed_widths[0, c]
                 phase1 = states[c, 0]
