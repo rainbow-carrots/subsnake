@@ -5,6 +5,7 @@ import sounddevice as sd
 import soundfile as sf
 import random
 import time as pytime
+import concurrent.futures
 from PySide6.QtCore import QMutex, QThreadPool
 from .generators import WrappedOsc
 from .filters import HalSVF
@@ -58,7 +59,6 @@ class AudioEngine():
             voice.detune_offset_3 = .975 + .050*random.random()
             voice_index += 1
 
-        self.voice_output = np.zeros((2048, 2), dtype=np.float32)
         self.recorder_output = np.zeros((2048, 2), dtype=np.float32)
         self.delay_output = np.zeros((2048, 2), dtype=np.float32)
         self.key_to_note = {}
@@ -88,6 +88,7 @@ class AudioEngine():
         self.key_event_worker = KeyEventWorker(self)
         self.threadpool.start(self.key_event_worker)
         self.run_threads = True
+        self.voice_executor = concurrent.futures.ThreadPoolExecutor(max_workers=16)
 
     #initialize stream
     def start_audio(self):
@@ -123,6 +124,7 @@ class AudioEngine():
             self.midi_input.close()
 
         self.run_threads = False
+        self.voice_executor.shutdown(wait=True, cancel_futures=True)
 
     #audio callback
     def callback(self, outdata, frames, time, status):
@@ -131,9 +133,18 @@ class AudioEngine():
         frame_start = time.outputBufferDacTime
         frame_end = frame_start + frame_width
         self.frame_times.put((frame_width, frame_start, frame_end, frames))
+        futures = []
         for voice in self.voices:
-            voice.callback(self.voice_output[:frames], self.note_to_voice, self.stopped_voice_indeces, self.released_voice_indeces, frames)
-            outdata += self.voice_output[:frames]
+            if voice.status != 0:
+                future = self.voice_executor.submit(
+                voice.callback, voice.voice_output[:frames], self.note_to_voice,
+                self.stopped_voice_indeces, self.released_voice_indeces, frames)
+                futures.append(future)
+            else:
+                voice.voice_output[:] = 0.0
+        concurrent.futures.wait(futures)
+        for voice in self.voices:
+            outdata += voice.voice_output[:frames]
         self.recorder.process_block(outdata, self.recorder_output)
         outdata += self.recorder_output[:frames]
 
@@ -634,6 +645,7 @@ class Voice():
         self.fenv_in = np.ones((2048, 2), dtype=np.float32)
         self.fenv_out = np.zeros((2048, 2), dtype=np.float32)
         self.no_mod = np.zeros((2048), dtype=np.float32)
+        self.voice_output = np.zeros((2048, 2), dtype=np.float32)
         self.osc = WrappedOsc(2, 0.5, 55, fs, .5)
         self.osc2 = WrappedOsc(2, 0.5, 55, fs, .5)
         self.osc3 = WrappedOsc(2, 0.5, 55, fs, .5)
