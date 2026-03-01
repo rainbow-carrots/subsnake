@@ -143,7 +143,7 @@ class ModEnv():
         self.release = release
         self.mode = mode
         self.fs = float(fs)
-        self.threshold = np.float32(.001)
+        self.threshold = np.float32(.0001)
         self.attack_sample = 0
         self.release_sample = 0
 
