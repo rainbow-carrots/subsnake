@@ -53,7 +53,7 @@ class ADSR():
     
     #ADSR envelope (recursive 1-pole LPF)
     @staticmethod
-    @njit(nogil=True, fastmath=True)
+    @njit(nogil=True, fastmath=True, cache=True)
     def envelope_block(state, gate, input, output, attack_start, release_start, att_mod, dec_mod, sus_mod, rel_mod, am_val, dm_val, sm_val, rm_val, att, dec, sus, rel):
         for n in range(len(output)):
             mod_att = max(1.0, fs*att + fs*att_mod[n]*am_val)

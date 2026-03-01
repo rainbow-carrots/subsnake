@@ -57,7 +57,7 @@ class HalSVF():
         self.base_freq = newFreq
         
     @staticmethod
-    @njit(nogil=True, fastmath=True)
+    @njit(nogil=True, fastmath=True, cache=True, inline="always")
     def filter_block(state, input, output, fenv, fenv_amount, clip_sample, cutoff, base_freq, kt_amt, freq_mod, res_mod, drive_mod, sat_mod, fenv_mod, fm_val, rm_val, dm_val, sm_val, fem_val):
         cutoff_freq_amt = (1.0 - kt_amt)*cutoff
         kt_freq_amt = kt_amt*base_freq*32.0
@@ -100,7 +100,7 @@ class HalSVF():
                 output[n, c] = sample
 
     @staticmethod
-    @njit(nogil=True, fastmath=True)
+    @njit(nogil=True, fastmath=True, cache=True)
     def clip_sample(sample, threshold):
         if (sample > threshold):
             output = threshold * 0.66667

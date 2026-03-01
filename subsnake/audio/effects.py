@@ -27,7 +27,7 @@ class StereoDelay():
                          mod_buffers[0], mod_buffers[1], mod_buffers[2], mod_values[0], mod_values[1], mod_values[2], self.tm_amount_smooth)
 
     @staticmethod
-    @njit(nogil=True, fastmath=True)
+    @njit(nogil=True, fastmath=True, cache=True, inline="always")
     def delay_block(input, output, buffer, offset_raw, offset_smooth, write_heads, feedback, mix, hermite_interpolate, time_mod, feedback_mod, mix_mod, tm_amt, fm_amt, mm_amt, tm_amt_smooth):
         frames = len(input)
         buffer_size = len(buffer)
@@ -83,7 +83,7 @@ class StereoDelay():
 
     #interpolator (catmull-rom)
     @staticmethod
-    @njit(nogil=True, fastmath=True)
+    @njit(nogil=True, fastmath=True, cache=True)
     def hermite_interpolate(y0, y1, y2, y3, frac):
         c0 = y1
         c1 = 0.5*(y2-y0)
@@ -180,7 +180,7 @@ class AudioRecorder():
             self.event_queue.put_nowait("stop")
 
     @staticmethod
-    @njit(nogil=True, fastmath=True)
+    @njit(nogil=True, fastmath=True, cache=True)
     def process_samples(rec_buffer, indata, outdata, frames, paused, stopped, record, loop, play_heads, end_heads, put_stop, input_level, input_level_smooth, output_level_smooth, rec_gate_smooth):
         alpha = .001
         for c in range(0, 2):

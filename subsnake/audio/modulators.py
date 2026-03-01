@@ -48,7 +48,7 @@ class LFO():
         self.shape = new_shape
     
     @staticmethod
-    @njit(nogil=True, fastmath=True)
+    @njit(nogil=True, fastmath=True, cache=True)
     def generate_sine(phase, offset, increment, output, freq_mod, phase_mod, fm_amt, pm_amt):
         frames = len(output)
         for n in range(0, frames):
@@ -60,7 +60,7 @@ class LFO():
                 phase[0] -= twopi
             
     @staticmethod
-    @njit(nogil=True, fastmath=True)
+    @njit(nogil=True, fastmath=True, cache=True)
     def generate_triangle(phase, offset, increment, output, freq_mod, phase_mod, fm_amt, pm_amt):
         frames = len(output)
         for n in range(0, frames):
@@ -75,7 +75,7 @@ class LFO():
                 phase[0] -= twopi
 
     @staticmethod
-    @njit(nogil=True, fastmath=True)
+    @njit(nogil=True, fastmath=True, cache=True)
     def generate_ramp(phase, offset, increment, output, freq_mod, phase_mod, fm_amt, pm_amt):
         frames = len(output)
         for n in range(0, frames):
@@ -90,7 +90,7 @@ class LFO():
                 phase[0] -= twopi
 
     @staticmethod
-    @njit(nogil=True, fastmath=True)
+    @njit(nogil=True, fastmath=True, cache=True)
     def generate_sawtooth(phase, offset, increment, output, freq_mod, phase_mod, fm_amt, pm_amt):
         frames = len(output)
         for n in range(0, frames):
@@ -105,7 +105,7 @@ class LFO():
                 phase[0] -= twopi
 
     @staticmethod
-    @njit(nogil=True, fastmath=True)
+    @njit(nogil=True, fastmath=True, cache=True)
     def generate_square(phase, offset, increment, output, width, freq_mod, phase_mod, fm_amt, pm_amt):
         frames = len(output)
         for n in range(0, frames):
@@ -120,7 +120,7 @@ class LFO():
                 phase[0] -= twopi
 
     @staticmethod
-    @njit(nogil=True, fastmath=True)
+    @njit(nogil=True, fastmath=True, cache=True)
     def sample_and_hold(phase, increment, output, held_value, freq_mod, fm_amt):
         frames = len(output)
         for n in range(0, frames):
@@ -174,7 +174,7 @@ class ModEnv():
         self.release_sample = release_sample
 
     @staticmethod
-    @njit(nogil=True, fastmath=True)
+    @njit(nogil=True, fastmath=True, cache=True)
     def gen_AR_oneshot(value, state, gate, run, attack, release, threshold, output, attack_start, release_start, attack_mod, release_mod, am_amt, rm_amt):
         frames = len(output)
         top_threshold =  1.0 - threshold
@@ -211,7 +211,7 @@ class ModEnv():
             output[n] = value[0]
 
     @staticmethod
-    @njit(nogil=True, fastmath=True)
+    @njit(nogil=True, fastmath=True, cache=True)
     def gen_AR_loop(value, state, gate, attack, release, threshold, output, attack_start, release_start, attack_mod, release_mod, am_amt, rm_amt):
         frames = len(output)
         top_threshold =  1.0 - threshold
@@ -244,7 +244,7 @@ class ModEnv():
             output[n] = value[0]
 
     @staticmethod
-    @njit(nogil=True, fastmath=True)
+    @njit(nogil=True, fastmath=True, cache=True)
     def gen_AHR(value, state, gate, attack, release, threshold, output, attack_start, release_start, attack_mod, release_mod, am_amt, rm_amt):
         frames = len(output)
         top_threshold =  1.0 - threshold
