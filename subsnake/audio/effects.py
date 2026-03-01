@@ -18,16 +18,17 @@ class StereoDelay():
         self.write_heads = np.zeros((2), dtype=np.int32)
         self.offset = 22050
         self.offset_smooth = np.array([22050, 22050], dtype=np.float32)
+        self.tm_amount_smooth = np.zeros((1, 2), dtype=np.float32)
         self.mix_level = mix
 
     def process_block(self, input, output, mod_buffers, mod_values):
         self.offset = self.delay_time*self.fs
         self.delay_block(input, output, self.buffer, self.offset, self.offset_smooth, self.write_heads, self.delay_feedback, self.mix_level, self.hermite_interpolate,
-                         mod_buffers[0], mod_buffers[1], mod_buffers[2], mod_values[0], mod_values[1], mod_values[2])
+                         mod_buffers[0], mod_buffers[1], mod_buffers[2], mod_values[0], mod_values[1], mod_values[2], self.tm_amount_smooth)
 
     @staticmethod
     @njit(nogil=True, fastmath=True)
-    def delay_block(input, output, buffer, offset_raw, offset_smooth, write_heads, feedback, mix, hermite_interpolate, time_mod, feedback_mod, mix_mod, tm_amt, fm_amt, mm_amt):
+    def delay_block(input, output, buffer, offset_raw, offset_smooth, write_heads, feedback, mix, hermite_interpolate, time_mod, feedback_mod, mix_mod, tm_amt, fm_amt, mm_amt, tm_amt_smooth):
         frames = len(input)
         buffer_size = len(buffer)
         alpha = .0001
@@ -35,7 +36,8 @@ class StereoDelay():
             for n in range(0, frames):
                 #smooth offset
                 offset_smooth[c] = offset_smooth[c]*(1.0 - alpha) + offset_raw*alpha
-                offset_mod = offset_smooth[c] + 22050.0*time_mod[n]*tm_amt
+                tm_amt_smooth[0, c] = tm_amt_smooth[0, c]*(1.0 - alpha) + tm_amt*alpha
+                offset_mod = offset_smooth[c] + 22050.0*time_mod[n]*tm_amt_smooth[0, c]
                 offset_mod = max(0.0, min(44100.0, offset_mod))
 
                 #calculate read head position & wrap
