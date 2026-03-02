@@ -8,7 +8,7 @@ import time as pytime
 import concurrent.futures
 from PySide6.QtCore import QMutex, QThreadPool
 from .generators import WrappedOsc
-from .filters import HalSVF
+from .filters import HalSVF, ZDFSVF
 from .envelopes import ADSR
 from .workers import KeyEventWorker
 from .effects import StereoDelay, AudioRecorder
@@ -343,6 +343,10 @@ class AudioEngine():
         for voice in self.voices:
             voice.filt.update_key_tracking(newTrack)
 
+    def update_mode(self, newMode):
+        for voice in self.voices:
+            voice.filt_mode = newMode
+
     # envelope
     def update_gate(self, newGate):
         for voice in self.voices:
@@ -650,6 +654,8 @@ class Voice():
         self.osc2 = WrappedOsc(2, 0.5, 55, fs, .5)
         self.osc3 = WrappedOsc(2, 0.5, 55, fs, .5)
         self.filt = HalSVF(0.0, 3520, 10, 1.0)
+        self.filt2 = ZDFSVF()
+        self.filt_mode = 0
         self.env = ADSR(.01, 1.0, 0.5, 1.0)
         self.fenv = ADSR(.01, .5, .5, .5)
         self.lfo1 = LFO(fs, 5, 0, 0)
@@ -736,7 +742,10 @@ class Voice():
             filt_mod_buffers.append(self.assign_mod_buffer(self.mod_dial_modes["fenv_amt"]))
             filt_mod_values = [self.mod_dial_values["filt_freq"], self.mod_dial_values["filt_res"],
                             self.mod_dial_values["filt_drive"], self.mod_dial_values["filt_sat"], self.mod_dial_values["fenv_amt"]]
-            self.filt.process_block(self.osc_out[:frames], self.filt_out[:frames], self.fenv_out[:frames], filt_mod_buffers, filt_mod_values)
+            if self.filt_mode == 0:
+                self.filt.process_block(self.osc_out[:frames], self.filt_out[:frames], self.fenv_out[:frames], filt_mod_buffers, filt_mod_values)
+            else:
+                self.filt2.process_block(self.osc_out[:frames], self.filt_out[:frames], self.fenv_out[:frames], filt_mod_buffers, filt_mod_values)
 
             # amplitude envelope
             env_mod_buffers = [self.assign_mod_buffer(self.mod_dial_modes["env_att"])]
