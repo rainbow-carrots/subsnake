@@ -224,6 +224,7 @@ class MainWindow(QMainWindow):
         self.filt_group.drive_changed.connect(self.update_filt_drive)
         self.filt_group.sat_changed.connect(self.update_filt_sat)
         self.filt_group.alg_changed.connect(self.update_filt_alg)
+        self.filt_group.mode_changed.connect(self.update_filt_mode)
 
         # oscillators
         #  1
@@ -859,6 +860,9 @@ class MainWindow(QMainWindow):
 
     def update_key_tracking(self, value):
         self.engine.update_key_tracking(value)
+
+    def update_filt_mode(self, newMode):
+        self.engine.update_mode(newMode)
 
     # oscillator drift
     def update_osc_drift(self, value):
