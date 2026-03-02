@@ -5,12 +5,13 @@ class UpdateGUI(QTimer):
         super().__init__()
         self.engine = engine
         self.window = window
+        self.scope = window.scope_group
         self.row_ccs = window.midi_group.row_ccs
         self.cc_values = engine.midi_cc_values
         self.cc_sliders = window.midi_cc_sliders
         self.cc_displays = window.midi_cc_displays
         self.rec_queue = engine.recorder.event_queue
-        self.setInterval(17)   #~60fps
+        self.setInterval(34)   #~30fps
         self.timeout.connect(self.update_gui)
 
 
@@ -44,6 +45,7 @@ class UpdateGUI(QTimer):
         current_mins, current_secs, max_mins, max_secs = engine_recorder.get_time()
         window_recorder.current_time_label.setText(f"{current_mins:02}:{current_secs:02}")
         window_recorder.end_time_label.setText(f"{max_mins:02}:{max_secs:02}")
+        self.scope.update_display()
 
 
     def assign_cc_slider(self, module, param):
