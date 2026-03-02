@@ -1,7 +1,7 @@
 from PySide6.QtWidgets import(
     QSlider, QLabel, QGridLayout,
     QRadioButton, QButtonGroup, QLCDNumber,
-    QHBoxLayout, QGroupBox
+    QHBoxLayout, QGroupBox, QStyle, QStyleOptionGroupBox
 )
 from PySide6.QtCore import Signal, Qt
 from PySide6.QtGui import QPalette, QColor
@@ -15,10 +15,12 @@ class FilterGUI(QGroupBox):
     drive_changed = Signal(float)
     sat_changed = Signal(float)
     alg_changed = Signal(str)
+    mode_changed = Signal(int)
 
     def __init__(self, display_color=QColor("black")):
         super().__init__()
         self.display_color = display_color
+        self.mode = 0
 
         #set title
         self.setTitle("filter")
@@ -200,3 +202,23 @@ class FilterGUI(QGroupBox):
 
     def reset_sat(self):
         self.filt_sat_slider.setValue(100)
+
+    def mouseReleaseEvent(self, event):
+        if event.button() == Qt.MouseButton.RightButton:
+            style_option = QStyleOptionGroupBox()
+            self.initStyleOption(style_option)
+        
+            title_rect = self.style().subControlRect(
+                QStyle.ComplexControl.CC_GroupBox,
+                style_option, QStyle.SubControl.SC_GroupBoxLabel, self 
+            )
+
+            if title_rect.contains(event.position().toPoint()):
+                if self.mode == 0:
+                    self.mode = 1
+                else:
+                    self.mode = 0
+                self.mode_changed.emit(self.mode)
+                event.accept()
+                return
+        super().mouseReleaseEvent(event)
