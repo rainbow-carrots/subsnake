@@ -19,16 +19,12 @@ class WrappedOsc():
         phase_increment = twopi * (frequency/sample_rate)
         self.state = np.array([0.0, amplitude, phase_increment], dtype=np.float32)
         self.state2 = np.array([0.0, amplitude, phase_increment], dtype=np.float32)
-        self.hardSyncBuffer = np.zeros((2048, 2), dtype=np.float32)
-        self.random_walk = np.zeros((2048), dtype=np.float32)
+        self.random_walk = np.ascontiguousarray(np.zeros((2048), dtype=np.float32))
         self.walk_state = np.zeros((1), dtype=np.float32)
         self.walk_amt = 0.0
         self.blit_integrators = np.zeros((3, 2), dtype=np.float32)
         self.blep_integrator = np.zeros((1), dtype=np.float32)
         self.blit_states = np.array([[0.0, amplitude, phase_increment], [0.0, amplitude, phase_increment]], dtype=np.float32)
-        self.blit_buffer = np.zeros((8192, 2))
-        self.blit_buffer_read = np.zeros((1, 2), dtype=np.float32)
-        self.blit_buffer_write = np.zeros((1, 2), dtype=np.int32)
         self.blit_blocker_ins = np.zeros((1, 2), dtype=np.float32)
         self.blit_blocker_outs = np.zeros((1, 2), dtype=np.float32)
         self.alg = alg
