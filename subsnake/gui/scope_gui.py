@@ -17,10 +17,10 @@ class ScopeGUI(QGroupBox):
         self.scope_buffer = scope_buffer
         self.scope_frames = scope_frames
         self.scope_head = scope_head
-        self.stable_scope = np.zeros((2048, 2), dtype=np.float32)
-        self.x_coords = np.arange(2048, dtype=np.float32)
-        self.base_x_coords = np.arange(2048, dtype=np.float32)
-        self.valid_crossings = np.zeros((2048), dtype=np.int32)
+        self.stable_scope = np.ascontiguousarray(np.zeros((2048, 2), dtype=np.float32))
+        self.x_coords = np.ascontiguousarray(np.arange(2048, dtype=np.float32))
+        self.base_x_coords = np.ascontiguousarray(np.arange(2048, dtype=np.float32))
+        self.valid_crossings = np.ascontiguousarray(np.zeros((2048), dtype=np.int32))
         self.valid_crossings_count = np.zeros((1), dtype=np.int32)
 
         self.test_data_x = np.arange(4096)
@@ -72,7 +72,7 @@ class ScopeGUI(QGroupBox):
         self.setLayout(layout)
         self.setTitle("scope")
         self.setObjectName("scope_group")
-        self.scope_timer.start()
+        #self.scope_timer.start()
 
     def update_display(self):
             self.update_display_math(self.scope_head, self.scope_buffer, self.base_x_coords,
