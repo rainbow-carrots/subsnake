@@ -321,27 +321,45 @@ class AudioEngine():
     # filter
     def update_cutoff(self, newFreq):
         for voice in self.voices:
-             voice.filt.update_cutoff(newFreq)
+            if voice.filt_mode == 0:
+                voice.filt.update_cutoff(newFreq)
+            else:
+                voice.filt2.update_cutoff(newFreq)
 
     def update_resonance(self, newRes):
         for voice in self.voices:
-             voice.filt.update_resonance(newRes)
+            if voice.filt_mode == 0:
+                voice.filt.update_resonance(newRes)
+            else:
+                voice.filt2.update_resonance(newRes)
 
     def update_drive(self, newDrive):
         for voice in self.voices:
-             voice.filt.update_drive(newDrive)
+            if voice.filt_mode == 0:
+                voice.filt.update_drive(newDrive)
+            else:
+                voice.filt2.update_drive(newDrive)
     
     def update_type(self, newType):
         for voice in self.voices:
-             voice.filt.update_type(newType)
+            if voice.filt_mode == 0:
+                voice.filt.update_type(newType)
+            else:
+                voice.filt2.update_type(newType)
 
     def update_saturate(self, newSat):
         for voice in self.voices:
-              voice.filt.update_saturate(newSat)
+            if voice.filt_mode == 0:
+                voice.filt.update_saturate(newSat)
+            else:
+                voice.filt2.update_saturate(newSat)
 
     def update_key_tracking(self, newTrack):
         for voice in self.voices:
-            voice.filt.update_key_tracking(newTrack)
+            if voice.filt_mode == 0:
+                voice.filt.update_key_tracking(newTrack)
+            else:
+                voice.filt2.update_key_tracking(newTrack)
 
     def update_mode(self, newMode):
         for voice in self.voices:
