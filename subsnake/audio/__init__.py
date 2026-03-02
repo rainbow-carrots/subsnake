@@ -1,4 +1,4 @@
-from .filters import HalSVF
+from .filters import HalSVF, ZDFSVF
 from .generators import WrappedOsc
 from .envelopes import ADSR
 from .engine import AudioEngine
