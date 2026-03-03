@@ -17,12 +17,11 @@ well, i'm very glad you asked.
 * 3 sine, triangle (+ PWM), sawtooth, or pulse (+ PWM) oscillators with pitch, detune & level controls
 * 1 state-variable filter with resonance, saturation & drive
 * 2 ADSR envelopes - one for amplitude, one for filter frequency (with bipolar depth control)
-* 4 modulators - 2 LFOs, 2 envelopes, with dedicated assignable attenuverters for every₁ parameter
+* 4 modulators - 2 LFOs, 2 envelopes, with dedicated assignable attenuverters for every parameter
     * LFO shapes: sine, triangle, ramp, sawtooth, square, sample & hold
         * 0.01-10Hz w/ controllable phase shift
     * env. modes: attack-release, attack-hold-release, loop (attack-release)
         * .01-1s per stage
-    * __₁__ *slider-controlled (excludes radio buttons)*
 
 there's also a stereo tape delay effect on the master bus (voice output + recorder), and a stereo audio recorder/looper with continuous overdubbing.
 
