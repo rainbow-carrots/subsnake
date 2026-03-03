@@ -14,7 +14,7 @@ class LFO():
     def __init__(self, fs, freq=10.0, offset=0.0, shape=0):
         self.fs = float(fs)
         self.oneoverfs = 1.0/self.fs
-        self.output = np.zeros((2048), dtype=np.float32)
+        self.output = np.ascontiguousarray(np.zeros((2048), dtype=np.float32))
         self.current_phase = np.zeros((1), dtype=np.float32)
         self.phase_increment = np.float32(twopi*(freq/float(fs)))
         self.frequency = freq
@@ -133,7 +133,7 @@ class LFO():
 
 class ModEnv():
     def __init__(self, fs, attack=0.5, release=0.5, mode=0):
-        self.output = np.zeros((2048), dtype=np.float32)
+        self.output = np.ascontiguousarray(np.zeros((2048), dtype=np.float32))
         self.value = np.zeros((1), dtype=np.float32)
         self.state = np.zeros((1), dtype=np.int32)
         self.run = np.zeros((1), dtype=np.int32)
