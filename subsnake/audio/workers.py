@@ -58,6 +58,7 @@ class KeyEventWorker(QRunnable):
             new_pitch3 = 440.0 * 2**((float(note))/12.0 + self.engine.pitch_offset_3) + self.engine.detune_3*new_voice.detune_offset_3
             new_voice.base_note = note
             new_voice.filt.update_base_freq(new_pitch)
+            new_voice.filt2.update_base_freq(new_pitch)
             new_voice.osc.update_pitch(new_pitch)
             new_voice.osc2.update_pitch(new_pitch2)
             new_voice.osc3.update_pitch(new_pitch3)
