@@ -47,7 +47,7 @@ class AudioEngine():
             self.voices.append(Voice(self.mod_dial_values, self.mod_dial_modes))
         self.delay = StereoDelay(fs)
         self.delay_modulators = [LFO(fs, 5, 0, 0), LFO(fs, 5, 0, 0), ModEnv(fs, 0.5, 0.5, 0), ModEnv(fs, 0.5, 0.5, 0)]
-        self.no_mod = np.zeros((2048), dtype=np.float32)
+        self.no_mod = np.ascontiguousarray(np.zeros((2048), dtype=np.float32))
         self.recorder = AudioRecorder(fs)
         self.stopped_voice_indeces = []
         self.released_voice_indeces = []
@@ -59,8 +59,8 @@ class AudioEngine():
             voice.detune_offset_3 = .975 + .050*random.random()
             voice_index += 1
 
-        self.recorder_output = np.zeros((2048, 2), dtype=np.float32)
-        self.delay_output = np.zeros((2048, 2), dtype=np.float32)
+        self.recorder_output = np.ascontiguousarray(np.zeros((2048, 2), dtype=np.float32))
+        self.delay_output = np.ascontiguousarray(np.zeros((2048, 2), dtype=np.float32))
         self.key_to_note = {}
         self.note_to_voice = {}
         self.octave = 0
@@ -80,7 +80,7 @@ class AudioEngine():
         self.midi_channel = None
         self.previous_buffer_dac_time = pytime.perf_counter()
         self.scope_mutex = QMutex()
-        self.scope_buffer = np.zeros((16384, 2), dtype=np.float32)
+        self.scope_buffer = np.ascontiguousarray(np.zeros((16384, 2), dtype=np.float32))
         self.scope_frames = [0]
         self.scope_head = [0]
         self.scope_buffer_length = len(self.scope_buffer)
@@ -660,14 +660,14 @@ class Voice():
     def __init__(self, mod_dial_values, mod_dial_modes):
         self.mod_dial_values = mod_dial_values
         self.mod_dial_modes = mod_dial_modes
-        self.osc_out = np.zeros((2048, 2), dtype=np.float32)
-        self.osc2_out = np.zeros((2048, 2), dtype=np.float32)
-        self.osc3_out = np.zeros((2048, 2), dtype=np.float32)
-        self.filt_out = np.zeros((2048, 2), dtype=np.float32)
-        self.fenv_in = np.ones((2048, 2), dtype=np.float32)
-        self.fenv_out = np.zeros((2048, 2), dtype=np.float32)
-        self.no_mod = np.zeros((2048), dtype=np.float32)
-        self.voice_output = np.zeros((2048, 2), dtype=np.float32)
+        self.osc_out = np.ascontiguousarray(np.zeros((2048, 2), dtype=np.float32))
+        self.osc2_out = np.ascontiguousarray(np.zeros((2048, 2), dtype=np.float32))
+        self.osc3_out = np.ascontiguousarray(np.zeros((2048, 2), dtype=np.float32))
+        self.filt_out = np.ascontiguousarray(np.zeros((2048, 2), dtype=np.float32))
+        self.fenv_in = np.ascontiguousarray(np.ones((2048, 2), dtype=np.float32))
+        self.fenv_out = np.ascontiguousarray(np.zeros((2048, 2), dtype=np.float32))
+        self.no_mod = np.ascontiguousarray(np.zeros((2048), dtype=np.float32))
+        self.voice_output = np.ascontiguousarray(np.zeros((2048, 2), dtype=np.float32))
         self.osc = WrappedOsc(2, 0.5, 55, fs, .5)
         self.osc2 = WrappedOsc(2, 0.5, 55, fs, .5)
         self.osc3 = WrappedOsc(2, 0.5, 55, fs, .5)
