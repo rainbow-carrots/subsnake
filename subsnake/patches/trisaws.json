@@ -36,6 +36,7 @@
     "menv1_rel": 500,
     "menv2_att": 250,
     "menv2_rel": 250,
+    "kt_amt": 0,
     "osc_freq_mod": 0,
     "osc_freq_ass": 0,
     "osc_amp_mod": 0,
