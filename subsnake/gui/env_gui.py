@@ -14,7 +14,6 @@ class EnvelopeGUI(QGroupBox):
     decay_changed = Signal(float)
     sustain_changed = Signal(float)
     release_changed = Signal(float)
-    gate_changed = Signal(bool)
 
     def __init__(self, display_color=QColor("black")):
         super().__init__()
@@ -37,7 +36,6 @@ class EnvelopeGUI(QGroupBox):
         adsr_dec_label = QLabel("decay:")
         adsr_sus_label = QLabel("sustain:")
         adsr_rel_label = QLabel("release:")
-        adsr_gate_label = QLabel("gate:")
 
         #sliders
         self.adsr_att_slider = QSlider(Qt.Horizontal)
@@ -79,7 +77,6 @@ class EnvelopeGUI(QGroupBox):
         env_layout.addWidget(adsr_dec_label, 1, 1)
         env_layout.addWidget(adsr_sus_label, 2, 1)
         env_layout.addWidget(adsr_rel_label, 3, 1)
-        env_layout.addWidget(adsr_gate_label, 4, 1)
 
         #add sliders
         env_layout.addWidget(self.adsr_att_slider, 0, 2)
@@ -93,18 +90,11 @@ class EnvelopeGUI(QGroupBox):
         env_layout.addWidget(self.adsr_sus_display, 2, 3)
         env_layout.addWidget(self.adsr_rel_display, 3, 3)
 
-        #add gate control
-        self.env_gate = QPushButton("latch")
-        self.env_gate.setObjectName("env_gate")
-        self.env_gate.setCheckable(True)
-        env_layout.addWidget(self.env_gate, 4, 2)
-
         #connect signals
         self.adsr_att_slider.valueChanged.connect(self.change_attack)
         self.adsr_dec_slider.valueChanged.connect(self.change_decay)
         self.adsr_sus_slider.valueChanged.connect(self.change_sustain)
         self.adsr_rel_slider.valueChanged.connect(self.change_release)
-        self.env_gate.clicked.connect(self.change_gate)
 
         self.adsr_att_display.double_clicked.connect(self.reset_attack)
         self.adsr_dec_display.double_clicked.connect(self.reset_decay)
@@ -152,9 +142,6 @@ class EnvelopeGUI(QGroupBox):
         rel = float(value)/1000.0
         self.adsr_rel_display.display(f"{rel:.2f}")
         self.release_changed.emit(rel)
-    
-    def change_gate(self, checked):
-        self.gate_changed.emit(checked)
 
     def reset_attack(self):
         self.adsr_att_slider.setValue(10)

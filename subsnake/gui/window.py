@@ -252,7 +252,6 @@ class MainWindow(QMainWindow):
         self.env_group.decay_changed.connect(self.update_env_decay)
         self.env_group.sustain_changed.connect(self.update_env_sustain)
         self.env_group.release_changed.connect(self.update_env_release)
-        self.env_group.gate_changed.connect(self.update_env_gate)
 
         # filter envelope
         self.fenv_group.attack_changed.connect(self.update_fenv_attack)
