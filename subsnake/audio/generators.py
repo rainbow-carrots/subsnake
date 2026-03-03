@@ -17,14 +17,14 @@ max_det_inc = twopi*(10.0/float(fs))
 class WrappedOsc():
     def __init__(self, alg, amplitude, frequency, sample_rate, width=0.5):
         phase_increment = twopi * (frequency/sample_rate)
-        self.state = np.array([0.0, amplitude, phase_increment], dtype=np.float32)
-        self.state2 = np.array([0.0, amplitude, phase_increment], dtype=np.float32)
+        self.state = np.ascontiguousarray(np.array([0.0, amplitude, phase_increment], dtype=np.float32))
+        self.state2 = np.ascontiguousarray(np.array([0.0, amplitude, phase_increment], dtype=np.float32))
         self.random_walk = np.ascontiguousarray(np.zeros((2048), dtype=np.float32))
         self.walk_state = np.zeros((1), dtype=np.float32)
         self.walk_amt = 0.0
-        self.blit_integrators = np.zeros((3, 2), dtype=np.float32)
+        self.blit_integrators = np.ascontiguousarray(np.zeros((3, 2), dtype=np.float32))
         self.blep_integrator = np.zeros((1), dtype=np.float32)
-        self.blit_states = np.array([[0.0, amplitude, phase_increment], [0.0, amplitude, phase_increment]], dtype=np.float32)
+        self.blit_states = np.ascontiguousarray(np.array([[0.0, amplitude, phase_increment], [0.0, amplitude, phase_increment]], dtype=np.float32))
         self.blit_blocker_ins = np.zeros((1, 2), dtype=np.float32)
         self.blit_blocker_outs = np.zeros((1, 2), dtype=np.float32)
         self.alg = alg
