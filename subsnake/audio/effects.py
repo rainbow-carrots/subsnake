@@ -12,7 +12,7 @@ class StereoDelay():
     def __init__(self, fs, delay_time=0.5, delay_feedback=0.5, mix=.5):
         samples = fs*2
         self.fs = fs
-        self.buffer = np.zeros((samples, 2), dtype=np.float32)
+        self.buffer = np.ascontiguousarray(np.zeros((samples, 2), dtype=np.float32))
         self.delay_time = delay_time
         self.delay_feedback = delay_feedback
         self.write_heads = np.zeros((2), dtype=np.int32)
@@ -98,7 +98,7 @@ class AudioRecorder():
     def __init__(self, fs):
         self.fs = fs
         self.max_buffer_samples = 4*fs*60*5
-        self.record_buffer = np.zeros((self.max_buffer_samples, 2), dtype=np.float32)
+        self.record_buffer = np.ascontiguousarray(np.zeros((self.max_buffer_samples, 2), dtype=np.float32))
         self.play_heads = np.zeros((2), dtype=np.int32)
         self.end_heads = np.zeros((2), dtype=np.int32)
         self.paused = [False]
