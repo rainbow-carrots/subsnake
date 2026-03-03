@@ -5,7 +5,7 @@ from PySide6.QtWidgets import QApplication
 from PySide6.QtGui import QIcon, QPixmap, QFontDatabase
 from PySide6.QtCore import Qt
 from subsnake.gui import MainWindow
-from subsnake.audio import WrappedOsc, HalSVF, ADSR, AudioEngine
+from subsnake.audio import WrappedOsc, HalSVF, ZDFSVF, ADSR, AudioEngine
 from subsnake.audio.effects import AudioRecorder, StereoDelay
 from subsnake.audio.modulators import LFO, ModEnv
 from subsnake.gui.scope_gui import ScopeGUI
@@ -21,7 +21,10 @@ osc2_test = np.array([0.1, 0.5, .01], dtype=np.float32)
 walk_test = np.zeros((16), dtype=np.float32)
 walk_test_state = np.zeros((1), dtype=np.float32)
 mod_test = np.zeros((16), dtype=np.float32)
-filt_test = np.array([[0.0, 0.0, 1.0, 2.0, 0.0, 1.0, 8.0], [0.0, 0.0, 1.0, 2.0, 0.0, 1.0, 8.0]], dtype=np.float32)
+filt_test = np.zeros((2, 2), dtype=np.float32)
+filt_test_in = np.zeros((16, 2), dtype=np.float32)
+filt_test_out = np.zeros((16, 2), dtype=np.float32)
+filt_test_env = np.ones((16, 2), dtype=np.float32)
 env_test = np.array([0.0, 0.0, 1.0, 1.0, 0.5, 1.0], dtype=np.float32)
 phase_test = np.zeros((1), dtype=np.float32)
 test_out = np.zeros((128), dtype=np.float32)
@@ -55,8 +58,10 @@ WrappedOsc.blit_pulse(test_blit_out, test_blit_states, test_blit_integrators, te
                     walk_test, 1.0, mod_test, mod_test, mod_test, mod_test, 0.0, 0.0, 0.0, 0.0, 0.5, 440.0, 0.5)
 WrappedOsc.blit_triangle(test_blit_out, test_blit_states, test_blit_integrators, test_smoothed_widths,
                     walk_test, 1.0, mod_test, mod_test, mod_test, mod_test, 0.0, 0.0, 0.0, 0.0, 0.5, 440.0, 0.5)
-HalSVF.filter_block(filt_test, np.zeros((16, 2), dtype=np.float32), np.zeros((16, 2), dtype=np.float32), np.ones((16, 2), dtype=np.float32), 0.0, HalSVF.clip_sample, 100.0, 100.0, 0.0,
-                    mod_test, mod_test, mod_test, mod_test, mod_test, 0, 0, 0, 0, 0)
+HalSVF.filter_block(filt_test_in, filt_test_out, filt_test, filt_test_env, 0.0, HalSVF.clip_sample, 100.0, 0.0, 1.0, 1.0, 1.0, 100.0, 0.0,
+                    mod_test, mod_test, mod_test, mod_test, mod_test, 0.0, 0.0, 0.0, 0.0, 0.0)
+ZDFSVF.filter_block(filt_test_in, filt_test_out, filt_test, 0.0, 440.0, 1.0, 1.0, 1.0, 440.0, 0.5, filt_test_env, 0.0,
+                    mod_test, mod_test, mod_test, mod_test, mod_test, 0.0, 0.0, 0.0, 0.0, 0.0, ZDFSVF.trapezoidal_integrate, ZDFSVF.clip_sample)
 ADSR.envelope_block(env_test, False, np.zeros((16, 2), dtype=np.float32), np.zeros((16, 2), dtype=np.float32), 0, 0, mod_test, mod_test, mod_test, mod_test, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1)
 AudioRecorder.process_samples(np.zeros((32, 2), dtype=np.float32), np.zeros((16, 2), dtype=np.float32), np.zeros((16, 2), dtype=np.float32), 0,
                               [False], [True], [False], False, np.zeros((2), dtype=np.int32), np.zeros((2), dtype=np.int32), [False], np.float32(1.0), test_smoothed_widths, test_smoothed_widths, test_smoothed_widths)
