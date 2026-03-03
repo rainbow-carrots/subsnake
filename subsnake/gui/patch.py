@@ -46,7 +46,7 @@ class PatchManager(QGroupBox):
                             "env_att_mod": 0, "env_att_ass": 0, "env_dec_mod": 0, "env_dec_ass": 0,
                             "env_sus_mod": 0, "env_sus_ass": 0, "env_rel_mod": 0, "env_rel_ass": 0,
                             "del_time_mod": 0, "del_time_ass": 0, "del_fback_mod": 0, "del_fback_ass": 0, "del_mix_mod": 0, "del_mix_ass": 0,
-                            "lfo1_shape": "sine", "lfo2_shape": "sine", "menv1_mode": "AR","menv2_mode": "Loop"}
+                            "lfo1_shape": "sine", "lfo2_shape": "sine", "menv1_mode": "AR", "menv2_mode": "Loop", "kt_amt": 0}
         self.current_patch = {}
         self.sliders_dict = sliders_dict
         self.button_group_list = button_group_list
