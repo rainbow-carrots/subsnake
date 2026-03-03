@@ -22,7 +22,7 @@ class HalSVF():
         f = 2*math.sin(np.pi*(cutoff/(8*fs)))
 
         #init parameter buffer | lowpass, bandpass, tuning, dampening, type, drive, saturation
-        self.state = np.array([[0.0, 0.0, f, q, type, drive, saturate], [0.0, 0.0, f, q, type, drive, saturate]], dtype=np.float32)
+        self.state = np.ascontiguousarray(np.array([[0.0, 0.0, f, q, type, drive, saturate], [0.0, 0.0, f, q, type, drive, saturate]], dtype=np.float32))
     
     def process_block(self, input, output, fenv, mod_buffer, mod_values):
         self.filter_block(self.state, input, output, fenv, self.env_amount, HalSVF.clip_sample, self.cutoff, self.base_freq, self.key_tracking,
@@ -115,7 +115,7 @@ class HalSVF():
     
 class ZDFSVF():
     def __init__(self):
-        self.integrator_states = np.zeros((2, 2), dtype=np.float32)
+        self.integrator_states = np.ascontiguousarray(np.zeros((2, 2), dtype=np.float32))
         self.cutoff = 22050.0
         self.feedback = 1.0
         self.drive = 1.0
