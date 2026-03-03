@@ -482,6 +482,8 @@ class MainWindow(QMainWindow):
 
         self.param_sliders.update({"menv2_att": self.mod_group.menv_att_slider_2})
         self.param_sliders.update({"menv2_rel": self.mod_group.menv_rel_slider_2})
+
+        self.param_sliders.update({"kt_amt": self.synth_group.key_tracking_slider})
     
     def init_buttons_dict(self):
         self.param_button_groups.append(self.osc_group.osc_alg_group)
