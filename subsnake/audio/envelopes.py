@@ -10,7 +10,7 @@ class ADSR():
     def __init__(self, attack=0.01, decay=0.5, sustain=0.5, release=0.5):
         #envelope state array
         #   level, stage, attack c, decay c, sustain, release c
-        self.state = np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
+        self.state = np.ascontiguousarray(np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0]))
         self.gate = False
         self.attack_sample = 0
         self.release_sample = 0
