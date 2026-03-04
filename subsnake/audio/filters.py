@@ -7,7 +7,6 @@ twopi = 2*np.pi
 oneoverpi = 1/np.pi
 
 # Hal Chamberlin's digital SV Filter w/ nonlinear feedback | 8x oversampled
-# type = 1.0: lowpass, 2.0: highpass, 3.0: bandpass, 4.0: notch
 class HalSVF():
     def __init__(self, type, cutoff, resonance, drive=1.0, saturate=8.0):
         self.integrators = np.ascontiguousarray(np.zeros((2, 2), dtype=np.float32))
@@ -19,10 +18,14 @@ class HalSVF():
         self.base_freq = 440.0
         self.key_tracking = 0.0
         self.mode = 0
+        self.params = np.zeros((8), dtype=np.float32)
+        self.mod_values = np.zeros((5), dtype=np.float32)
     
     def process_block(self, input, output, fenv, mod_buffer, mod_values):
-        self.filter_block(input, output, self.integrators, fenv, self.env_amount, HalSVF.clip_sample, self.cutoff, self.mode, self.resonance, self.drive, self.saturate, self.base_freq, self.key_tracking,
-                          mod_buffer[0], mod_buffer[1], mod_buffer[2], mod_buffer[3], mod_buffer[4], mod_values[0], mod_values[1], mod_values[2], mod_values[3], mod_values[4])
+        self.params[:] = [self.cutoff, self.resonance, self.drive, self.saturate, self.mode, self.base_freq, self.key_tracking, self.env_amount]
+        self.mod_values[:] = [mod_values[0], mod_values[1], mod_values[2], mod_values[3], mod_values[4]]
+        self.filter_block(input, output, self.integrators, self.params, fenv, HalSVF.clip_sample,
+                          mod_buffer[0], mod_buffer[1], mod_buffer[2], mod_buffer[3], mod_buffer[4], self.mod_values)
 
     def update_cutoff(self, freq):
         self.cutoff = freq
@@ -50,9 +53,27 @@ class HalSVF():
         
     @staticmethod
     @njit(nogil=True, fastmath=True, cache=True, inline="always")
-    def filter_block(input, output, states, fenv, fenv_amount, clip_sample, cutoff, mode, resonance, drive, saturate, base_freq, kt_amt, freq_mod, res_mod, drive_mod, sat_mod, fenv_mod, fm_val, rm_val, dm_val, sm_val, fem_val):
+    def filter_block(input, output, states, params, fenv, clip_sample, freq_mod, res_mod, drive_mod, sat_mod, fenv_mod, mod_vals):
+        #assign scalars
+        cutoff = params[0]
+        resonance = params[1]
+        drive = params[2]
+        saturate = params[3]
+        mode = params[4]
+        base_freq = params[5]
+        kt_amt = params[6]
+        fenv_amount = params[7]
+        fm_val = mod_vals[0]
+        rm_val = mod_vals[1]
+        dm_val = mod_vals[2]
+        sm_val = mod_vals[3]
+        fem_val = mod_vals[4]
+
+        #calculate key tracking
         cutoff_freq_amt = (1.0 - kt_amt)*cutoff
         kt_freq_amt = kt_amt*base_freq*32.0
+
+        #main loop
         for c in range (2):
             for n in range(len(output)):
                 freq_mod_amt = freq_mod[n]*fm_val
@@ -104,11 +125,11 @@ class HalSVF():
             output = clip_sample * threshold
         return output
 
-    
+# ZDF-solved Chamberlin SVF w/ nonlinear resonance & output soft clipping
 class ZDFSVF():
     def __init__(self):
         self.integrator_states = np.ascontiguousarray(np.zeros((2, 2), dtype=np.float32))
-        self.cutoff = 22050.0
+        self.cutoff = 20000.0
         self.feedback = 1.0
         self.drive = 1.0
         self.saturate = 8.0
@@ -116,11 +137,14 @@ class ZDFSVF():
         self.base_freq = 440.0
         self.key_tracking = 0.0
         self.mode = 0
+        self.params = np.zeros((8), dtype=np.float32)
+        self.mod_values = np.zeros((5), dtype=np.float32)
     
     def process_block(self, filt_input, filt_output, fenv, mod_buffers, mod_values):
-        self.filter_block(filt_input, filt_output, self.integrator_states, self.mode, self.cutoff, self.feedback, self.drive, self.saturate, self.base_freq, self.key_tracking, fenv, self.env_amount,
-                          mod_buffers[0], mod_buffers[1], mod_buffers[2], mod_buffers[3], mod_buffers[4],
-                          mod_values[0], mod_values[1], mod_values[2], mod_values[3], mod_values[4],
+        self.params[:] = [self.cutoff, self.feedback, self.drive, self.saturate, self.mode, self.base_freq, self.key_tracking, self.env_amount]
+        self.mod_values[:] = [mod_values[0], mod_values[1], mod_values[2], mod_values[3], mod_values[4]]
+        self.filter_block(filt_input, filt_output, self.integrator_states, self.params, fenv,
+                          mod_buffers[0], mod_buffers[1], mod_buffers[2], mod_buffers[3], mod_buffers[4], self.mod_values,
                           self.trapezoidal_integrate, self.clip_sample)
 
     def update_cutoff(self, freq):
@@ -149,9 +173,27 @@ class ZDFSVF():
 
     @staticmethod
     @njit(nogil=True, fastmath=True, cache=True, inline="always")
-    def filter_block(filt_in, filt_out, states, mode, cutoff, feedback, drive, saturate, base_freq, kt_amt, fenv, fenv_amt, freq_mod, res_mod, drive_mod, sat_mod, fenv_mod, fm_val, rm_val, dm_val, sm_val, fem_val, trap_int, clip):
+    def filter_block(filt_in, filt_out, states, params, fenv, freq_mod, res_mod, drive_mod, sat_mod, fenv_mod, mod_vals, trap_int, clip):
+        #assign scalars
+        cutoff = params[0]
+        feedback = params[1]
+        drive = params[2]
+        saturate = params[3]
+        mode = params[4]
+        base_freq = params[5]
+        kt_amt = params[6]
+        fenv_amt = params[7]
+        fm_val = mod_vals[0]
+        rm_val = mod_vals[1]
+        dm_val = mod_vals[2]
+        sm_val = mod_vals[3]
+        fem_val = mod_vals[4]
+
+        #calculate key tracking
         cutoff_freq_amt = (1.0 - kt_amt)*cutoff
         kt_freq_amt = kt_amt*base_freq*32.0
+
+        #main loop
         for c in range(2):
             for n in range(len(filt_out)):
                 freq_mod_amt = freq_mod[n]*fm_val
@@ -169,7 +211,7 @@ class ZDFSVF():
                 
                 prev_band = states[0, c]
                 if prev_band != 0.0:
-                    nl_res_c = math.tanh((prev_band*new_drive)*oneoverdrive) / prev_band
+                    nl_res_c = res_c*math.tanh((prev_band*new_drive)*oneoverdrive) / prev_band
                 else:
                     nl_res_c = res_c
 
