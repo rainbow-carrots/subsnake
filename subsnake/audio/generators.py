@@ -46,13 +46,13 @@ class WrappedOsc():
         elif (self.alg == 1.0):
             if (self.alg_type == 0):
                 self.blit_saw(buffer, self.blit_states, self.blit_integrators,
-                          self.random_walk[:frames], self.walk_amt, mod_buffers[0], mod_buffers[1], mod_buffers[2], mod_values[0], mod_values[1], mod_values[2], self.amp, self.freq)
+                          self.random_walk[:frames], self.walk_amt, mod_buffers[0], mod_buffers[1], mod_buffers[2], mod_values[0], mod_values[1], mod_values[2], self.leaky_trapezoidal_integrate, self.amp, self.freq)
             else:
                 self.polyblep_saw(self.state, buffer, self.random_walk, self.walk_amt, mod_buffers[0], mod_buffers[1], mod_buffers[2], mod_values[1], mod_values[2], mod_values[3], self.amp, self.freq)
         elif (self.alg == 2.0):
             if (self.alg_type == 0):
                 self.blit_pulse(buffer, self.blit_states, self.blit_integrators, self.smoothed_widths,
-                          self.random_walk[:frames], self.walk_amt, mod_buffers[0], mod_buffers[1], mod_buffers[2], mod_buffers[3], mod_values[0], mod_values[1], mod_values[2], mod_values[3], self.amp, self.freq, self.pulsewidth)
+                          self.random_walk[:frames], self.walk_amt, mod_buffers[0], mod_buffers[1], mod_buffers[2], mod_buffers[3], mod_values[0], mod_values[1], mod_values[2], mod_values[3], self.leaky_trapezoidal_integrate, self.amp, self.freq, self.pulsewidth)
             else:
                 self.polyblep_pulse(self.state, buffer, self.state2, self.pulsewidth, self.random_walk, self.walk_amt,
                                     mod_buffers[0], mod_buffers[1], mod_buffers[2], mod_buffers[3], mod_values[0], mod_values[1], mod_values[2], mod_values[3], self.amp, self.freq)
@@ -257,7 +257,7 @@ class WrappedOsc():
     @staticmethod
     @njit(nogil=True, fastmath=True, cache=True)
     def blit_saw(outdata, states, integrators,
-                 walk_mod, walk_amt, pitch_mod, det_mod, amp_mod, pm_amt, dm_amt, am_amt, amp=1.0, freq=440.0):
+                 walk_mod, walk_amt, pitch_mod, det_mod, amp_mod, pm_amt, dm_amt, am_amt, trap_int, amp=1.0, freq=440.0):
         frames = len(outdata)
         base_inc = freq*oneoverfs
         for n in range(0, frames):
@@ -273,11 +273,11 @@ class WrappedOsc():
                 else:
                     slope = 1.0-math.sin(np.pi*harmonics*phase)/kernel_den
                 slope *= mod_inc*2
-                integrators[0, c] = integrators[0, c]*leak_c + slope
+                v1, integrators[0, c] = trap_int(slope, integrators[0, c])
                 states[c, 0] += mod_inc
                 states[c, 0] -= np.floor(states[c, 0])
 
-                output_sample = integrators[0, c]
+                output_sample = v1
                 mod_amp = max(-1.0, min(1.0, amp + amp_mod[n]*am_amt))
                 outdata[n, c] = output_sample*mod_amp
 
@@ -285,11 +285,10 @@ class WrappedOsc():
     @staticmethod
     @njit(nogil=True, fastmath=True, cache=True)
     def blit_pulse(outdata, states, integrators, smoothed_widths,
-                    walk_mod, walk_amt, pitch_mod, det_mod, amp_mod, width_mod, pm_amt, dm_amt, am_amt, wm_amt, amp=1.0, freq=440.0, width=0.5):
+                    walk_mod, walk_amt, pitch_mod, det_mod, amp_mod, width_mod, pm_amt, dm_amt, am_amt, wm_amt, trap_int, amp=1.0, freq=440.0, width=0.5):
         frames = len(outdata)
         base_inc = freq*oneoverfs
         alpha = 1.0 - math.exp(-twopi*50.0*oneoverfs)
-        leak_c = .9995
         for n in range(0, frames):
             for c in range(0, 2):
                 mod_inc = base_inc + base_inc*pitch_mod[n]*pm_amt + max_det_inc*walk_mod[n]*walk_amt + max_det_inc*det_mod[n]*dm_amt
@@ -313,12 +312,12 @@ class WrappedOsc():
                     slope2 = 1.0-math.sin(np.pi*harmonics*phase2)/kernel_den_2
                 slope1 *= mod_inc*2
                 slope2 *= mod_inc*2
-                integrators[0, c] = integrators[0, c]*leak_c + slope1
-                integrators[1, c] = integrators[1, c]*leak_c + slope2
+                v1, integrators[0, c] = trap_int(slope1, integrators[0, c])
+                v2, integrators[1, c] = trap_int(slope2, integrators[1, c])
                 states[c, 0] += mod_inc
                 states[c, 0] -= np.floor(states[c, 0])
 
-                output_sample = integrators[0, c] - integrators[1, c]
+                output_sample = v1 - v2
                 mod_amp = max(-1.0, min(1.0, amp + amp_mod[n]*am_amt))
                 outdata[n, c] = output_sample*mod_amp
 
