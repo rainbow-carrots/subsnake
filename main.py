@@ -59,7 +59,7 @@ WrappedOsc.blit_saw(test_blit_out, test_blit_states, test_blit_integrators,
 WrappedOsc.blit_pulse(test_blit_out, test_blit_states, test_blit_integrators, test_smoothed_widths,
                     walk_test, 1.0, mod_test, mod_test, mod_test, mod_test, 0.0, 0.0, 0.0, 0.0, 0.5, 440.0, 0.5)
 WrappedOsc.blit_triangle(test_blit_out, test_blit_states, test_blit_integrators, test_smoothed_widths,
-                    walk_test, 1.0, mod_test, mod_test, mod_test, mod_test, 0.0, 0.0, 0.0, 0.0, 0.5, 440.0, 0.5)
+                    walk_test, 1.0, mod_test, mod_test, mod_test, mod_test, 0.0, 0.0, 0.0, 0.0, WrappedOsc.leaky_trapezoidal_integrate, 0.5, 440.0, 0.5)
 HalSVF.filter_block(filt_test_in, filt_test_out, filt_test, filt_test_params, filt_test_env, HalSVF.clip_sample,
                     mod_test, mod_test, mod_test, mod_test, mod_test, filt_test_mod_values)
 ZDFSVF.filter_block(filt_test_in, filt_test_out, filt_test, filt_test_params, filt_test_env,
