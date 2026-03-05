@@ -55,9 +55,9 @@ WrappedOsc.polyblep_saw(osc_test, np.zeros((16, 2), dtype=np.float32), walk_test
 WrappedOsc.polyblep_pulse(osc_test, np.zeros((16, 2), dtype=np.float32), osc2_test, 0.5, walk_test, 1.0, mod_test, mod_test, mod_test, mod_test, 0.0, 0.0, 0.0, 0.0, 1.0, 440.0)
 WrappedOsc.polyblep_triangle(osc_test, test_blep_integrator, test_smoothed_width, test_output_hpf, np.zeros((16, 2), dtype=np.float32), osc2_test, 0.5, walk_test, 1.0, mod_test, mod_test, mod_test, mod_test, 0.0, 0.0, 0.0, 0.0, 1.0, 440.0)
 WrappedOsc.blit_saw(test_blit_out, test_blit_states, test_blit_integrators,
-                    walk_test, 1.0, mod_test, mod_test, mod_test, 0.0, 0.0, 0.0, 0.5, 440.0)
+                    walk_test, 1.0, mod_test, mod_test, mod_test, 0.0, 0.0, 0.0, WrappedOsc.leaky_trapezoidal_integrate, 0.5, 440.0)
 WrappedOsc.blit_pulse(test_blit_out, test_blit_states, test_blit_integrators, test_smoothed_widths,
-                    walk_test, 1.0, mod_test, mod_test, mod_test, mod_test, 0.0, 0.0, 0.0, 0.0, 0.5, 440.0, 0.5)
+                    walk_test, 1.0, mod_test, mod_test, mod_test, mod_test, 0.0, 0.0, 0.0, 0.0, WrappedOsc.leaky_trapezoidal_integrate, 0.5, 440.0, 0.5)
 WrappedOsc.blit_triangle(test_blit_out, test_blit_states, test_blit_integrators, test_smoothed_widths,
                     walk_test, 1.0, mod_test, mod_test, mod_test, mod_test, 0.0, 0.0, 0.0, 0.0, WrappedOsc.leaky_trapezoidal_integrate, 0.5, 440.0, 0.5)
 HalSVF.filter_block(filt_test_in, filt_test_out, filt_test, filt_test_params, filt_test_env, HalSVF.clip_sample,
