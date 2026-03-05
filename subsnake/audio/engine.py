@@ -230,7 +230,9 @@ class AudioEngine():
 
     def save_rec_buffer(self, filename):
         frames = max(self.recorder.end_heads[0], self.recorder.end_heads[1])
-        sf.write(filename, self.recorder.record_buffer[:frames], fs)
+        buffer_max = np.max(np.abs(self.recorder.record_buffer[:frames]))
+        norm_buffer = self.recorder.record_buffer[:frames] / buffer_max
+        sf.write(filename, norm_buffer, fs)
         print(f"audio saved to: {filename}")
 
     #voice helper functions
