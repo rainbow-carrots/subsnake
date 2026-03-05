@@ -11,6 +11,8 @@ oneoverpi = 1/np.pi
 oneovertwopi = 1/twopi
 piovertwo = np.pi/2.0
 max_det_inc = twopi*(10.0/float(fs))
+integrator_gain = math.tan(np.pi * 10.0/fs)
+g_norm = 1.0/(1.0 + integrator_gain)
 
 # phase-wrapped oscillator
 # alg = 0.0: sine, 1.0: BLIT sawtooth, 2.0: BLIT pulse | width = 0.0 to 1.0
@@ -57,7 +59,7 @@ class WrappedOsc():
         elif (self.alg == 3.0):
             if (self.alg_type == 0):
                 self.blit_triangle(buffer, self.blit_states, self.blit_integrators, self.smoothed_widths,
-                          self.random_walk[:frames], self.walk_amt, mod_buffers[0], mod_buffers[1], mod_buffers[2], mod_buffers[3], mod_values[0], mod_values[1], mod_values[2], mod_values[3], self.amp, self.freq, self.pulsewidth)
+                          self.random_walk[:frames], self.walk_amt, mod_buffers[0], mod_buffers[1], mod_buffers[2], mod_buffers[3], mod_values[0], mod_values[1], mod_values[2], mod_values[3], self.leaky_trapezoidal_integrate, self.amp, self.freq, self.pulsewidth)
             else:
                 self.polyblep_triangle(self.state, self.blep_integrator, self.smoothed_blep_width, self.output_hpf, buffer, self.state2, self.pulsewidth, self.random_walk, self.walk_amt,
                                     mod_buffers[0], mod_buffers[1], mod_buffers[2], mod_buffers[3], mod_values[0], mod_values[1], mod_values[2], mod_values[3], self.amp, self.freq)
@@ -323,9 +325,9 @@ class WrappedOsc():
     #anti-aliased trisaw (BLIT)
     # (width=0.5: triangle, width≈0.0: sawtooth, width≈1.0: ramp)
     @staticmethod
-    @njit(nogil=True, fastmath=True, cache=True)
+    @njit(nogil=True, fastmath=True, cache=True, inline="always")
     def blit_triangle(outdata, states, integrators, smoothed_widths,
-                    walk_mod, walk_amt, pitch_mod, det_mod, amp_mod, width_mod, pm_amt, dm_amt, am_amt, wm_amt, amp=1.0, freq=440.0, width=0.5):
+                    walk_mod, walk_amt, pitch_mod, det_mod, amp_mod, width_mod, pm_amt, dm_amt, am_amt, wm_amt, trap_int, amp=1.0, freq=440.0, width=0.5):
         frames = len(outdata)
         base_inc = freq*oneoverfs
         alpha = 1.0 - math.exp(-twopi*50.0*oneoverfs)
@@ -340,7 +342,6 @@ class WrappedOsc():
                 phase1 = states[c, 0]
                 phase2 = phase1 + smoothed_width
                 phase2 -= np.floor(phase2)
-                leak_c = 1.0 - twopi*mod_inc*.1
                 kernel_den_1 = math.sin(np.pi*phase1)
                 kernel_den_2 = math.sin(np.pi*phase2)
                 if phase1 < 1e-9:
@@ -353,14 +354,22 @@ class WrappedOsc():
                     slope2 = 1.0-math.sin(np.pi*harmonics*phase2)/kernel_den_2
                 slope1 *= mod_inc*2
                 slope2 *= mod_inc*2
-                integrators[0, c] = integrators[0, c]*leak_c + slope1
-                integrators[1, c] = integrators[1, c]*leak_c + slope2
+                v1, integrators[0, c] = trap_int(slope1, integrators[0, c])
+                v2, integrators[1, c] = trap_int(slope2, integrators[1, c])
                 states[c, 0] += mod_inc
                 states[c, 0] -= np.floor(states[c, 0])
 
-                blit_pulse = (integrators[0, c] - integrators[1, c])
-                integrators[2, c] = integrators[2, c]*leak_c + blit_pulse
+                blit_pulse = (v1 - v2)
+                v3, integrators[2, c] = trap_int(blit_pulse, integrators[2, c])
                 scale = (mod_inc)/(smoothed_width*(1.0 - smoothed_width))
-                output_sample = integrators[2, c]*scale
+                output_sample = v3*scale
                 mod_amp = max(-1.0, min(1.0, amp + amp_mod[n]*am_amt))
                 outdata[n, c] = output_sample*mod_amp
+
+    @staticmethod
+    @njit(nogil=True, fastmath=True, cache=True)
+    def leaky_trapezoidal_integrate(x, state, gn=g_norm):
+        x = x*0.5
+        v = (x + state)*gn
+        next_state = 2*v - state
+        return v, next_state
