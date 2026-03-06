@@ -110,8 +110,7 @@ class MainWindow(QMainWindow):
         self.record_group = RecorderSettings()
         self.record_group.setFocusPolicy(Qt.NoFocus)
 
-        self.scope_group = ScopeGUI(self.engine.scope_mutex, self.engine.scope_buffer,
-                                    self.engine.scope_frames, self.engine.scope_head)
+        self.scope_group = ScopeGUI(self.engine.scope_buffer, self.engine.scope_head)
         self.scope_group.setFocusPolicy(Qt.NoFocus)
 
         self.settings_view = QWidget()
