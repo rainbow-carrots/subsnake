@@ -1,4 +1,4 @@
-from PySide6.QtCore import QPointF, Qt, QTimer, QMutexLocker
+from PySide6.QtCore import QPointF, Qt, QTimer
 from PySide6.QtWidgets import (
     QGroupBox, QGraphicsScene, QSizePolicy, QGraphicsDropShadowEffect,
     QGraphicsView, QGraphicsPathItem, QGridLayout, QGraphicsItem
@@ -7,16 +7,17 @@ from PySide6.QtGui import (
     QPolygonF, QPainterPath, QPen,
     QColor, QPainter
 )
+import shiboken6
 import numpy as np
 from numba import njit
+kernel = np.ones(15, dtype=np.float32) / 15.0
 
 class ScopeGUI(QGroupBox):
-    def __init__(self, scope_mutex, scope_buffer, scope_frames, scope_head):
+    def __init__(self, scope_buffer, scope_head):
         super().__init__()
-        self.scope_mutex = scope_mutex
         self.scope_buffer = scope_buffer
-        self.scope_frames = scope_frames
         self.scope_head = scope_head
+        self.scope_flat = np.copy(self.scope_buffer)
         self.stable_scope = np.ascontiguousarray(np.zeros((2048, 2), dtype=np.float32))
         self.x_coords = np.ascontiguousarray(np.arange(2048, dtype=np.float32))
         self.base_x_coords = np.ascontiguousarray(np.arange(2048, dtype=np.float32))
@@ -45,8 +46,14 @@ class ScopeGUI(QGroupBox):
         
         self.scope_points_list = [self.test_data_x, self.test_data_y]
         self.scope_points_buffer = np.column_stack(self.scope_points_list)
-        self.scope_points = [QPointF(x, y) for x, y in self.scope_points_buffer]
+        self.scope_points = [QPointF(0.0, 0.0)] * 2048
         self.scope_polygon = QPolygonF(self.scope_points)
+        _scope_polygon = self.scope_polygon.data()
+        sp_bytes = 2048 * 2 * 8
+        scope_polygon_ptr = shiboken6.VoidPtr(_scope_polygon, sp_bytes, True)
+        self.scope_polygon_view = np.frombuffer(scope_polygon_ptr, dtype=np.float64).reshape(2048, 2)
+        self.scope_polygon_view[:, 0] = self.x_coords
+
         self.scope_painter_path = QPainterPath()
         self.scope_painter_path.addPolygon(self.scope_polygon)
 
@@ -75,13 +82,12 @@ class ScopeGUI(QGroupBox):
         #self.scope_timer.start()
 
     def update_display(self):
-            self.update_display_math(self.scope_head, self.scope_buffer, self.base_x_coords,
+            np.concatenate((self.scope_buffer[self.scope_head[0]:], self.scope_buffer[:self.scope_head[0]]), axis=0, out=self.scope_flat)
+            self.update_display_math(self.base_x_coords, self.scope_flat,
                                      self.stable_scope, self.x_coords, self.valid_crossings, self.valid_crossings_count)
-            self.scope_points_list[0] = self.x_coords
             self.scope_points_list[1] = np.mean(self.stable_scope, axis=1)
-            self.scope_points_buffer = np.column_stack(self.scope_points_list)
-            self.scope_points = [QPointF(x, y+1.0) for x, y in self.scope_points_buffer]
-            self.scope_polygon = QPolygonF(self.scope_points)
+            self.scope_polygon_view[:, 0] = self.x_coords
+            self.scope_polygon_view[:, 1] = self.scope_points_list[1] + 1.0
             self.scope_painter_path = QPainterPath()
             self.scope_painter_path.addPolygon(self.scope_polygon)
             self.scope_path.setPath(self.scope_painter_path)
@@ -96,21 +102,18 @@ class ScopeGUI(QGroupBox):
 
     @staticmethod
     @njit(nogil=True, fastmath=True, cache=True)
-    def update_display_math(scope_head, scope_buffer, base_x_coords, stable_scope, x_coords, valid_crossings, vc_count):
-        head_pos = scope_head[0]
-
-        scope_flat = np.roll(scope_buffer, -head_pos)
+    def update_display_math(base_x_coords, scope_flat, stable_scope, x_coords, valid_crossings, vc_count):
         search_start = max(0, len(scope_flat) - 6144)
         search_end = len(scope_flat) - 2048
         search_window = np.sum(scope_flat[search_start:search_end], axis=1)
 
-        kernel = np.ones(15, dtype=np.float32) / 15.0
         smoothed_window = np.convolve(search_window, kernel, mode="same")
 
         peak_amp = np.max(np.abs(smoothed_window))
         hysteresis_thresh = -0.1*peak_amp if peak_amp > 0 else -.01
             
         zero_crossings = np.where((smoothed_window[:-1] <= 0) & (smoothed_window[1:] > 0))[0]
+
         vc_count[0] = 0
         for c in zero_crossings:
             lookback = smoothed_window[max(0, c - 1000):c]
