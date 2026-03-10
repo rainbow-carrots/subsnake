@@ -167,6 +167,10 @@ class FilterGUI(QGroupBox):
             self.filt_alg_notch.setChecked(True)
         self.alg_changed.emit(new_type)
 
+    def update_mode(self, newMode):
+        self.mode = newMode
+        self.mode_changed.emit(newMode)
+
     #slots
     def change_freq(self, value):
         newFreq = 27.5 * 2**(float(value)/100.0)
