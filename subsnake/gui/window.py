@@ -34,6 +34,7 @@ class MainWindow(QMainWindow):
         #attributes
         self.param_sliders = {}
         self.mod_dials = {}
+        self.modules_dict = {}
         self.param_button_groups = []
         self.midi_controls = []
         self.midi_cc_sliders = {}
@@ -56,7 +57,7 @@ class MainWindow(QMainWindow):
         self.record_drop_shadow = self.configure_drop_shadow(QGraphicsDropShadowEffect(), QColor("#1c0627"))
 
         #toolbar
-        self.patch_manager = PatchManager(self.param_sliders, self.param_button_groups, self.mod_dials)
+        self.patch_manager = PatchManager(self.param_sliders, self.param_button_groups, self.mod_dials, self.modules_dict)
         self.recorder = RecorderGUI()
         settings_layout = QHBoxLayout()
         self.settings_group = QGroupBox("settings")
@@ -113,6 +114,7 @@ class MainWindow(QMainWindow):
         self.scope_group = ScopeGUI(self.engine.scope_buffer, self.engine.scope_head)
         self.scope_group.setFocusPolicy(Qt.NoFocus)
 
+        #settings stack
         self.settings_view = QWidget()
         self.settings_stack = QStackedLayout()
         self.settings_stack.addWidget(self.midi_group)
@@ -131,6 +133,16 @@ class MainWindow(QMainWindow):
         self.fenv_group = FilterEnvGUI(self.display_color)
         self.del_group = DelayGUI(self.display_color)
         self.mod_group = ModulatorGUI(self.display_color)
+
+        #update modulate dictionary
+        self.modules_dict.update({"filt_group": self.filt_group})
+        self.modules_dict.update({"osc_group": self.osc_group})
+        self.modules_dict.update({"osc2_group": self.osc2_group})
+        self.modules_dict.update({"osc3_group": self.osc3_group})
+        self.modules_dict.update({"env_group": self.env_group})
+        self.modules_dict.update({"fenv_group": self.fenv_group})
+        self.modules_dict.update({"del_group": self.del_group})
+        self.modules_dict.update({"mod_group": self.osc2_group})
 
         #module drop shadows
         self.osc_group.setGraphicsEffect(self.osc_drop_shadow)
@@ -555,6 +567,8 @@ class MainWindow(QMainWindow):
                 self.osc3_group.update_wave(patch[param])
             elif param == "filt_type":
                 self.filt_group.update_type(patch[param])
+            elif param == "filt_mode":
+                self.filt_group.update_mode(patch[param])
             elif param == "lfo1_shape":
                 self.mod_group.set_lfo1_shape(patch[param])
             elif param == "lfo2_shape":
