@@ -12,10 +12,9 @@ from pathlib import Path
 
 class PatchManager(QGroupBox):
     patch_loaded = Signal(dict)
-    def __init__(self, sliders_dict, button_group_list, mod_dials_dict):
+    def __init__(self, sliders_dict, button_group_list, mod_dials_dict, groups_dict):
         super().__init__()
         self.setTitle("patch")
-
         self.patch_select = QComboBox()
         self.patch_select.setFocusPolicy(Qt.NoFocus)
         self.save_patch = QPushButton("save")
@@ -24,7 +23,7 @@ class PatchManager(QGroupBox):
         self.default_patch = {"osc_drift": 0, "osc_freq": 0, "osc_amp": 500, "osc_width": 250, "osc_wave": "pulse",
                             "osc2_freq": 0, "osc2_det": 0, "osc2_amp": 0, "osc2_width": 250, "osc2_wave": "saw",
                             "osc3_freq": 0, "osc3_det": 0, "osc3_amp": 0, "osc3_width": 250, "osc3_wave": "saw",
-                            "filt_freq": 700, "filt_res": 0, "filt_drive": 40, "filt_sat": 100, "filt_type": "low",
+                            "filt_freq": 700, "filt_res": 0, "filt_drive": 40, "filt_sat": 100, "filt_type": "low", "filt_mode": 1,
                             "fenv_att": 10, "fenv_dec": 500, "fenv_sus": 1000, "fenv_rel": 500, "fenv_amt": 0,
                             "env_att": 10, "env_dec": 500, "env_sus": 1000, "env_rel": 250,
                             "del_time": 100, "del_fback": 500, "del_mix": 0,
@@ -51,6 +50,7 @@ class PatchManager(QGroupBox):
         self.sliders_dict = sliders_dict
         self.button_group_list = button_group_list
         self.mod_dials_dict = mod_dials_dict
+        self.modules_dict = groups_dict
 
         layout = QHBoxLayout()
         layout.addStretch()
@@ -163,6 +163,7 @@ class PatchManager(QGroupBox):
         self.current_patch.update({"lfo2_shape": lfo2_shape_button.text()})
         self.current_patch.update({"menv1_mode": menv1_mode_button.text()})
         self.current_patch.update({"menv2_mode": menv2_mode_button.text()})
+        self.current_patch.update({"filt_mode": self.modules_dict["filt_group"].mode})
 
     def check_user_dir(self):
         self.user_patch_path.mkdir(parents=True, exist_ok=True)
