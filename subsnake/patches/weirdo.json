@@ -114,5 +114,6 @@
     "lfo1_shape": "s+h",
     "lfo2_shape": "sine",
     "menv1_mode": "AR",
-    "menv2_mode": "AR"
+    "menv2_mode": "AR",
+    "filt_mode": 0
 }
