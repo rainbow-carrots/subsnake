@@ -52,7 +52,7 @@ class HalSVF():
         self.base_freq = newFreq
         
     @staticmethod
-    @njit(nogil=True, fastmath=True, cache=True, inline="always")
+    @njit(nogil=True, fastmath=True, inline="always")
     def filter_block(input, output, states, params, fenv, clip_sample, freq_mod, res_mod, drive_mod, sat_mod, fenv_mod, mod_vals):
         #assign scalars
         cutoff = params[0]
@@ -172,7 +172,7 @@ class ZDFSVF():
         self.base_freq = newFreq
 
     @staticmethod
-    @njit(nogil=True, fastmath=True, cache=True, inline="always")
+    @njit(nogil=True, fastmath=True, inline="always")
     def filter_block(filt_in, filt_out, states, params, fenv, freq_mod, res_mod, drive_mod, sat_mod, fenv_mod, mod_vals, trap_int, clip):
         #assign scalars
         cutoff = params[0]
@@ -238,14 +238,14 @@ class ZDFSVF():
                     filt_out[n, c] = N_out
 
     @staticmethod
-    @njit(nogil=True, fastmath=True, cache=True)
+    @njit(nogil=True, fastmath=True)
     def trapezoidal_integrate(x, g, state):
         v = g*x + state
         next_state = v + g*x
         return v, next_state
     
     @staticmethod
-    @njit(nogil=True, fastmath=True, cache=True)
+    @njit(nogil=True, fastmath=True)
     def clip_sample(sample, threshold):
         if (sample > threshold):
             output = threshold * 0.66667
