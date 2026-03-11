@@ -46,13 +46,13 @@ there's also a stereo tape delay effect on the master bus (voice output + record
 * the keys A-' are mapped chromatically and can trigger note events (fixed velocity)
     * you can shift the pc keyboard octave range up/down using the +/- keys
 * to switch between oscillator types (BLIT/polyBLEP), *right click* the oscillator title box
-    * applies to sawtooth, pulse & triangle selections (sine is a sine)
 * to switch between filter types (Chamberlin/ZDF), *right click* the filter title box
+* the filter & oscillator type selections are saved with the patch (& restored on load)
 * changing the width of the triangle wave morphs the waveform from a sawtooth (w≈0.0), through a triangle (w=0.5), to a ramp (w≈1.0)
 
 
 ### how can i play it?
-* [v0.2.7](https://github.com/rainbow-carrots/subsnake/releases/tag/v0.2.7) is the latest build
+* [v0.2.8](https://github.com/rainbow-carrots/subsnake/releases/tag/v0.2.8) is the latest build
 * click on the version that corresponds to your platform to download the zip, extract, & run! if it doesn't open:
     * __on linux__: right click the file, go to *Properties* -> *Permissions*, and make sure "Allow executing file as program" is checked 
     * __on macos__: you'll need to [authorize the app](https://support.apple.com/guide/mac-help/open-a-mac-app-from-an-unknown-developer-mh40616/mac) when running it for the first time. go to *System Settings* -> *Privacy & Security*, scroll down to the bottom, and choose *Open anyway* (under *Security*)
