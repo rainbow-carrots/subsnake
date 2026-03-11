@@ -16,7 +16,7 @@ from subsnake.gui.scope_gui import ScopeGUI
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QColor, QPalette
 from PySide6.QtWidgets import (
-    QMainWindow, QGridLayout,
+    QMainWindow, QGridLayout, QApplication,
     QFrame, QWidget, QGraphicsDropShadowEffect,
     QPushButton, QHBoxLayout, 
     QStackedLayout, QButtonGroup, QGroupBox)
@@ -403,8 +403,10 @@ class MainWindow(QMainWindow):
         #load stylesheets
         light_style_file = resources.files() / 'window.qss'
         self.light_style = light_style_file.read_text(encoding='utf-8')
+        self.light_tooltip = "QToolTip { background-color: #cc94f8; font-family: 'Dogica Pixel'; font-size: 12px; color: #1c0627; border: 1px solid white; border-radius: 3px;}"
         dark_style_file = resources.files() / 'window_dark.qss'
         self.dark_style = dark_style_file.read_text(encoding='utf-8')
+        self.dark_tooltip = "QToolTip { background-color: #792fb2; font-family: 'Dogica Pixel'; font-size: 12px; color: #dfdfef; border: 1px solid white; border-radius: 3px;}"
         self.setStyleSheet(self.light_style)
 
         #start slider cc update timer
@@ -561,10 +563,16 @@ class MainWindow(QMainWindow):
                 self.param_sliders[param].valueChanged.emit(patch[param])
             elif param == "osc_wave":
                 self.osc_group.update_wave(patch[param])
+            elif param == "osc_type":
+                self.osc_group.update_type(patch[param])
             elif param == "osc2_wave":
                 self.osc2_group.update_wave(patch[param])
+            elif param == "osc2_type":
+                self.osc2_group.update_type(patch[param])
             elif param == "osc3_wave":
                 self.osc3_group.update_wave(patch[param])
+            elif param == "osc3_type":
+                self.osc3_group.update_type(patch[param])
             elif param == "filt_type":
                 self.filt_group.update_type(patch[param])
             elif param == "filt_mode":
@@ -731,6 +739,7 @@ class MainWindow(QMainWindow):
     def update_dark_mode(self, checked):
         if checked:
             self.setStyleSheet(self.dark_style)
+            QApplication.instance().setStyleSheet(self.dark_tooltip)
             self.display_color = QColor("#dfdfef")
             self.update_drop_shadow_colors(QColor("#b4b4d2"))
             scope_pen = self.scope_group.scope_path.pen()
@@ -739,6 +748,7 @@ class MainWindow(QMainWindow):
             self.toggle_dark.setText("lite")
         else:
             self.setStyleSheet(self.light_style)
+            QApplication.instance().setStyleSheet(self.light_tooltip)
             self.display_color = QColor("black")
             self.update_drop_shadow_colors(QColor("#1c0627"))
             scope_pen = self.scope_group.scope_path.pen()
@@ -885,11 +895,6 @@ class MainWindow(QMainWindow):
     # oscillator type (algorithm)
     def update_osc_type(self, osc, new_type):
         self.engine.update_osc_type(osc, new_type)
-        print(f"DEBUG: osc {osc}, algorithm: {new_type}")
-        if new_type == 0:
-            print("BLIT")
-        elif new_type == 1:
-            print("polyBLEP")
         
     # oscillator 1
     def update_osc_freq(self, value):
