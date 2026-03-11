@@ -20,9 +20,9 @@ class PatchManager(QGroupBox):
         self.save_patch = QPushButton("save")
         self.new_patch = QPushButton("new")
         self.patch_dialog = NewPatchDialog()
-        self.default_patch = {"osc_drift": 0, "osc_freq": 0, "osc_amp": 500, "osc_width": 250, "osc_wave": "pulse",
-                            "osc2_freq": 0, "osc2_det": 0, "osc2_amp": 0, "osc2_width": 250, "osc2_wave": "saw",
-                            "osc3_freq": 0, "osc3_det": 0, "osc3_amp": 0, "osc3_width": 250, "osc3_wave": "saw",
+        self.default_patch = {"osc_drift": 0, "osc_freq": 0, "osc_amp": 500, "osc_width": 250, "osc_wave": "pulse", "osc_type": 0,
+                            "osc2_freq": 0, "osc2_det": 0, "osc2_amp": 0, "osc2_width": 250, "osc2_wave": "saw", "osc2_type": 0,
+                            "osc3_freq": 0, "osc3_det": 0, "osc3_amp": 0, "osc3_width": 250, "osc3_wave": "saw", "osc3_type": 0,
                             "filt_freq": 700, "filt_res": 0, "filt_drive": 40, "filt_sat": 100, "filt_type": "low", "filt_mode": 1,
                             "fenv_att": 10, "fenv_dec": 500, "fenv_sus": 1000, "fenv_rel": 500, "fenv_amt": 0,
                             "env_att": 10, "env_dec": 500, "env_sus": 1000, "env_rel": 250,
@@ -164,6 +164,9 @@ class PatchManager(QGroupBox):
         self.current_patch.update({"menv1_mode": menv1_mode_button.text()})
         self.current_patch.update({"menv2_mode": menv2_mode_button.text()})
         self.current_patch.update({"filt_mode": self.modules_dict["filt_group"].mode})
+        self.current_patch.update({"osc_type": self.modules_dict["osc_group"].type})
+        self.current_patch.update({"osc2_type": self.modules_dict["osc2_group"].type})
+        self.current_patch.update({"osc3_type": self.modules_dict["osc3_group"].type})
 
     def check_user_dir(self):
         self.user_patch_path.mkdir(parents=True, exist_ok=True)
