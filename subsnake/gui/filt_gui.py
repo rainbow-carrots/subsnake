@@ -1,9 +1,9 @@
 from PySide6.QtWidgets import(
-    QSlider, QLabel, QGridLayout,
+    QSlider, QLabel, QGridLayout, QToolTip,
     QRadioButton, QButtonGroup, QLCDNumber,
     QHBoxLayout, QGroupBox, QStyle, QStyleOptionGroupBox
 )
-from PySide6.QtCore import Signal, Qt
+from PySide6.QtCore import Signal, Qt, QEvent
 from PySide6.QtGui import QPalette, QColor
 from subsnake.gui.lcd import ClickLCD
 from subsnake.gui.mod_gui import CoolDial
@@ -222,7 +222,36 @@ class FilterGUI(QGroupBox):
                     self.mode = 1
                 else:
                     self.mode = 0
+                if self.mode == 0:
+                    type_text = "Chamberlin"
+                elif self.mode == 1:
+                    type_text = "ZDF"
                 self.mode_changed.emit(self.mode)
+                QToolTip.showText(event.globalPos(), type_text)
                 event.accept()
                 return
         super().mouseReleaseEvent(event)
+
+    
+    def event(self, event):
+        if event.type() == QEvent.Type.ToolTip:
+            style_option = QStyleOptionGroupBox()
+            self.initStyleOption(style_option)
+        
+            title_rect = self.style().subControlRect(
+                QStyle.ComplexControl.CC_GroupBox,
+                style_option, QStyle.SubControl.SC_GroupBoxLabel, self 
+            )
+
+            if title_rect.contains(event.pos()):
+                if self.mode == 0:
+                    type_text = "Chamberlin"
+                elif self.mode == 1:
+                    type_text = "ZDF"
+                QToolTip.showText(event.globalPos(), type_text)
+            else:
+                QToolTip.hideText()
+            event.accept()
+            return True
+        else:
+            return super().event(event)
