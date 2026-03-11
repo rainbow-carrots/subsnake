@@ -115,5 +115,8 @@
     "lfo2_shape": "sine",
     "menv1_mode": "AR",
     "menv2_mode": "Loop",
-    "filt_mode": 1
+    "filt_mode": 1,
+    "osc_type": 0,
+    "osc2_type": 0,
+    "osc3_type": 0
 }

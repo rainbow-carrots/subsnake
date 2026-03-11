@@ -115,5 +115,8 @@
     "lfo2_shape": "tri",
     "menv1_mode": "AR",
     "menv2_mode": "Loop",
-    "filt_mode": 0
+    "filt_mode": 0,
+    "osc_type": 0,
+    "osc2_type": 0,
+    "osc3_type": 0
 }

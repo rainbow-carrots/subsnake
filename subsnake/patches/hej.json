@@ -15,11 +15,11 @@
     "filt_res": 50,
     "filt_drive": 97,
     "filt_sat": 278,
-    "filt_track": 0,
+    "filt_track": 251,
     "fenv_att": 634,
     "fenv_dec": 519,
-    "fenv_sus": 645,
-    "fenv_rel": 371,
+    "fenv_sus": 721,
+    "fenv_rel": 718,
     "fenv_amt": 333,
     "env_att": 472,
     "env_dec": 500,
@@ -36,7 +36,7 @@
     "menv1_rel": 1,
     "menv2_att": 1,
     "menv2_rel": 1,
-    "kt_amt": 0,
+    "kt_amt": 251,
     "osc_freq_mod": 0,
     "osc_freq_ass": 0,
     "osc_amp_mod": 0,
@@ -115,5 +115,8 @@
     "lfo2_shape": "s+h",
     "menv1_mode": "AR",
     "menv2_mode": "AR",
-    "filt_mode": 0
+    "filt_mode": 0,
+    "osc_type": 1,
+    "osc2_type": 1,
+    "osc3_type": 1
 }
