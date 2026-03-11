@@ -113,7 +113,6 @@ with resources.as_file(resources.files("subsnake").joinpath("gui/fonts/dogica/do
         print(f"error: could not load font file at {font_file}")
     else:
         font_family = QFontDatabase.applicationFontFamilies(font_id)[0]
-        print(f"success! loaded font {font_family}")
 
 with resources.as_file(resources.files("subsnake").joinpath("gui/fonts/dogica/dogicapixelbold.ttf")) as font_file:
     font_id = QFontDatabase.addApplicationFont(str(font_file))
@@ -121,11 +120,12 @@ with resources.as_file(resources.files("subsnake").joinpath("gui/fonts/dogica/do
         print(f"error: could not load font file at {font_file}")
     else:
         font_family = QFontDatabase.applicationFontFamilies(font_id)[0]
-        print(f"success! loaded font {font_family}")
 
 app.setApplicationName("subsnake")
 app.setApplicationDisplayName("subsnake")
 app.setDesktopFileName("subsnake")
+light_tooltip = "QToolTip { background-color: #cc94f8; font-family: 'Dogica Pixel'; font-size: 12px; color: #1c0627; border: 1px solid white; border-radius: 3px;}"
+app.setStyleSheet(light_tooltip)
 
 #load icon
 with resources.as_file(resources.files("subsnake").joinpath("images/icon.png")) as icon_path:
