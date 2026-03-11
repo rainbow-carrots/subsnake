@@ -1,9 +1,9 @@
 from PySide6.QtWidgets import(
-    QSlider, QLabel, QGridLayout,
+    QSlider, QLabel, QGridLayout, QToolTip,
     QRadioButton, QButtonGroup, QLCDNumber,
     QHBoxLayout, QGroupBox, QStyle, QStyleOptionGroupBox
 )
-from PySide6.QtCore import Signal, Qt
+from PySide6.QtCore import Signal, Qt, QEvent
 from PySide6.QtGui import QPalette, QColor
 from subsnake.gui.lcd import ClickLCD
 from subsnake.gui.mod_gui import CoolDial
@@ -168,6 +168,10 @@ class Oscillator3GUI(QGroupBox):
             self.osc3_alg_pulse.setChecked(True)
         self.alg_changed.emit(new_wave)
 
+    def update_type(self, new_type):
+        self.type = new_type
+        self.type_changed.emit(3, self.type)
+
     #slots
     def change_pitch(self, value):
         offset = float(value)/100.0
@@ -219,7 +223,35 @@ class Oscillator3GUI(QGroupBox):
                     self.type += 1
                 else:
                     self.type = 0
+                if self.type == 0:
+                    type_text = "BLIT"
+                elif self.type == 1:
+                    type_text = "PolyBLEP"
                 self.type_changed.emit(3, self.type)
+                QToolTip.showText(event.globalPos(), type_text)
                 event.accept()
                 return
         super().mouseReleaseEvent(event)
+
+    def event(self, event):
+        if event.type() == QEvent.Type.ToolTip:
+            style_option = QStyleOptionGroupBox()
+            self.initStyleOption(style_option)
+        
+            title_rect = self.style().subControlRect(
+                QStyle.ComplexControl.CC_GroupBox,
+                style_option, QStyle.SubControl.SC_GroupBoxLabel, self 
+            )
+
+            if title_rect.contains(event.pos()):
+                if self.type == 0:
+                    type_text = "BLIT"
+                elif self.type == 1:
+                    type_text = "PolyBLEP"
+                QToolTip.showText(event.globalPos(), type_text)
+            else:
+                QToolTip.hideText()
+            event.accept()
+            return True
+        else:
+            return super().event(event)
