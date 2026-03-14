@@ -21,6 +21,14 @@ class StereoDelay():
         self.tm_amount_smooth = np.zeros((1, 2), dtype=np.float32)
         self.mix_level = mix
 
+        #init numba compile call
+        test_in = np.zeros((16, 2), dtype=np.float32)
+        test_out = np.zeros((16, 2), dtype=np.float32)
+        mod_test = np.zeros((16), dtype=np.float32)
+        mod_test_val = np.float32(0.0)
+        delay_block(test_in, test_out, self.buffer, self.offset, self.offset_smooth, self.write_heads, self.delay_feedback, self.mix_level,
+                         mod_test, mod_test, mod_test, mod_test_val, mod_test_val, mod_test_val, self.tm_amount_smooth)
+
     def process_block(self, input, output, mod_buffers, mod_values):
         self.offset = self.delay_time*self.fs
         delay_block(input, output, self.buffer, self.offset, self.offset_smooth, self.write_heads, self.delay_feedback, self.mix_level,
@@ -56,6 +64,10 @@ class AudioRecorder():
         self.input_level_smooth = np.zeros((1, 2), dtype=np.float32)
         self.output_level_smooth = np.zeros((1, 2), dtype=np.float32)
         self.rec_gate_smooth = np.zeros((1, 2), dtype=np.float32)
+
+        test_smoothers = np.zeros((1, 2), dtype=np.float32)
+        process_samples(np.zeros((32, 2), dtype=np.float32), np.zeros((16, 2), dtype=np.float32), np.zeros((16, 2), dtype=np.float32), 0,
+                              [False], [True], [False], False, np.zeros((2), dtype=np.int32), np.zeros((2), dtype=np.int32), [False], np.float32(1.0), test_smoothers, test_smoothers, test_smoothers)
 
     def delete(self):
         self.delete_queue.put("delete")
