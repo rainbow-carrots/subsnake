@@ -2,7 +2,7 @@
     "osc_drift": 51,
     "osc_freq": -249,
     "osc_amp": 500,
-    "osc_width": 359,
+    "osc_width": 406,
     "osc2_freq": 0,
     "osc2_det": 3,
     "osc2_amp": 433,
@@ -11,7 +11,7 @@
     "osc3_det": 11,
     "osc3_amp": 361,
     "osc3_width": 250,
-    "filt_freq": 649,
+    "filt_freq": 627,
     "filt_res": 79,
     "filt_drive": 292,
     "filt_sat": 715,
@@ -116,7 +116,7 @@
     "menv1_mode": "AR",
     "menv2_mode": "Loop",
     "filt_mode": 1,
-    "osc_type": 0,
-    "osc2_type": 0,
-    "osc3_type": 0
+    "osc_type": 1,
+    "osc2_type": 1,
+    "osc3_type": 1
 }
