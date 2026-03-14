@@ -5,9 +5,7 @@ from PySide6.QtWidgets import QApplication
 from PySide6.QtGui import QIcon, QPixmap, QFontDatabase
 from PySide6.QtCore import Qt
 from subsnake.gui import MainWindow
-from subsnake.audio import WrappedOsc, HalSVF, ZDFSVF, ADSR, AudioEngine
-from subsnake.audio.effects import AudioRecorder, StereoDelay
-from subsnake.audio.modulators import LFO, ModEnv
+from subsnake.audio import AudioEngine
 from subsnake.gui.scope_gui import ScopeGUI
 from importlib import resources
 
@@ -15,72 +13,13 @@ fs = 44100
 twopi = 2*np.pi
 oneoverpi = 1/np.pi
 
-#init compile (numba functions)
-osc_test = np.array([0.1, 0.5, .01], dtype=np.float32)
-osc2_test = np.array([0.1, 0.5, .01], dtype=np.float32)
-walk_test = np.zeros((16), dtype=np.float32)
-walk_test_state = np.zeros((1), dtype=np.float32)
-mod_test = np.zeros((16), dtype=np.float32)
-filt_test = np.zeros((2, 2), dtype=np.float32)
-filt_test_in = np.zeros((16, 2), dtype=np.float32)
-filt_test_out = np.zeros((16, 2), dtype=np.float32)
-filt_test_env = np.ones((16, 2), dtype=np.float32)
-filt_test_params = np.zeros((8), dtype=np.float32)
-filt_test_mod_values = np.zeros((5), dtype=np.float32)
-env_test = np.array([0.0, 0.0, 1.0, 1.0, 0.5, 1.0], dtype=np.float32)
-phase_test = np.zeros((1), dtype=np.float32)
-test_out = np.zeros((128), dtype=np.float32)
-test_blit_integrators = np.zeros((3, 2), dtype=np.float32)
-test_blep_integrator = np.zeros((1), dtype=np.float32)
-test_blit_states = np.array([[0.0, 0.5, .001], [0.0, 0.5, .001]], dtype=np.float32)
-test_blit_out = np.zeros((16, 2), dtype=np.float32)
-test_smoothed_widths = np.zeros((1, 2), dtype=np.float32)
-test_smoothed_width = np.zeros((1), dtype=np.float32)
-test_output_hpf = np.zeros((2), dtype=np.float32)
+#init compile (scope)
 test_stable_scope = np.ascontiguousarray(np.zeros((2048, 2), dtype=np.float32))
 test_x_coords = np.ascontiguousarray(np.arange(2048, dtype=np.float32))
 test_base_x_coords = np.ascontiguousarray(np.arange(2048, dtype=np.float32))
 test_scope_flat = np.ascontiguousarray(np.zeros((16384, 2), dtype=np.float32))
 test_valid_crossings = np.ascontiguousarray(np.zeros((2048), dtype=np.int32))
 test_valid_crossings_count = np.zeros((1), dtype=np.int32)
-
-f32_increment = np.float32(0.1)
-f32_offset = np.float32(0.0)
-f64_attack_c = 0.1
-f64_release_c = 0.1
-f32_threshold = np.float32(.001)
-WrappedOsc.generate_walk(walk_test, walk_test_state)
-WrappedOsc.generate_sine(osc_test, np.zeros((16, 2), dtype=np.float32), walk_test, 1.0, mod_test, mod_test, mod_test, 0.0, 0.0, 0.0, 1.0, 440.0)
-WrappedOsc.polyblep_saw(osc_test, np.zeros((16, 2), dtype=np.float32), walk_test, 1.0, mod_test, mod_test, mod_test, 0.0, 0.0, 0.0, 1.0, 440.0)
-WrappedOsc.polyblep_pulse(osc_test, np.zeros((16, 2), dtype=np.float32), osc2_test, 0.5, walk_test, 1.0, mod_test, mod_test, mod_test, mod_test, 0.0, 0.0, 0.0, 0.0, 1.0, 440.0)
-WrappedOsc.polyblep_triangle(osc_test, test_blep_integrator, test_smoothed_width, test_output_hpf, np.zeros((16, 2), dtype=np.float32), osc2_test, 0.5, walk_test, 1.0, mod_test, mod_test, mod_test, mod_test, 0.0, 0.0, 0.0, 0.0, 1.0, 440.0)
-WrappedOsc.blit_saw(test_blit_out, test_blit_states, test_blit_integrators,
-                    walk_test, 1.0, mod_test, mod_test, mod_test, 0.0, 0.0, 0.0, WrappedOsc.leaky_trapezoidal_integrate, 0.5, 440.0)
-WrappedOsc.blit_pulse(test_blit_out, test_blit_states, test_blit_integrators, test_smoothed_widths,
-                    walk_test, 1.0, mod_test, mod_test, mod_test, mod_test, 0.0, 0.0, 0.0, 0.0, WrappedOsc.leaky_trapezoidal_integrate, 0.5, 440.0, 0.5)
-WrappedOsc.blit_triangle(test_blit_out, test_blit_states, test_blit_integrators, test_smoothed_widths,
-                    walk_test, 1.0, mod_test, mod_test, mod_test, mod_test, 0.0, 0.0, 0.0, 0.0, WrappedOsc.leaky_trapezoidal_integrate, 0.5, 440.0, 0.5)
-HalSVF.filter_block(filt_test_in, filt_test_out, filt_test, filt_test_params, filt_test_env, HalSVF.clip_sample,
-                    mod_test, mod_test, mod_test, mod_test, mod_test, filt_test_mod_values)
-ZDFSVF.filter_block(filt_test_in, filt_test_out, filt_test, filt_test_params, filt_test_env,
-                    mod_test, mod_test, mod_test, mod_test, mod_test, filt_test_mod_values, ZDFSVF.trapezoidal_integrate, ZDFSVF.clip_sample)
-ADSR.envelope_block(env_test, False, np.zeros((16, 2), dtype=np.float32), np.zeros((16, 2), dtype=np.float32), 0, 0, mod_test, mod_test, mod_test, mod_test, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1)
-AudioRecorder.process_samples(np.zeros((32, 2), dtype=np.float32), np.zeros((16, 2), dtype=np.float32), np.zeros((16, 2), dtype=np.float32), 0,
-                              [False], [True], [False], False, np.zeros((2), dtype=np.int32), np.zeros((2), dtype=np.int32), [False], np.float32(1.0), test_smoothed_widths, test_smoothed_widths, test_smoothed_widths)
-StereoDelay.delay_block(np.zeros((32, 2), dtype=np.float32), np.zeros((32, 2), dtype=np.float32), np.zeros((32, 2), dtype=np.float32), 0,
-                        np.zeros((2), dtype=np.float32), np.zeros((2), dtype=np.int32), 0.5, 0.5, StereoDelay.hermite_interpolate, mod_test, mod_test, mod_test, 0.0, 0.0, 0.0, test_smoothed_widths)
-LFO.generate_sine(phase_test, f32_increment, f32_offset, test_out, mod_test, mod_test, 0.0, 0.0)
-LFO.generate_triangle(phase_test, f32_increment, f32_offset, test_out, mod_test, mod_test, 0.0, 0.0)
-LFO.generate_ramp(phase_test, f32_increment, f32_offset, test_out, mod_test, mod_test, 0.0, 0.0)
-LFO.generate_sawtooth(phase_test, f32_increment, f32_offset, test_out, mod_test, mod_test, 0.0, 0.0)
-LFO.generate_square(phase_test, f32_increment, f32_offset, test_out, 0.5, mod_test, mod_test, 0.0, 0.0)
-LFO.sample_and_hold(phase_test, f32_increment, test_out, np.zeros((1), dtype=np.float32), mod_test, 0.0)
-ModEnv.gen_AR_oneshot(np.zeros((1), dtype=np.float32), np.zeros((1), dtype=np.int32), True, np.zeros((1), dtype=np.int32),
-                      f64_attack_c, f64_release_c, f32_threshold, np.zeros((16), dtype=np.float32), 0, 0, mod_test, mod_test, 0.0, 0.0)
-ModEnv.gen_AR_loop(np.zeros((1), dtype=np.float32), np.zeros((1), dtype=np.int32), True,
-                   f64_attack_c, f64_release_c, f32_threshold, np.zeros((16), dtype=np.float32), 0, 0, mod_test, mod_test, 0.0, 0.0)
-ModEnv.gen_AHR(np.zeros((1), dtype=np.float32), np.zeros((1), dtype=np.int32), True,
-               f64_attack_c, f64_release_c, f32_threshold, np.zeros((16), dtype=np.float32), 0, 0, mod_test, mod_test, 0.0, 0.0)
 ScopeGUI.update_display_math(test_base_x_coords, test_scope_flat, test_stable_scope, test_x_coords, test_valid_crossings, test_valid_crossings_count)
 
 #get midi inputs & channels
