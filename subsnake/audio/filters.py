@@ -20,6 +20,17 @@ class HalSVF():
         self.mode = 0
         self.params = np.zeros((8), dtype=np.float32)
         self.mod_values = np.zeros((5), dtype=np.float32)
+
+        #init numba compile call
+        mod_test = np.zeros((16), dtype=np.float32)
+        filt_test = np.zeros((2, 2), dtype=np.float32)
+        filt_test_in = np.zeros((16, 2), dtype=np.float32)
+        filt_test_out = np.zeros((16, 2), dtype=np.float32)
+        filt_test_env = np.ones((16, 2), dtype=np.float32)
+        filt_test_params = np.zeros((8), dtype=np.float32)
+        filt_test_mod_values = np.zeros((5), dtype=np.float32)
+        filter_block_hal(filt_test_in, filt_test_out, filt_test, filt_test_params, filt_test_env,
+                    mod_test, mod_test, mod_test, mod_test, mod_test, filt_test_mod_values)
     
     def process_block(self, input, output, fenv, mod_buffer, mod_values):
         self.params[:] = [self.cutoff, self.resonance, self.drive, self.saturate, self.mode, self.base_freq, self.key_tracking, self.env_amount]
@@ -65,6 +76,17 @@ class ZDFSVF():
         self.mode = 0
         self.params = np.zeros((8), dtype=np.float32)
         self.mod_values = np.zeros((5), dtype=np.float32)
+
+        #init numba compile call
+        mod_test = np.zeros((16), dtype=np.float32)
+        filt_test = np.zeros((2, 2), dtype=np.float32)
+        filt_test_in = np.zeros((16, 2), dtype=np.float32)
+        filt_test_out = np.zeros((16, 2), dtype=np.float32)
+        filt_test_env = np.ones((16, 2), dtype=np.float32)
+        filt_test_params = np.zeros((8), dtype=np.float32)
+        filt_test_mod_values = np.zeros((5), dtype=np.float32)
+        filter_block_zdf(filt_test_in, filt_test_out, filt_test, filt_test_params, filt_test_env,
+                    mod_test, mod_test, mod_test, mod_test, mod_test, filt_test_mod_values)
     
     def process_block(self, filt_input, filt_output, fenv, mod_buffers, mod_values):
         self.params[:] = [self.cutoff, self.feedback, self.drive, self.saturate, self.mode, self.base_freq, self.key_tracking, self.env_amount]
