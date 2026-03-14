@@ -26,6 +26,11 @@ class ADSR():
         self.state[4] = sustain
         self.state[5] = 1.0 - math.exp(threshold/(fs*release))
 
+        #init numba compile call
+        env_test = np.array([0.0, 0.0, 1.0, 1.0, 0.5, 1.0], dtype=np.float32)
+        mod_test = np.zeros((16), dtype=np.float32)
+        envelope_block(env_test, False, np.zeros((16, 2), dtype=np.float32), np.zeros((16, 2), dtype=np.float32), 0, 0, mod_test, mod_test, mod_test, mod_test, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1)
+
     def process_block(self, input, output, mod_buffers, mod_values):
         envelope_block(self.state, self.gate, input, output, self.attack_sample, self.release_sample,
                             mod_buffers[0], mod_buffers[1], mod_buffers[2], mod_buffers[3], mod_values[0], mod_values[1], mod_values[2], mod_values[3],
