@@ -9,6 +9,7 @@ oneoverpi = 1.0/math.pi
 oneovertwopi = 1.0/twopi
 oneoverfs = 1.0/44100.0
 max_increment = twopi*10.0*oneoverfs
+log_threshold = math.log(.0001)
 
 class LFO():
     def __init__(self, fs, freq=10.0, offset=0.0, shape=0):
@@ -23,19 +24,32 @@ class LFO():
         self.held_value = np.zeros((1), dtype=np.float32)
         self.held_value[0] = 2*np.random.random() - 1.0
 
+        #init numba compile calls
+        test_out = np.zeros((16), dtype=np.float32)
+        mod_test = np.zeros((16), dtype=np.float32)
+        phase_test = np.zeros((1), dtype=np.float32)
+        f32_increment = np.float32(0.1)
+        f32_offset = np.float32(0.0)
+        generate_sine(phase_test, f32_increment, f32_offset, test_out, mod_test, mod_test, 0.0, 0.0)
+        generate_triangle(phase_test, f32_increment, f32_offset, test_out, mod_test, mod_test, 0.0, 0.0)
+        generate_ramp(phase_test, f32_increment, f32_offset, test_out, mod_test, mod_test, 0.0, 0.0)
+        generate_sawtooth(phase_test, f32_increment, f32_offset, test_out, mod_test, mod_test, 0.0, 0.0)
+        generate_square(phase_test, f32_increment, f32_offset, test_out, 0.5, mod_test, mod_test, 0.0, 0.0)
+        sample_and_hold(phase_test, f32_increment, test_out, np.zeros((1), dtype=np.float32), mod_test, 0.0)
+
     def process_block(self, frames, mod_buffers, mod_values):
         if self.shape == 0:
-            self.generate_sine(self.current_phase, self.phase_offset, self.phase_increment, self.output[:frames], mod_buffers[0], mod_buffers[1], mod_values[0], mod_values[1])
+            generate_sine(self.current_phase, self.phase_offset, self.phase_increment, self.output[:frames], mod_buffers[0], mod_buffers[1], mod_values[0], mod_values[1])
         elif self.shape == 1:
-            self.generate_triangle(self.current_phase, self.phase_offset, self.phase_increment, self.output[:frames], mod_buffers[0], mod_buffers[1], mod_values[0], mod_values[1])
+            generate_triangle(self.current_phase, self.phase_offset, self.phase_increment, self.output[:frames], mod_buffers[0], mod_buffers[1], mod_values[0], mod_values[1])
         elif self.shape == 2:
-            self.generate_ramp(self.current_phase, self.phase_offset, self.phase_increment, self.output[:frames], mod_buffers[0], mod_buffers[1], mod_values[0], mod_values[1])
+            generate_ramp(self.current_phase, self.phase_offset, self.phase_increment, self.output[:frames], mod_buffers[0], mod_buffers[1], mod_values[0], mod_values[1])
         elif self.shape == 3:
-            self.generate_sawtooth(self.current_phase, self.phase_offset, self.phase_increment, self.output[:frames], mod_buffers[0], mod_buffers[1], mod_values[0], mod_values[1])
+            generate_sawtooth(self.current_phase, self.phase_offset, self.phase_increment, self.output[:frames], mod_buffers[0], mod_buffers[1], mod_values[0], mod_values[1])
         elif self.shape == 4:
-            self.generate_square(self.current_phase, self.phase_offset, self.phase_increment, self.output[:frames], 0.5, mod_buffers[0], mod_buffers[1], mod_values[0], mod_values[1])
+            generate_square(self.current_phase, self.phase_offset, self.phase_increment, self.output[:frames], 0.5, mod_buffers[0], mod_buffers[1], mod_values[0], mod_values[1])
         elif self.shape == 5:
-            self.sample_and_hold(self.current_phase, self.phase_increment, self.output, self.held_value,  mod_buffers[0], mod_values[0])
+            sample_and_hold(self.current_phase, self.phase_increment, self.output, self.held_value,  mod_buffers[0], mod_values[0])
 
     def set_frequency(self, new_freq):
         self.frequency = np.float32(new_freq)
@@ -47,89 +61,6 @@ class LFO():
     def set_shape(self, new_shape):
         self.shape = new_shape
     
-    @staticmethod
-    @njit(nogil=True, fastmath=True, cache=True)
-    def generate_sine(phase, offset, increment, output, freq_mod, phase_mod, fm_amt, pm_amt):
-        frames = len(output)
-        for n in range(0, frames):
-            mod_increment = max(0.0, min(max_increment, increment + max_increment*freq_mod[n]*fm_amt))
-            mod_offset = max(0.0, min(twopi, offset + twopi*phase_mod[n]*pm_amt))
-            output[n] = math.sin(phase[0] + mod_offset)
-            phase[0] += mod_increment
-            if phase[0] >= twopi:
-                phase[0] -= twopi
-            
-    @staticmethod
-    @njit(nogil=True, fastmath=True, cache=True)
-    def generate_triangle(phase, offset, increment, output, freq_mod, phase_mod, fm_amt, pm_amt):
-        frames = len(output)
-        for n in range(0, frames):
-            mod_increment = max(0.0, min(max_increment, increment + max_increment*freq_mod[n]*fm_amt))
-            mod_offset = max(0.0, min(twopi, offset + twopi*phase_mod[n]*pm_amt))
-            new_phase = phase[0] + mod_offset
-            norm_phase = new_phase*oneovertwopi
-            norm_phase = norm_phase - np.floor(norm_phase)
-            output[n] = 4*abs(norm_phase - 0.5) - 1
-            phase[0] += mod_increment
-            if phase[0] >= twopi:
-                phase[0] -= twopi
-
-    @staticmethod
-    @njit(nogil=True, fastmath=True, cache=True)
-    def generate_ramp(phase, offset, increment, output, freq_mod, phase_mod, fm_amt, pm_amt):
-        frames = len(output)
-        for n in range(0, frames):
-            mod_increment = max(0.0, min(max_increment, increment + max_increment*freq_mod[n]*fm_amt))
-            mod_offset = max(0.0, min(twopi, offset + twopi*phase_mod[n]*pm_amt))
-            new_phase = phase[0] + mod_offset
-            norm_phase = new_phase*oneovertwopi
-            norm_phase = norm_phase - np.floor(norm_phase)
-            output[n] = 2*norm_phase - 1.0
-            phase[0] += mod_increment
-            if phase[0] >= twopi:
-                phase[0] -= twopi
-
-    @staticmethod
-    @njit(nogil=True, fastmath=True, cache=True)
-    def generate_sawtooth(phase, offset, increment, output, freq_mod, phase_mod, fm_amt, pm_amt):
-        frames = len(output)
-        for n in range(0, frames):
-            mod_increment = max(0.0, min(max_increment, increment + max_increment*freq_mod[n]*fm_amt))
-            mod_offset = max(0.0, min(twopi, offset + twopi*phase_mod[n]*pm_amt))
-            new_phase = phase[0] + mod_offset
-            norm_phase = new_phase*oneovertwopi
-            norm_phase = norm_phase - np.floor(norm_phase)
-            output[n] = 2*(1.0-norm_phase) - 1.0
-            phase[0] += mod_increment
-            if phase[0] >= twopi:
-                phase[0] -= twopi
-
-    @staticmethod
-    @njit(nogil=True, fastmath=True, cache=True)
-    def generate_square(phase, offset, increment, output, width, freq_mod, phase_mod, fm_amt, pm_amt):
-        frames = len(output)
-        for n in range(0, frames):
-            mod_increment = max(0.0, min(max_increment, increment + max_increment*freq_mod[n]*fm_amt))
-            mod_offset = max(0.0, min(twopi, offset + twopi*phase_mod[n]*pm_amt))
-            new_phase = phase[0] + mod_offset
-            norm_phase = new_phase*oneovertwopi
-            norm_phase = norm_phase - np.floor(norm_phase)
-            output[n] = 2*(norm_phase < width) - 1.0
-            phase[0] += mod_increment
-            if phase[0] >= twopi:
-                phase[0] -= twopi
-
-    @staticmethod
-    @njit(nogil=True, fastmath=True, cache=True)
-    def sample_and_hold(phase, increment, output, held_value, freq_mod, fm_amt):
-        frames = len(output)
-        for n in range(0, frames):
-            mod_increment = max(0.0, min(max_increment, increment + max_increment*freq_mod[n]*fm_amt))
-            output[n] = held_value[0]
-            phase[0] += mod_increment
-            if phase[0] >= twopi:
-                phase[0] -= twopi
-                held_value[0] = 2*np.random.random() - 1.0
 
 class ModEnv():
     def __init__(self, fs, attack=0.5, release=0.5, mode=0):
@@ -147,13 +78,25 @@ class ModEnv():
         self.attack_sample = 0
         self.release_sample = 0
 
+        #init numba compile calls
+        f64_attack_c = 0.1
+        f64_release_c = 0.1
+        f32_threshold = np.float32(.0001)
+        mod_test = np.zeros((16), dtype=np.float32)
+        gen_AR_oneshot(np.zeros((1), dtype=np.float32), np.zeros((1), dtype=np.int32), True, np.zeros((1), dtype=np.int32),
+                      f64_attack_c, f64_release_c, f32_threshold, np.zeros((16), dtype=np.float32), 0, 0, mod_test, mod_test, 0.0, 0.0)
+        gen_AR_loop(np.zeros((1), dtype=np.float32), np.zeros((1), dtype=np.int32), True,
+                   f64_attack_c, f64_release_c, f32_threshold, np.zeros((16), dtype=np.float32), 0, 0, mod_test, mod_test, 0.0, 0.0)
+        gen_AHR(np.zeros((1), dtype=np.float32), np.zeros((1), dtype=np.int32), True,
+               f64_attack_c, f64_release_c, f32_threshold, np.zeros((16), dtype=np.float32), 0, 0, mod_test, mod_test, 0.0, 0.0)
+
     def process_block(self, frames, mod_buffers, mod_values):
         if self.mode == 0:
-            self.gen_AR_oneshot(self.value, self.state, self.gate, self.run, self.attack, self.release, self.threshold, self.output[:frames], self.attack_sample, self.release_sample, mod_buffers[0], mod_buffers[1], mod_values[0], mod_values[1])
+            gen_AR_oneshot(self.value, self.state, self.gate, self.run, self.attack, self.release, self.threshold, self.output[:frames], self.attack_sample, self.release_sample, mod_buffers[0], mod_buffers[1], mod_values[0], mod_values[1])
         elif self.mode == 1:
-            self.gen_AHR(self.value, self.state, self.gate, self.attack, self.release, self.threshold, self.output[:frames], self.attack_sample, self.release_sample, mod_buffers[0], mod_buffers[1], mod_values[0], mod_values[1])
+            gen_AHR(self.value, self.state, self.gate, self.attack, self.release, self.threshold, self.output[:frames], self.attack_sample, self.release_sample, mod_buffers[0], mod_buffers[1], mod_values[0], mod_values[1])
         elif self.mode == 2:
-            self.gen_AR_loop(self.value, self.state, self.gate, self.attack, self.release, self.threshold, self.output[:frames], self.attack_sample, self.release_sample, mod_buffers[0], mod_buffers[1], mod_values[0], mod_values[1])
+            gen_AR_loop(self.value, self.state, self.gate, self.attack, self.release, self.threshold, self.output[:frames], self.attack_sample, self.release_sample, mod_buffers[0], mod_buffers[1], mod_values[0], mod_values[1])
 
     def set_attack(self, new_attack):
         self.attack = new_attack
@@ -173,104 +116,191 @@ class ModEnv():
     def update_release_start(self, release_sample):
         self.release_sample = release_sample
 
-    @staticmethod
-    @njit(nogil=True, fastmath=True, cache=True)
-    def gen_AR_oneshot(value, state, gate, run, attack, release, threshold, output, attack_start, release_start, attack_mod, release_mod, am_amt, rm_amt):
-        frames = len(output)
-        top_threshold =  1.0 - threshold
-        for n in range(0, frames):
-            attack_time = max(0.001, min(1.0, attack + attack_mod[n]*am_amt))*fs
-            release_time = max(0.001, min(1.0, release + release_mod[n]*rm_amt))*fs
-            attack_c = np.float32(1.0 - math.exp(-1/attack_time))
-            release_c = np.float32(1.0 - math.exp(-1/release_time))
-            if not gate:
-                state[0] = 0                        
-                if run[0]:                          #clear run flag if set
-                    run[0] = 0
-                if value[0] > threshold:            #finish release
-                    value[0] += release_c*(0.0 - value[0])
-                else:                               #stop
-                    value[0] = 0.0
-            else:
-                if not run[0]:
-                    if (state[0] == 0) and (n >= attack_start):       #start
-                        state[0] = 1
-                    elif state[0] == 1:                               #attack
-                        if value[0] < top_threshold:
-                            value[0] += attack_c*(1.0 - value[0])
-                        else:
-                            value[0] = 1.0
-                            state[0] = 2
-                    elif state[0] == 2:                               #release
-                        if value[0] > threshold:
-                            value[0] += release_c*(0.0 - value[0])
-                        else:
-                            value[0] = 0.0
-                            state[0] = 0                              #stop
-                            run[0] = 1
-            output[n] = value[0]
+#numba DSP
+#-modulators (waveforms)
+#--sinusoid
+@njit(nogil=True, fastmath=True, cache=True)
+def generate_sine(phase, offset, increment, output, freq_mod, phase_mod, fm_amt, pm_amt):
+    frames = len(output)
+    for n in range(0, frames):
+        mod_increment = max(0.0, min(max_increment, increment + max_increment*freq_mod[n]*fm_amt))
+        mod_offset = max(0.0, min(twopi, offset + twopi*phase_mod[n]*pm_amt))
+        output[n] = math.sin(phase[0] + mod_offset)
+        phase[0] += mod_increment
+        if phase[0] >= twopi:
+            phase[0] -= twopi
 
-    @staticmethod
-    @njit(nogil=True, fastmath=True, cache=True)
-    def gen_AR_loop(value, state, gate, attack, release, threshold, output, attack_start, release_start, attack_mod, release_mod, am_amt, rm_amt):
-        frames = len(output)
-        top_threshold =  1.0 - threshold
-        for n in range(0, frames):
-            attack_time = max(0.001, min(1.0, attack + attack_mod[n]*am_amt))*fs
-            release_time = max(0.001, min(1.0, release + release_mod[n]*rm_amt))*fs
-            attack_c = np.float32(1.0 - math.exp(-1/attack_time))
-            release_c = np.float32(1.0 - math.exp(-1/release_time))
-            if not gate:
-                state[0] = 0                        
-                if value[0] > threshold:        #finish release
-                    value[0] += release_c*(0.0 - value[0])
-                else:                           #stop
-                    value[0] = 0.0
-            else:
-                if state[0] == 0  and (n >= attack_start):               #start
+#--triangle  
+@njit(nogil=True, fastmath=True, cache=True)
+def generate_triangle(phase, offset, increment, output, freq_mod, phase_mod, fm_amt, pm_amt):
+    frames = len(output)
+    for n in range(0, frames):
+        mod_increment = max(0.0, min(max_increment, increment + max_increment*freq_mod[n]*fm_amt))
+        mod_offset = max(0.0, min(twopi, offset + twopi*phase_mod[n]*pm_amt))
+        new_phase = phase[0] + mod_offset
+        norm_phase = new_phase*oneovertwopi
+        norm_phase = norm_phase - np.floor(norm_phase)
+        output[n] = 4*abs(norm_phase - 0.5) - 1
+        phase[0] += mod_increment
+        if phase[0] >= twopi:
+            phase[0] -= twopi
+
+#--ramp
+@njit(nogil=True, fastmath=True, cache=True)
+def generate_ramp(phase, offset, increment, output, freq_mod, phase_mod, fm_amt, pm_amt):
+    frames = len(output)
+    for n in range(0, frames):
+        mod_increment = max(0.0, min(max_increment, increment + max_increment*freq_mod[n]*fm_amt))
+        mod_offset = max(0.0, min(twopi, offset + twopi*phase_mod[n]*pm_amt))
+        new_phase = phase[0] + mod_offset
+        norm_phase = new_phase*oneovertwopi
+        norm_phase = norm_phase - np.floor(norm_phase)
+        output[n] = 2*norm_phase - 1.0
+        phase[0] += mod_increment
+        if phase[0] >= twopi:
+            phase[0] -= twopi
+
+#--sawtooth
+@njit(nogil=True, fastmath=True, cache=True)
+def generate_sawtooth(phase, offset, increment, output, freq_mod, phase_mod, fm_amt, pm_amt):
+    frames = len(output)
+    for n in range(0, frames):
+        mod_increment = max(0.0, min(max_increment, increment + max_increment*freq_mod[n]*fm_amt))
+        mod_offset = max(0.0, min(twopi, offset + twopi*phase_mod[n]*pm_amt))
+        new_phase = phase[0] + mod_offset
+        norm_phase = new_phase*oneovertwopi
+        norm_phase = norm_phase - np.floor(norm_phase)
+        output[n] = 2*(1.0-norm_phase) - 1.0
+        phase[0] += mod_increment
+        if phase[0] >= twopi:
+            phase[0] -= twopi
+
+#--square (+pwm)
+@njit(nogil=True, fastmath=True, cache=True)
+def generate_square(phase, offset, increment, output, width, freq_mod, phase_mod, fm_amt, pm_amt):
+    frames = len(output)
+    for n in range(0, frames):
+        mod_increment = max(0.0, min(max_increment, increment + max_increment*freq_mod[n]*fm_amt))
+        mod_offset = max(0.0, min(twopi, offset + twopi*phase_mod[n]*pm_amt))
+        new_phase = phase[0] + mod_offset
+        norm_phase = new_phase*oneovertwopi
+        norm_phase = norm_phase - np.floor(norm_phase)
+        output[n] = 2*(norm_phase < width) - 1.0
+        phase[0] += mod_increment
+        if phase[0] >= twopi:
+            phase[0] -= twopi
+
+#--sample & hold (no slew)
+@njit(nogil=True, fastmath=True, cache=True)
+def sample_and_hold(phase, increment, output, held_value, freq_mod, fm_amt):
+    frames = len(output)
+    for n in range(0, frames):
+        mod_increment = max(0.0, min(max_increment, increment + max_increment*freq_mod[n]*fm_amt))
+        output[n] = held_value[0]
+        phase[0] += mod_increment
+        if phase[0] >= twopi:
+            phase[0] -= twopi
+            held_value[0] = 2*np.random.random() - 1.0
+
+#-modulators (functions)
+#--attack/release envelope (oneshot)
+@njit(nogil=True, fastmath=True, cache=True)
+def gen_AR_oneshot(value, state, gate, run, attack, release, threshold, output, attack_start, release_start, attack_mod, release_mod, am_amt, rm_amt):
+    frames = len(output)
+    top_threshold =  1.0 - threshold
+    for n in range(0, frames):
+        attack_time = max(0.001, min(1.0, attack + attack_mod[n]*am_amt))*fs
+        release_time = max(0.001, min(1.0, release + release_mod[n]*rm_amt))*fs
+        attack_c = np.float32(1.0 - math.exp(log_threshold/attack_time))
+        release_c = np.float32(1.0 - math.exp(log_threshold/release_time))
+        if not gate:
+            state[0] = 0                        
+            if run[0]:                          #clear run flag if set
+                run[0] = 0
+            if value[0] > threshold:            #finish release
+                value[0] += release_c*(0.0 - value[0])
+            else:                               #stop
+                value[0] = 0.0
+        else:
+            if not run[0]:
+                if (state[0] == 0) and (n >= attack_start):       #start
                     state[0] = 1
-                elif state[0] == 1:             #attack
+                elif state[0] == 1:                               #attack
                     if value[0] < top_threshold:
                         value[0] += attack_c*(1.0 - value[0])
                     else:
                         value[0] = 1.0
                         state[0] = 2
-                elif state[0] == 2:             #release
+                elif state[0] == 2:                               #release
                     if value[0] > threshold:
                         value[0] += release_c*(0.0 - value[0])
                     else:
                         value[0] = 0.0
-                        state[0] = 0            #stop
-            output[n] = value[0]
+                        state[0] = 0                              #stop
+                        run[0] = 1
+        output[n] = value[0]
 
-    @staticmethod
-    @njit(nogil=True, fastmath=True, cache=True)
-    def gen_AHR(value, state, gate, attack, release, threshold, output, attack_start, release_start, attack_mod, release_mod, am_amt, rm_amt):
-        frames = len(output)
-        top_threshold =  1.0 - threshold
-        for n in range(0, frames):
-            attack_time = max(0.001, min(1.0, attack + attack_mod[n]*am_amt))*fs
-            release_time = max(0.001, min(1.0, release + release_mod[n]*rm_amt))*fs
-            attack_c = np.float32(1.0 - math.exp(-1/attack_time))
-            release_c = np.float32(1.0 - math.exp(-1/release_time))
-            if not gate:
-                state[0] = 0                        
-                if value[0] > threshold:        #finish release
+#--attack/release envelope (loop)
+@njit(nogil=True, fastmath=True, cache=True)
+def gen_AR_loop(value, state, gate, attack, release, threshold, output, attack_start, release_start, attack_mod, release_mod, am_amt, rm_amt):
+    frames = len(output)
+    top_threshold =  1.0 - threshold
+    for n in range(0, frames):
+        attack_time = max(0.001, min(1.0, attack + attack_mod[n]*am_amt))*fs
+        release_time = max(0.001, min(1.0, release + release_mod[n]*rm_amt))*fs
+        attack_c = np.float32(1.0 - math.exp(log_threshold/attack_time))
+        release_c = np.float32(1.0 - math.exp(log_threshold/release_time))
+        if not gate:
+            state[0] = 0                        
+            if value[0] > threshold:        #finish release
+                value[0] += release_c*(0.0 - value[0])
+            else:                           #stop
+                value[0] = 0.0
+        else:
+            if state[0] == 0  and (n >= attack_start):               #start
+                state[0] = 1
+            elif state[0] == 1:             #attack
+                if value[0] < top_threshold:
+                    value[0] += attack_c*(1.0 - value[0])
+                else:
+                    value[0] = 1.0
+                    state[0] = 2
+            elif state[0] == 2:             #release
+                if value[0] > threshold:
                     value[0] += release_c*(0.0 - value[0])
-                else:                           #stop
+                else:
                     value[0] = 0.0
-            else:
-                if state[0] == 0  and (n >= attack_start):               #start
-                    state[0] = 1
-                elif state[0] == 1:             #attack
-                    if value[0] < top_threshold:
-                        value[0] += attack_c*(1.0 - value[0])
-                    else:
-                        value[0] = 1.0
-                        state[0] = 2
-                elif state[0] == 2:             #hold
-                    if value[0] < top_threshold:
-                        value[0] += attack_c*(1.0 - value[0])
-                    else:
-                        value[0] = 1.0
-            output[n] = value[0]
+                    state[0] = 0            #stop
+        output[n] = value[0]
+
+#--attack/hold/release envelope
+@njit(nogil=True, fastmath=True, cache=True)
+def gen_AHR(value, state, gate, attack, release, threshold, output, attack_start, release_start, attack_mod, release_mod, am_amt, rm_amt):
+    frames = len(output)
+    top_threshold =  1.0 - threshold
+    for n in range(0, frames):
+        attack_time = max(0.001, min(1.0, attack + attack_mod[n]*am_amt))*fs
+        release_time = max(0.001, min(1.0, release + release_mod[n]*rm_amt))*fs
+        attack_c = np.float32(1.0 - math.exp(log_threshold/attack_time))
+        release_c = np.float32(1.0 - math.exp(log_threshold/release_time))
+        if not gate:
+            state[0] = 0                        
+            if value[0] > threshold:        #finish release
+                value[0] += release_c*(0.0 - value[0])
+            else:                           #stop
+                value[0] = 0.0
+        else:
+            if state[0] == 0  and (n >= attack_start):               #start
+                state[0] = 1
+            elif state[0] == 1:             #attack
+                if value[0] < top_threshold:
+                    value[0] += attack_c*(1.0 - value[0])
+                else:
+                    value[0] = 1.0
+                    state[0] = 2
+            elif state[0] == 2:             #hold
+                if value[0] < top_threshold:
+                    value[0] += attack_c*(1.0 - value[0])
+                else:
+                    value[0] = 1.0
+        output[n] = value[0]
