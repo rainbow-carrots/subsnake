@@ -23,53 +23,8 @@ class StereoDelay():
 
     def process_block(self, input, output, mod_buffers, mod_values):
         self.offset = self.delay_time*self.fs
-        self.delay_block(input, output, self.buffer, self.offset, self.offset_smooth, self.write_heads, self.delay_feedback, self.mix_level, self.hermite_interpolate,
+        delay_block(input, output, self.buffer, self.offset, self.offset_smooth, self.write_heads, self.delay_feedback, self.mix_level,
                          mod_buffers[0], mod_buffers[1], mod_buffers[2], mod_values[0], mod_values[1], mod_values[2], self.tm_amount_smooth)
-
-    @staticmethod
-    @njit(nogil=True, fastmath=True, cache=True, inline="always")
-    def delay_block(input, output, buffer, offset_raw, offset_smooth, write_heads, feedback, mix, hermite_interpolate, time_mod, feedback_mod, mix_mod, tm_amt, fm_amt, mm_amt, tm_amt_smooth):
-        frames = len(input)
-        buffer_size = len(buffer)
-        alpha = .0001
-        for c in range (0, 2):
-            for n in range(0, frames):
-                #smooth offset
-                offset_smooth[c] = offset_smooth[c]*(1.0 - alpha) + offset_raw*alpha
-                tm_amt_smooth[0, c] = tm_amt_smooth[0, c]*(1.0 - alpha) + tm_amt*alpha
-                offset_mod = offset_smooth[c] + 22050.0*time_mod[n]*tm_amt_smooth[0, c]
-                offset_mod = max(0.0, min(44100.0, offset_mod))
-
-                #calculate read head position & wrap
-                read_head_exact = write_heads[c] - offset_mod
-                read_head_int = np.floor(read_head_exact)
-                offset_frac = read_head_exact - read_head_int
-                read_head = int(read_head_int) % buffer_size
-
-                #calculate interpolation indeces
-                y0_index = read_head-1
-                if y0_index < 0:
-                    y0_index += buffer_size
-                y2_index = read_head+1
-                if y2_index >= buffer_size:
-                    y2_index -= buffer_size
-                y3_index = read_head+2
-                if y3_index >= buffer_size:
-                    y3_index -= buffer_size
-
-                #interpolate sample
-                delayed_sample = hermite_interpolate(buffer[y0_index, c], buffer[read_head, c], buffer[y2_index, c], buffer[y3_index, c], offset_frac)
-
-                #write to output buffer & increment/wrap write head
-                mod_feedback = max(0.0, min(1.0, feedback + feedback_mod[n]*fm_amt))
-                buffer[write_heads[c], c] = delayed_sample*mod_feedback + input[n, c]
-                write_heads[c] += 1
-                if (write_heads[c] >= buffer_size):
-                    write_heads[c] = 0
-
-                #output
-                mod_mix = max(0.0, min(1.0, mix + mix_mod[n]*mm_amt))
-                output[n, c] = (1.0-mod_mix)*input[n, c] + mod_mix*delayed_sample
 
     #helpers
     def update_time(self, new_time):
@@ -80,17 +35,6 @@ class StereoDelay():
 
     def update_mix(self, new_mix):
         self.mix_level = new_mix
-
-    #interpolator (catmull-rom)
-    @staticmethod
-    @njit(nogil=True, fastmath=True, cache=True)
-    def hermite_interpolate(y0, y1, y2, y3, frac):
-        c0 = y1
-        c1 = 0.5*(y2-y0)
-        c2 = y0 - 2.5*y1 + 2.0*y2 - 0.5*y3
-        c3 = 0.5*(y3-y0) + 1.5*(y1-y2)
-
-        return ((c3*frac + c2)*frac + c1)*frac + c0
 
 #stereo audio recorder/looper
 # 5m rec buffer | 
@@ -173,34 +117,87 @@ class AudioRecorder():
                         self.stopped[0] = True
                         self.record[0] = False
                     self.play_heads[:] = 0
-            self.process_samples(self.record_buffer, indata, outdata, frames, self.paused, self.stopped,
+            process_samples(self.record_buffer, indata, outdata, frames, self.paused, self.stopped,
                                 self.record, self.loop, self.play_heads, self.end_heads, self.put_stop, self.input_level, self.input_level_smooth, self.output_level_smooth, self.rec_gate_smooth)
         if self.put_stop[0]:
             self.put_stop[0] = False
             self.event_queue.put_nowait("stop")
 
-    @staticmethod
-    @njit(nogil=True, fastmath=True, cache=True)
-    def process_samples(rec_buffer, indata, outdata, frames, paused, stopped, record, loop, play_heads, end_heads, put_stop, input_level, input_level_smooth, output_level_smooth, rec_gate_smooth):
-        alpha = .001
-        for c in range(0, 2):
-            for n in range(0, frames):
-                input_level_smooth[0, c] = input_level_smooth[0, c]*(1.0 - alpha) + input_level*alpha
-                output_level_smooth[0, c] = max(0.0, min(1.0, output_level_smooth[0, c]*(1.0 - alpha) + alpha*np.float32(~stopped[0] & ~paused[0])))
-                rec_gate_smooth[0, c] = max(0.0, min(1.0, rec_gate_smooth[0, c]*(1.0 - alpha) + alpha*np.float32(record[0] & ~stopped[0])))
-                if not paused[0] and not stopped[0]:
-                    read_sample = rec_buffer[play_heads[c], c]
-                    if record[0]:
-                        rec_buffer[play_heads[c], c] += indata[n, c]*input_level_smooth[0, c]*rec_gate_smooth[0, c]
-                    if play_heads[c] < end_heads[c]:
-                        play_heads[c] += 1
-                    else:
-                        play_heads[:] = 0
-                        if not loop:
-                            put_stop[0] = True
-                            stopped[0] = True
-                            record[0] = False
-                    outdata[n, c] = read_sample*output_level_smooth[0, c]
+#numba DSP
+# delay
+@njit(nogil=True, fastmath=True, cache=True, inline="always")
+def delay_block(input, output, buffer, offset_raw, offset_smooth, write_heads, feedback, mix, time_mod, feedback_mod, mix_mod, tm_amt, fm_amt, mm_amt, tm_amt_smooth):
+    frames = len(input)
+    buffer_size = len(buffer)
+    alpha = .0001
+    for c in range (0, 2):
+        for n in range(0, frames):
+            #smooth offset
+            offset_smooth[c] = offset_smooth[c]*(1.0 - alpha) + offset_raw*alpha
+            tm_amt_smooth[0, c] = tm_amt_smooth[0, c]*(1.0 - alpha) + tm_amt*alpha
+            offset_mod = offset_smooth[c] + 22050.0*time_mod[n]*tm_amt_smooth[0, c]
+            offset_mod = max(0.0, min(44100.0, offset_mod))
 
+            #calculate read head position & wrap
+            read_head_exact = write_heads[c] - offset_mod
+            read_head_int = np.floor(read_head_exact)
+            offset_frac = read_head_exact - read_head_int
+            read_head = int(read_head_int) % buffer_size
 
+            #calculate interpolation indeces
+            y0_index = read_head-1
+            if y0_index < 0:
+                y0_index += buffer_size
+            y2_index = read_head+1
+            if y2_index >= buffer_size:
+                y2_index -= buffer_size
+            y3_index = read_head+2
+            if y3_index >= buffer_size:
+                y3_index -= buffer_size
+
+            #interpolate sample
+            delayed_sample = hermite_interpolate(buffer[y0_index, c], buffer[read_head, c], buffer[y2_index, c], buffer[y3_index, c], offset_frac)
+
+            #write to output buffer & increment/wrap write head
+            mod_feedback = max(0.0, min(1.0, feedback + feedback_mod[n]*fm_amt))
+            buffer[write_heads[c], c] = delayed_sample*mod_feedback + input[n, c]
+            write_heads[c] += 1
+            if (write_heads[c] >= buffer_size):
+                write_heads[c] = 0
+
+            #output
+            mod_mix = max(0.0, min(1.0, mix + mix_mod[n]*mm_amt))
+            output[n, c] = (1.0-mod_mix)*input[n, c] + mod_mix*delayed_sample
+
+# interpolator (catmull-rom)
+@njit(nogil=True, fastmath=True, cache=True)
+def hermite_interpolate(y0, y1, y2, y3, frac):
+    c0 = y1
+    c1 = 0.5*(y2-y0)
+    c2 = y0 - 2.5*y1 + 2.0*y2 - 0.5*y3
+    c3 = 0.5*(y3-y0) + 1.5*(y1-y2)
+    return ((c3*frac + c2)*frac + c1)*frac + c0
+
+# audio recorder
+@njit(nogil=True, fastmath=True, cache=True)
+def process_samples(rec_buffer, indata, outdata, frames, paused, stopped, record, loop, play_heads, end_heads, put_stop, input_level, input_level_smooth, output_level_smooth, rec_gate_smooth):
+    alpha = .001
+    for c in range(0, 2):
+        for n in range(0, frames):
+            input_level_smooth[0, c] = input_level_smooth[0, c]*(1.0 - alpha) + input_level*alpha
+            output_level_smooth[0, c] = max(0.0, min(1.0, output_level_smooth[0, c]*(1.0 - alpha) + alpha*np.float32(~stopped[0] & ~paused[0])))
+            rec_gate_smooth[0, c] = max(0.0, min(1.0, rec_gate_smooth[0, c]*(1.0 - alpha) + alpha*np.float32(record[0] & ~stopped[0])))
+            if not paused[0] and not stopped[0]:
+                read_sample = rec_buffer[play_heads[c], c]
+                if record[0]:
+                    rec_buffer[play_heads[c], c] += indata[n, c]*input_level_smooth[0, c]*rec_gate_smooth[0, c]
+                if play_heads[c] < end_heads[c]:
+                    play_heads[c] += 1
+                else:
+                    play_heads[:] = 0
+                    if not loop:
+                        put_stop[0] = True
+                        stopped[0] = True
+                        record[0] = False
+                outdata[n, c] = read_sample*output_level_smooth[0, c]
 
