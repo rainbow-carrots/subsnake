@@ -29,6 +29,9 @@ class WrappedOsc():
         self.blit_states = np.ascontiguousarray(np.array([[0.0, amplitude, phase_increment], [0.0, amplitude, phase_increment]], dtype=np.float32))
         self.blit_blocker_ins = np.zeros((1, 2), dtype=np.float32)
         self.blit_blocker_outs = np.zeros((1, 2), dtype=np.float32)
+        self.blit_env_follower = np.zeros((2, 2), dtype=np.float32)
+        self.blit_env_follower[0][:] = -10000.0
+        self.blit_env_follower[1][:] = 10000.0
         self.alg = alg
         self.pulsewidth = width
         self.smoothed_widths = np.zeros((1, 2), dtype=np.float32)
@@ -48,7 +51,7 @@ class WrappedOsc():
         polyblep_triangle(self.state, self.blep_integrator, self.smoothed_blep_width, self.output_hpf, test_out, self.state2, 0.5, self.random_walk[:16], 1.0, mod_test, mod_test, mod_test, mod_test, 0.0, 0.0, 0.0, 0.0, 1.0, 440.0)
         blit_saw(test_out, self.blit_states, self.blit_integrators, self.random_walk[:16], 1.0, mod_test, mod_test, mod_test, 0.0, 0.0, 0.0, 0.5, 440.0)
         blit_pulse(test_out, self.blit_states, self.blit_integrators, self.smoothed_widths, self.random_walk[:16], 1.0, mod_test, mod_test, mod_test, mod_test, 0.0, 0.0, 0.0, 0.0, 0.5, 440.0, 0.5)
-        blit_triangle(test_out, self.blit_states, self.blit_integrators, self.smoothed_widths, self.random_walk[:16], 1.0, mod_test, mod_test, mod_test, mod_test, 0.0, 0.0, 0.0, 0.0, 0.5, 440.0, 0.5)
+        blit_triangle(test_out, self.blit_states, self.blit_integrators, self.smoothed_widths, self.blit_env_follower, self.random_walk[:16], 1.0, mod_test, mod_test, mod_test, mod_test, 0.0, 0.0, 0.0, 0.0, 0.5, 440.0, 0.5)
     
     def process_block(self, buffer, mod_buffers, mod_values):
         frames = len(buffer)
@@ -70,7 +73,7 @@ class WrappedOsc():
                                     mod_buffers[0], mod_buffers[1], mod_buffers[2], mod_buffers[3], mod_values[0], mod_values[1], mod_values[2], mod_values[3], self.amp, self.freq)
         elif (self.alg == 3.0):
             if (self.alg_type == 0):
-                blit_triangle(buffer, self.blit_states, self.blit_integrators, self.smoothed_widths,
+                blit_triangle(buffer, self.blit_states, self.blit_integrators, self.smoothed_widths, self.blit_env_follower,
                           self.random_walk[:frames], self.walk_amt, mod_buffers[0], mod_buffers[1], mod_buffers[2], mod_buffers[3], mod_values[0], mod_values[1], mod_values[2], mod_values[3], self.amp, self.freq, self.pulsewidth)
             else:
                 polyblep_triangle(self.state, self.blep_integrator, self.smoothed_blep_width, self.output_hpf, buffer, self.state2, self.pulsewidth, self.random_walk, self.walk_amt,
@@ -323,7 +326,7 @@ def blit_pulse(outdata, states, integrators, smoothed_widths,
 #--anti-aliased trisaw (BLIT)
 #---(width=0.5: triangle, width≈0.0: sawtooth, width≈1.0: ramp)
 @njit(nogil=True, fastmath=True, cache=True)
-def blit_triangle(outdata, states, integrators, smoothed_widths,
+def blit_triangle(outdata, states, integrators, smoothed_widths, followers,
                 walk_mod, walk_amt, pitch_mod, det_mod, amp_mod, width_mod, pm_amt, dm_amt, am_amt, wm_amt, amp=1.0, freq=440.0, width=0.5):
     frames = len(outdata)
     base_inc = freq*oneoverfs
@@ -332,7 +335,9 @@ def blit_triangle(outdata, states, integrators, smoothed_widths,
         for c in range(0, 2):
             mod_inc = base_inc + base_inc*pitch_mod[n]*pm_amt + max_det_inc*walk_mod[n]*walk_amt + max_det_inc*det_mod[n]*dm_amt
             new_freq = max(1e-9, mod_inc)*fs
-            harmonics = 2*int(nyquist/new_freq) + 1
+            nyquist_by_nf = nyquist/new_freq
+            harmonics = 2*int(nyquist_by_nf) + 1
+            harmonic_f = nyquist_by_nf - int(nyquist_by_nf)
             new_width = max(.01, min(.99, width + width_mod[n]*wm_amt))
             smoothed_widths[0, c] += alpha*(new_width - smoothed_widths[0, c])
             smoothed_width = smoothed_widths[0, c]
@@ -351,6 +356,8 @@ def blit_triangle(outdata, states, integrators, smoothed_widths,
                 slope2 = 1.0-math.sin(np.pi*harmonics*phase2)/kernel_den_2
             slope1 *= mod_inc*2
             slope2 *= mod_inc*2
+            slope1 -= mod_inc*4*harmonic_f*math.cos(twopi*phase1*int(nyquist_by_nf + 1))
+            slope2 -= mod_inc*4*harmonic_f*math.cos(twopi*phase2*int(nyquist_by_nf + 1))             
             v1, integrators[0, c] = leaky_trapezoidal_integrate(slope1, integrators[0, c])
             v2, integrators[1, c] = leaky_trapezoidal_integrate(slope2, integrators[1, c])
             states[c, 0] += mod_inc
@@ -358,10 +365,23 @@ def blit_triangle(outdata, states, integrators, smoothed_widths,
 
             blit_pulse = (v1 - v2)
             v3, integrators[2, c] = leaky_trapezoidal_integrate(blit_pulse, integrators[2, c])
+            
+            if v3 > followers[0, c]:
+                followers[0, c] = v3
+            if v3 < followers[1, c]:
+                followers[1, c] = v3
+
+            dc_correct = (followers[0, c] + followers[1, c]) / 2.0
+            v3 = v3 - dc_correct
+
             scale = (mod_inc)/(smoothed_width*(1.0 - smoothed_width))
             output_sample = v3*scale
             mod_amp = max(-1.0, min(1.0, amp + amp_mod[n]*am_amt))
             outdata[n, c] = output_sample*mod_amp
+
+            follower_leak = 1.0 - (mod_inc*10.0)
+            followers[0, c] *= follower_leak
+            followers[1, c] *= follower_leak
 
 #-utilities
 #--random walk generator
