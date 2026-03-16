@@ -217,7 +217,7 @@ def filter_block_zdf(filt_in, filt_out, states, params, fenv, freq_mod, res_mod,
             
             prev_band = states[0, c]
             if prev_band != 0.0:
-                nl_res_c = res_c*math.tanh((prev_band*new_drive)*oneoverdrive) / prev_band
+                nl_res_c = res_c*math.tanh((prev_band*new_drive))*oneoverdrive / prev_band
             else:
                 nl_res_c = res_c
 
