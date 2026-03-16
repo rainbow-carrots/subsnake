@@ -135,10 +135,6 @@ def filter_block_hal(input, output, states, params, fenv, freq_mod, res_mod, dri
     sm_val = mod_vals[3]
     fem_val = mod_vals[4]
 
-    #calculate key tracking
-    cutoff_freq_amt = (1.0 - kt_amt)*cutoff
-    kt_freq_amt = kt_amt*base_freq*32.0
-
     #main loop
     for c in range (2):
         for n in range(len(output)):
@@ -150,7 +146,10 @@ def filter_block_hal(input, output, states, params, fenv, freq_mod, res_mod, dri
             prev_low = states[0, c]
             prev_band = states[1, c]
             fenv_amount = max(-1.0, min(1.0, fenv_amount + fenv_mod[n]*fem_val))
-            new_cutoff = max(0.1, min(cutoff_freq_amt + kt_freq_amt + 14080.0*freq_mod_amt + 14080.0*fenv[n, c]*fenv_amount, 14080.0))
+            
+            fm_amount = 14080.0*freq_mod_amt
+            fenv_mod_amount = 14080.0*fenv[n, c]*fenv_amount
+            new_cutoff = (1.0 - kt_amt)*max(0.1, min(cutoff + fm_amount + fenv_mod_amount, 14080.0)) + kt_amt*max(0.1, min(base_freq + fm_amount + fenv_mod_amount, 14080.0))
             freq_c = 2*math.sin(np.pi*(new_cutoff/(8*fs)))
             res_c = max(.02, min(20.0, resonance + res_mod_amt))
             substate = mode
@@ -195,10 +194,6 @@ def filter_block_zdf(filt_in, filt_out, states, params, fenv, freq_mod, res_mod,
     sm_val = mod_vals[3]
     fem_val = mod_vals[4]
 
-    #calculate key tracking
-    cutoff_freq_amt = (1.0 - kt_amt)*cutoff
-    kt_freq_amt = kt_amt*base_freq*32.0
-
     #main loop
     for c in range(2):
         for n in range(len(filt_out)):
@@ -207,7 +202,9 @@ def filter_block_zdf(filt_in, filt_out, states, params, fenv, freq_mod, res_mod,
             drive_mod_amt = drive_mod[n]*dm_val
             sat_mod_amt = sat_mod[n]*sm_val
             fenv_amount = max(-1.0, min(1.0, fenv_amt + fenv_mod[n]*fem_val))
-            new_cutoff = max(0.1, min(cutoff_freq_amt + kt_freq_amt + 20000.0*freq_mod_amt + 20000.0*fenv[n, c]*fenv_amount, 20000.0))
+            fm_amount = 20000.0*freq_mod_amt
+            fenv_mod_amount = 20000.0*fenv[n, c]*fenv_amount
+            new_cutoff = (1.0 - kt_amt)*max(0.1, min(cutoff + fm_amount + fenv_mod_amount, 20000.0)) + kt_amt*max(0.1, min(base_freq + fm_amount + fenv_mod_amount, 20000.0))
             freq_c = math.tan(np.pi*(new_cutoff/fs))
             res_c = max(.02, min(20.0, feedback + res_mod_amt))
 
