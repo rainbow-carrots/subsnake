@@ -22,7 +22,7 @@ jobs:
             asset_name: subsnake-linux-amd64
           - os: windows-latest
             artifact_name: subsnake.exe
-            asset_name: subsnake-windows-amd64.exe
+            asset_name: subsnake-windows-amd64
           - os: macos-latest
             artifact_name: subsnake
             asset_name: subsnake-macos-arm64
