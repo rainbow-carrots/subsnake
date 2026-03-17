@@ -102,6 +102,14 @@ class WrappedOsc():
     def update_type(self, newType):
         self.alg_type = newType
 
+    def reset_buffers(self):
+        self.blit_integrators[:, :] = 0.0
+        self.blep_integrator[0] = 0.0
+        self.blit_blocker_ins[0, :] = 0.0
+        self.blit_blocker_outs[0, :] = 0.0
+        self.blit_env_follower[0][:] = -10000.0
+        self.blit_env_follower[1][:] = 10000.0
+
 #numba DSP - oscillators
 #-naive
 #--sinusoid
