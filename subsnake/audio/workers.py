@@ -1,5 +1,6 @@
 from PySide6.QtCore import QRunnable
 import time
+import numpy as np
 
 middle_a = 69
 sleeptime = 0.0025
@@ -98,12 +99,30 @@ class KeyEventWorker(QRunnable):
                 return voice
         for voice in self.engine.voices:           #first stopped voice
             if voice.status == 0:
+                voice = self.reset_voice(voice)
                 return voice
         for voice in self.engine.voices:           #first releasing voice
             if voice.status == 1:
+                voice = self.fade_voice(voice)
+                voice = self.reset_voice(voice)
                 return voice
         self.steal_voice += 1                      #steal voice (round-robin)
         if self.steal_voice > 11:
             self.steal_voice = 0
-        return self.engine.voices[self.steal_voice]
+        voice = self.engine.voices[self.steal_voice]
+        voice = self.fade_voice(voice)
+        voice = self.reset_voice(voice)
+        return voice
+    
+    def fade_voice(self, voice):
+        linear_fade = np.linspace(1.0, 0.0, 100)
+        for n in linear_fade:
+            voice.velocity = voice.velocity*n
+        return voice
+    
+    def reset_voice(self, voice):
+        voice.osc.reset_buffers()
+        voice.osc2.reset_buffers()
+        voice.osc3.reset_buffers()
+        return voice
 
