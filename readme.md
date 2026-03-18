@@ -14,10 +14,10 @@ well, i'm very glad you asked.
 
 
 ### what's in a voice?
-* 3 sine, triangle (+ PWM), sawtooth, or pulse (+ PWM) oscillators with pitch, detune & level controls
-* 1 state-variable filter with resonance, saturation & drive
-* 2 ADSR envelopes - one for amplitude, one for filter frequency (with bipolar depth control)
-* 4 modulators - 2 LFOs, 2 envelopes, with dedicated assignable attenuverters for every parameter
+* 3 sine, triangle (+ PWM), sawtooth, or pulse (+ PWM) oscillators with pitch, detune & level controls | 2 algorithms (BLIT, polyBLEP)
+* 1 state-variable filter with resonance, saturation & drive | 2 types (recursive Chamberlin, ZDF-solved Chamberlin)
+* 2 ADSR envelopes - one for amplitude, one for filter frequency (with bipolar depth control) | .004-4s per stage
+* 4 modulators - 2 LFOs, 2 AR envelopes, with dedicated assignable attenuverters for every parameter
     * LFO shapes: sine, triangle, ramp, sawtooth, square, sample & hold
         * 0.01-10Hz w/ controllable phase shift
     * env. modes: attack-release, attack-hold-release, loop (attack-release)
@@ -52,7 +52,7 @@ there's also a stereo tape delay effect on the master bus (voice output + record
 
 
 ### how can i play it?
-* [v0.3.1](https://github.com/rainbow-carrots/subsnake/releases/tag/v0.3.1) is the latest build
+* [v0.3.2](https://github.com/rainbow-carrots/subsnake/releases/tag/v0.3.2) is the latest build
 * click on the version that corresponds to your platform to download the zip, extract, & run! if it doesn't open:
     * __on linux__: right click the file, go to *Properties* -> *Permissions*, and make sure "Allow executing file as program" is checked 
     * __on macos__: you'll need to [authorize the app](https://support.apple.com/guide/mac-help/open-a-mac-app-from-an-unknown-developer-mh40616/mac) when running it for the first time. go to *System Settings* -> *Privacy & Security*, scroll down to the bottom, and choose *Open anyway* (under *Security*)
