@@ -124,12 +124,12 @@ class EnvelopeGUI(QGroupBox):
 
     #slots
     def change_attack(self, value):
-        att = float(value)/1000.0
+        att = float(value)/250.0
         self.adsr_att_display.display(f"{att:.2f}")
         self.attack_changed.emit(att)
     
     def change_decay(self, value):
-        dec = float(value)/1000.0
+        dec = float(value)/250.0
         self.adsr_dec_display.display(f"{dec:.2f}")
         self.decay_changed.emit(dec)
     
@@ -139,7 +139,7 @@ class EnvelopeGUI(QGroupBox):
         self.sustain_changed.emit(sus)
 
     def change_release(self, value):
-        rel = float(value)/1000.0
+        rel = float(value)/250.0
         self.adsr_rel_display.display(f"{rel:.2f}")
         self.release_changed.emit(rel)
 
