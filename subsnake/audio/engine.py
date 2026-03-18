@@ -17,6 +17,7 @@ from .modulators import LFO, ModEnv
 fs = 44100
 twopi = 2*np.pi
 oneoverpi = 1/np.pi
+oott = 1.0/32.0
 middle_a = 69
 midi_latency = 0.0029025   #seconds
 
@@ -137,8 +138,7 @@ class AudioEngine():
         for voice in self.voices:
             if voice.status != 0:
                 future = self.voice_executor.submit(
-                voice.callback, voice.voice_output[:frames], self.note_to_voice,
-                self.stopped_voice_indeces, self.released_voice_indeces, frames)
+                voice.callback, voice.voice_output[:frames], frames)
                 futures.append(future)
             else:
                 voice.voice_output[:] = 0.0
@@ -541,11 +541,12 @@ class AudioEngine():
         
     #filter env
     def cc_change_fenv_attack(self, value):
-        new_attack = (float(value)/127.0) + .001
+        new_attack = (float(value)/32.0) + oott
+        print(new_attack)
         self.update_fenv_attack(new_attack)
 
     def cc_change_fenv_decay(self, value):
-        new_decay = (float(value)/127.0) + .001
+        new_decay = (float(value)/32.0) + oott
         self.update_fenv_decay(new_decay)
 
     def cc_change_fenv_sustain(self, value):
@@ -553,7 +554,7 @@ class AudioEngine():
         self.update_fenv_sustain(new_sustain)
 
     def cc_change_fenv_release(self, value):
-        new_release = (float(value)/127.0) + .001
+        new_release = (float(value)/32.0) + oott
         self.update_fenv_release(new_release)
 
     def cc_change_fenv_amount(self, value):
@@ -562,11 +563,11 @@ class AudioEngine():
 
     #envelope
     def cc_change_env_attack(self, value):
-        new_attack = (float(value)/127.0) + .001
+        new_attack = (float(value)/32.0) + oott
         self.update_attack(new_attack)
 
     def cc_change_env_decay(self, value):
-        new_decay = (float(value)/127.0) + .001
+        new_decay = (float(value)/32.0) + oott
         self.update_decay(new_decay)
 
     def cc_change_env_sustain(self, value):
@@ -574,7 +575,7 @@ class AudioEngine():
         self.update_sustain(new_sustain)
 
     def cc_change_env_release(self, value):
-        new_release = (float(value)/127.0) + .001
+        new_release = (float(value)/32.0) + oott
         self.update_release(new_release)
 
     #delay
@@ -679,7 +680,7 @@ class Voice():
         self.detune_offset_2 = 0.0
         self.detune_offset_3 = 0.0
 
-    def callback(self, output, note_to_voice, stopped_voices, released_voices, frames):
+    def callback(self, output, frames):
         if self.status != 0:
             #modulators
             # lfo 1
