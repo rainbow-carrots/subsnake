@@ -263,10 +263,18 @@ class UpdateGUI(QTimer):
         elif (module == "filter env"):
             if (param == "depth"):
                 display_val = float(value)/500.0
-            else:
+            elif (param == "sustain"):
                 display_val = float(value)/1000.0
+            else:
+                display_val = float(value)/250.0
             display.display(f"{display_val:.2f}")
-        elif (module == "envelope" or module == "delay" or module == "menv 1" or module == "menv 2"):
+        elif (module == "envelope"):
+            if (param == "sustain"):
+                display_val = float(value)/1000.0
+            else:
+                display_val = float(value)/250.0
+            display.display(f"{display_val:.2f}")
+        elif (module == "delay" or module == "menv 1" or module == "menv 2"):
             display_val = float(value)/1000.0
             display.display(f"{display_val:.2f}")
         elif (module == "lfo 1" or module == "lfo 2"):
