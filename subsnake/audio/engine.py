@@ -1,4 +1,5 @@
 import numpy as np
+import math
 import mido
 import queue
 import sounddevice as sd
@@ -6,6 +7,7 @@ import soundfile as sf
 import random
 import time as pytime
 import concurrent.futures
+from numba import njit
 from PySide6.QtCore import QMutex, QThreadPool
 from .generators import WrappedOsc
 from .filters import HalSVF, ZDFSVF
@@ -20,6 +22,8 @@ oneoverpi = 1/np.pi
 oott = 1.0/32.0
 middle_a = 69
 midi_latency = 0.0029025   #seconds
+hpf_g = math.tan(math.pi*6.667/fs)
+hpf_g_div = 1.0/(1.0 + hpf_g)
 
 class AudioEngine():
     def __init__(self):
@@ -90,6 +94,7 @@ class AudioEngine():
         self.threadpool.start(self.key_event_worker)
         self.run_threads = True
         self.voice_executor = concurrent.futures.ThreadPoolExecutor(max_workers=16)
+        self.output_hpf_states = np.zeros((2), dtype=np.float32)
 
     #initialize stream
     def start_audio(self):
@@ -145,6 +150,7 @@ class AudioEngine():
         concurrent.futures.wait(futures)
         for voice in self.voices:
             outdata += voice.voice_output[:frames]
+        dc_hpf(outdata, self.output_hpf_states)
         self.recorder.process_block(outdata, self.recorder_output)
         outdata += self.recorder_output[:frames]
 
@@ -785,3 +791,14 @@ class Voice():
             return self.menv1.output
         elif mode == 4:
             return self.menv2.output
+
+@njit(nogil=True, fastmath=True, cache=True)
+def dc_hpf(buffer, hp_state):
+    frames = len(buffer)
+    for c in range(0, 2):
+        for n in range(0, frames):
+            x = buffer[n, c]
+            lp = (hpf_g*x + hp_state[c])*hpf_g_div
+            hp = x - lp
+            hp_state[c] = lp + hpf_g*hp
+            buffer[n, c] = hp
