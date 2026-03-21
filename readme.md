@@ -14,7 +14,7 @@ well, i'm very glad you asked.
 
 
 ### what's in a voice?
-* 3 sine, triangle (+ PWM), sawtooth, or pulse (+ PWM) oscillators with pitch, detune & level controls | 2 algorithms (BLIT, polyBLEP)
+* 3 sine, triangle, sawtooth, or pulse oscillators with pitch, detune, level & width controls | 2 algorithms (BLIT, polyBLEP)
 * 1 state-variable filter with resonance, saturation & drive | 2 types (recursive Chamberlin, ZDF-solved Chamberlin)
 * 2 ADSR envelopes - one for amplitude, one for filter frequency (with bipolar depth control) | .004-4s per stage
 * 4 modulators - 2 LFOs, 2 AR envelopes, with dedicated assignable attenuverters for every parameter
@@ -48,11 +48,16 @@ there's also a stereo tape delay effect on the master bus (voice output + record
 * to switch between oscillator types (BLIT/polyBLEP), *right click* the oscillator title box
 * to switch between filter types (Chamberlin/ZDF), *right click* the filter title box
 * the filter & oscillator type selections are saved with the patch (& restored on load)
-* changing the width of the triangle wave morphs the waveform from a sawtooth (w≈0.0), through a triangle (w=0.5), to a ramp (w≈1.0)
+* the width parameter will have a different effect, depending on the selected shape:
+    * sine: crossfades between silence at both extremes (center is full volume)
+    * triangle: morphs the waveform from a sawtooth (w≈0.0), through a triangle (w=0.5), to a ramp (w≈1.0)
+    * saw: crossfades between a saw & a second (free-running) saw at twice the fundamental (center is full fundamental)
+    * pulse: bog-standard through-zero PWM
+
 
 
 ### how can i play it?
-* [v0.3.2](https://github.com/rainbow-carrots/subsnake/releases/tag/v0.3.2) is the latest build
+* [v0.3.3](https://github.com/rainbow-carrots/subsnake/releases/tag/v0.3.3) is the latest build
 * click on the version that corresponds to your platform to download the zip, extract, & run! if it doesn't open:
     * __on linux__: right click the file, go to *Properties* -> *Permissions*, and make sure "Allow executing file as program" is checked 
     * __on macos__: you'll need to [authorize the app](https://support.apple.com/guide/mac-help/open-a-mac-app-from-an-unknown-developer-mh40616/mac) when running it for the first time. go to *System Settings* -> *Privacy & Security*, scroll down to the bottom, and choose *Open anyway* (under *Security*)
