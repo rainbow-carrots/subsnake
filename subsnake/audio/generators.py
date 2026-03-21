@@ -26,7 +26,7 @@ class WrappedOsc():
         self.walk_amt = 0.0
         self.blit_integrators = np.ascontiguousarray(np.zeros((3, 2), dtype=np.float32))
         self.blep_integrator = np.zeros((1), dtype=np.float32)
-        self.blit_states = np.ascontiguousarray(np.array([[0.0, amplitude, phase_increment], [0.0, amplitude, phase_increment]], dtype=np.float32))
+        self.blit_states = np.ascontiguousarray(np.array([[0.0, amplitude, phase_increment, 0.0], [0.0, amplitude, phase_increment, 0.0]], dtype=np.float32))
         self.blit_blocker_ins = np.zeros((1, 2), dtype=np.float32)
         self.blit_blocker_outs = np.zeros((1, 2), dtype=np.float32)
         self.blit_env_follower = np.zeros((2, 2), dtype=np.float32)
@@ -45,11 +45,11 @@ class WrappedOsc():
         mod_test = np.zeros((16), dtype=np.float32)
         test_out = np.zeros((16, 2), dtype=np.float32)
         generate_walk(self.random_walk[:16], self.walk_state)
-        generate_sine(self.state, test_out, self.random_walk[:16], 1.0, mod_test, mod_test, mod_test, 0.0, 0.0, 0.0, 1.0, 440.0)
-        polyblep_saw(self.state, test_out, self.random_walk[:16], 1.0, mod_test, mod_test, mod_test, 0.0, 0.0, 0.0, 1.0, 440.0)
+        generate_sine(self.state, test_out, self.random_walk[:16], 1.0, self.pulsewidth, mod_test, mod_test, mod_test, mod_test, 0.0, 0.0, 0.0, 0.0, 1.0, 440.0)
+        polyblep_saw(self.state, test_out, self.pulsewidth, self.random_walk[:16], 1.0, mod_test, mod_test, mod_test, mod_test, 0.0, 0.0, 0.0, 0.0, 1.0, 440.0)
         polyblep_pulse(self.state, test_out, self.state2, 0.5, self.random_walk[:16], 1.0, mod_test, mod_test, mod_test, mod_test, 0.0, 0.0, 0.0, 0.0, 1.0, 440.0)
         polyblep_triangle(self.state, self.blep_integrator, self.smoothed_blep_width, self.output_hpf, test_out, self.state2, 0.5, self.random_walk[:16], 1.0, mod_test, mod_test, mod_test, mod_test, 0.0, 0.0, 0.0, 0.0, 1.0, 440.0)
-        blit_saw(test_out, self.blit_states, self.blit_integrators, self.random_walk[:16], 1.0, mod_test, mod_test, mod_test, 0.0, 0.0, 0.0, 0.5, 440.0)
+        blit_saw(test_out, self.blit_states, self.blit_integrators, self.pulsewidth, self.random_walk[:16], 1.0, mod_test, mod_test, mod_test, mod_test, 0.0, 0.0, 0.0, 0.0, 0.5, 440.0)
         blit_pulse(test_out, self.blit_states, self.blit_integrators, self.smoothed_widths, self.random_walk[:16], 1.0, mod_test, mod_test, mod_test, mod_test, 0.0, 0.0, 0.0, 0.0, 0.5, 440.0, 0.5)
         blit_triangle(test_out, self.blit_states, self.blit_integrators, self.smoothed_widths, self.blit_env_follower, self.random_walk[:16], 1.0, mod_test, mod_test, mod_test, mod_test, 0.0, 0.0, 0.0, 0.0, 0.5, 440.0, 0.5)
     
@@ -57,13 +57,13 @@ class WrappedOsc():
         frames = len(buffer)
         generate_walk(self.random_walk[:frames], self.walk_state)
         if (self.alg == 0):
-            generate_sine(self.state, buffer, self.random_walk[:frames], self.walk_amt, mod_buffers[0], mod_buffers[1], mod_buffers[2], mod_values[0], mod_values[1], mod_values[2], self.amp, self.freq)
+            generate_sine(self.state, buffer, self.random_walk[:frames], self.walk_amt, self.pulsewidth, mod_buffers[0], mod_buffers[1], mod_buffers[2], mod_buffers[3], mod_values[0], mod_values[1], mod_values[2], mod_values[3], self.amp, self.freq)
         elif (self.alg == 1.0):
             if (self.alg_type == 0):
-                blit_saw(buffer, self.blit_states, self.blit_integrators,
-                          self.random_walk[:frames], self.walk_amt, mod_buffers[0], mod_buffers[1], mod_buffers[2], mod_values[0], mod_values[1], mod_values[2], self.amp, self.freq)
+                blit_saw(buffer, self.blit_states, self.blit_integrators, self.pulsewidth,
+                          self.random_walk[:frames], self.walk_amt, mod_buffers[0], mod_buffers[1], mod_buffers[2], mod_buffers[3], mod_values[0], mod_values[1], mod_values[2], mod_values[3], self.amp, self.freq)
             else:
-                polyblep_saw(self.state, buffer, self.random_walk, self.walk_amt, mod_buffers[0], mod_buffers[1], mod_buffers[2], mod_values[1], mod_values[2], mod_values[3], self.amp, self.freq)
+                polyblep_saw(self.state, buffer, self.pulsewidth, self.random_walk, self.walk_amt, mod_buffers[0], mod_buffers[1], mod_buffers[2], mod_buffers[3], mod_values[0], mod_values[1], mod_values[2], mod_values[3], self.amp, self.freq)
         elif (self.alg == 2.0):
             if (self.alg_type == 0):
                 blit_pulse(buffer, self.blit_states, self.blit_integrators, self.smoothed_widths,
@@ -112,15 +112,16 @@ class WrappedOsc():
 
 #numba DSP - oscillators
 #-naive
-#--sinusoid
+#--sinusoid (w/ bipolar "width" mod (amplitude))
 @njit(nogil=True, fastmath=True, cache=True)
-def generate_sine(state, outdata, walk_mod, walk_amt, pitch_mod, det_mod, amp_mod, pm_amt, dm_amt, am_amt, amp=1.0, freq=440.0):
+def generate_sine(state, outdata, walk_mod, walk_amt, width, pitch_mod, det_mod, amp_mod, width_mod, pm_amt, dm_amt, am_amt, wm_amt, amp=1.0, freq=440.0):
     base_inc = twopi*freq*oneoverfs
     for n in range(len(outdata)):
         state[2] = base_inc + base_inc*pitch_mod[n]*pm_amt + max_det_inc*det_mod[n]*dm_amt + max_det_inc*walk_mod[n]*walk_amt
-        sample = state[1] * math.sin(state[0])
-        outdata[n][0] = sample*(amp - amp_mod[n]*am_amt)
-        outdata[n][1] = sample*(amp - amp_mod[n]*am_amt)
+        mod_width = 2*np.abs(0.5 - (width + width_mod[n]*wm_amt))
+        mod_amp = max(-1.0, min(1.0, (amp + amp_mod[n]*am_amt)*(1.0 - mod_width)))
+        sample = math.sin(state[0])*mod_amp
+        outdata[n, :] = sample
         state[0] += state[2]
         if (state[0] > twopi):
             state[0] -= twopi
@@ -128,15 +129,17 @@ def generate_sine(state, outdata, walk_mod, walk_amt, pitch_mod, det_mod, amp_mo
 #-polyBLEP
 #--anti-aliased sawtooth
 @njit(nogil=True, fastmath=True, cache=True)
-def polyblep_saw(state, outdata, walk_mod, walk_amt, pitch_mod, det_mod, amp_mod, pm_amt, dm_amt, am_amt, amp=1.0, freq=440.0):
+def polyblep_saw(state, outdata, width, walk_mod, walk_amt, pitch_mod, det_mod, amp_mod, width_mod, pm_amt, dm_amt, am_amt, wm_amt, amp=1.0, freq=440.0):
     frames = len(outdata)
     base_inc = twopi*freq*oneoverfs
     for n in range(frames):
         #modulate phase increment
         state[2] = base_inc + base_inc*pitch_mod[n]*pm_amt + max_det_inc*det_mod[n]*dm_amt + max_det_inc*walk_mod[n]*walk_amt
+        mod_inc_d = state[2]*2
 
         #generate naive saw
         sample = (state[0] * oneoverpi) - 1.0
+        sample_d = (state[3] * oneoverpi) - 1.0
         
         #apply polyblep corrections
         if (state[0] < state[2]):           #phase just wrapped
@@ -146,15 +149,30 @@ def polyblep_saw(state, outdata, walk_mod, walk_amt, pitch_mod, det_mod, amp_mod
             t = (twopi - state[0])/state[2]
             sample -= (t - 1.0)**2
 
-        #increment phase & wrap
+        #apply polyblep corrections (double freq.)
+        if (state[3] < mod_inc_d):           #phase just wrapped
+            t_d = state[3]/mod_inc_d
+            sample_d += (t_d - 1.0)**2
+        elif (state[3] + mod_inc_d > twopi):   #phase about to wrap
+            t_d = (twopi - state[3])/mod_inc_d
+            sample_d -= (t_d - 1.0)**2
+
+        #increment phases & wrap
         state[0] += state[2]
         if (state[0] > twopi):
             state[0] -= twopi
 
+        state[3] += mod_inc_d
+        if (state[3] > twopi):
+            state[3] -= twopi
+
         #output
-        sample *= state[1]
-        outdata[n, 0] = sample*(amp - amp_mod[n]*am_amt)
-        outdata[n, 1] = sample*(amp - amp_mod[n]*am_amt)
+        mod_width = 2*np.abs(0.5 - (width + width_mod[n]*wm_amt))
+        mod_amp = max(-1.0, min(1.0, amp + amp_mod[n]*am_amt))
+        out_sample = (1.0 - mod_width)*sample + mod_width*sample_d
+        out_sample *= mod_amp
+        outdata[n, 0] = out_sample
+        outdata[n, 1] = out_sample
 
 #--anti-aliased pulse
 @njit(nogil=True, fastmath=True, cache=True)
@@ -267,28 +285,44 @@ def polyblep_triangle(state, integrator, smoothed_width, hpf, outdata, state2, w
 #-BLIT
 #--anti-aliased sawtooth
 @njit(nogil=True, fastmath=True, cache=True)
-def blit_saw(outdata, states, integrators,
-                walk_mod, walk_amt, pitch_mod, det_mod, amp_mod, pm_amt, dm_amt, am_amt, amp=1.0, freq=440.0):
+def blit_saw(outdata, states, integrators, width,
+                walk_mod, walk_amt, pitch_mod, det_mod, amp_mod, width_mod, pm_amt, dm_amt, am_amt, wm_amt, amp=1.0, freq=440.0):
     frames = len(outdata)
     base_inc = freq*oneoverfs
     for n in range(0, frames):
         for c in range(0, 2):
             mod_inc = base_inc + base_inc*pitch_mod[n]*pm_amt + max_det_inc*walk_mod[n]*walk_amt + max_det_inc*det_mod[n]*dm_amt
+            mod_inc_d = mod_inc*2
             new_freq = max(1e-9, mod_inc)*fs
+            new_freq_d = max(1e-9, mod_inc_d)*fs
             harmonics = 2*int(nyquist/new_freq) + 1
+            harmonics_d = 2*int(nyquist/new_freq_d) + 1
             phase = states[c, 0]
-            leak_c = 1.0 - twopi*mod_inc*.1
+            phase_d = states[c, 3]
+            #leak_c = 1.0 - twopi*mod_inc*.1
             kernel_den = math.sin(np.pi*phase)
+            kernel_den_d = math.sin(np.pi*phase_d)
+
             if phase < .0000001:
                 slope = 1.0-harmonics
             else:
                 slope = 1.0-math.sin(np.pi*harmonics*phase)/kernel_den
-            slope *= mod_inc*2
-            v1, integrators[0, c] = leaky_trapezoidal_integrate(slope, integrators[0, c])
-            states[c, 0] += mod_inc
-            states[c, 0] -= np.floor(states[c, 0])
+            if phase_d < .0000001:
+                slope_d = 1.0-harmonics_d
+            else:
+                slope_d = 1.0-math.sin(np.pi*harmonics_d*phase_d)/kernel_den_d
 
-            output_sample = v1
+            slope *= mod_inc*2
+            slope_d *= mod_inc_d*2
+            v1, integrators[0, c] = leaky_trapezoidal_integrate(slope, integrators[0, c])
+            v1_d, integrators[1, c] = leaky_trapezoidal_integrate(slope_d, integrators[1, c])
+            states[c, 0] += mod_inc
+            states[c, 3] += mod_inc_d
+            states[c, 0] -= np.floor(states[c, 0])
+            states[c, 3] -= np.floor(states[c, 3])
+
+            mod_width = 2*np.abs(0.5 - (width + width_mod[n]*wm_amt))
+            output_sample = v1*(1.0 - mod_width) + v1_d*mod_width
             mod_amp = max(-1.0, min(1.0, amp + amp_mod[n]*am_amt))
             outdata[n, c] = output_sample*mod_amp
 
