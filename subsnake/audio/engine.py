@@ -27,6 +27,10 @@ hpf_g_div = 1.0/(1.0 + hpf_g)
 
 class AudioEngine():
     def __init__(self):
+        #init compile dc_hpf
+        self.test_hpf_states = np.zeros((2), dtype=np.float32)
+        dc_hpf(np.zeros((16, 2), dtype=np.float32), self.test_hpf_states)
+
         #mod dial value states (float)
         self.mod_dial_values = {"osc_freq": 0.0, "osc_amp": 0.0, "osc_width": 0.0,
                                 "osc2_freq": 0.0, "osc2_det": 0.0, "osc2_amp": 0.0, "osc2_width": 0.0,
