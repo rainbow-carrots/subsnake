@@ -113,14 +113,20 @@ class AudioEngine():
         if port_name:
             self.midi_input = mido.open_input(port_name, callback=self.midi_callback)
 
+    #midi callback
+    def midi_callback(self, message):
+        stamped_message = (message, pytime.perf_counter())
+        self.midi_in_queue.put(stamped_message) 
+
+    #midi helpers
     def set_midi_channel(self, channel):
         self.midi_channel = channel-1
 
     def get_midi_inputs(self):
-        #get midi inputs
         input_list = mido.get_input_names()
         return input_list
 
+    #close stream/midi port, stop KeyEventWorker & shutdown voice executor
     def close(self):
         if self.stream:
             self.stream.stop()
@@ -132,13 +138,16 @@ class AudioEngine():
         self.run_threads = False
         self.voice_executor.shutdown(wait=True, cancel_futures=True)
 
-    #audio callback
+    #main audio callback
     def callback(self, outdata, frames, time, status):
+        #zero output buffer
         outdata[:frames] = 0.0
+        #calc. frame times & push to queue
         frame_width = frames/fs
         frame_start = time.outputBufferDacTime
         frame_end = frame_start + frame_width
         self.frame_times.put((frame_width, frame_start, frame_end, frames))
+        #run voice callbacks (multithreaded)
         futures = []
         for voice in self.voices:
             if voice.status != 0:
@@ -148,10 +157,14 @@ class AudioEngine():
             else:
                 voice.voice_output[:] = 0.0
         concurrent.futures.wait(futures)
+        #sum voice outputs
         for voice in self.voices:
             outdata += voice.voice_output[:frames]
+        #remove DC offset
         dc_hpf(outdata, self.output_hpf_states)
+        #pass main output to rec.
         self.recorder.process_block(outdata, self.recorder_output)
+        #sum rec. output to main
         outdata += self.recorder_output[:frames]
 
         # delay modulators (self/cross modulated)
@@ -198,11 +211,6 @@ class AudioEngine():
             self.scope_buffer[head_pos:new_pos] = outdata[:frames]
             self.scope_head[0] = new_pos
         self.scope_frames[0] = frames
-
-    #midi callback
-    def midi_callback(self, message):
-        stamped_message = (message, pytime.perf_counter())
-        self.midi_in_queue.put(stamped_message) 
     
     #key input handlers
     def key_pressed(self, note_val, velocity_val, sample_offset=0):
@@ -641,6 +649,8 @@ class AudioEngine():
 
     def update_mod_mode(self, name, mode):
         self.mod_dial_modes.update({name: mode})
+        for voice in self.voices:
+            voice.update_mod_mode(name, mode)
 
     def assign_mod_buffer(self, mode):
         if mode == 0:
@@ -659,26 +669,76 @@ class Voice():
     def __init__(self, mod_dial_values, mod_dial_modes):
         self.mod_dial_values = mod_dial_values
         self.mod_dial_modes = mod_dial_modes
+        #audio buffers
         self.osc_out = np.ascontiguousarray(np.zeros((2048, 2), dtype=np.float32))
         self.osc2_out = np.ascontiguousarray(np.zeros((2048, 2), dtype=np.float32))
         self.osc3_out = np.ascontiguousarray(np.zeros((2048, 2), dtype=np.float32))
         self.filt_out = np.ascontiguousarray(np.zeros((2048, 2), dtype=np.float32))
+        self.voice_output = np.ascontiguousarray(np.zeros((2048, 2), dtype=np.float32))
+        #mod buffers
+         #fenv i/o & no modulation
         self.fenv_in = np.ascontiguousarray(np.ones((2048, 2), dtype=np.float32))
         self.fenv_out = np.ascontiguousarray(np.zeros((2048, 2), dtype=np.float32))
         self.no_mod = np.ascontiguousarray(np.zeros((2048), dtype=np.float32))
-        self.voice_output = np.ascontiguousarray(np.zeros((2048, 2), dtype=np.float32))
+         #modulators
+          #lfo 1
+        self.lfo1_mod_buffers = [self.assign_mod_buffer(self.mod_dial_modes["lfo1_freq"])]
+        self.lfo1_mod_buffers.append(self.assign_mod_buffer(self.mod_dial_modes["lfo1_phase"]))
+          #lfo 2
+        self.lfo2_mod_buffers = [self.assign_mod_buffer(self.mod_dial_modes["lfo2_freq"])]
+        self.lfo2_mod_buffers.append(self.assign_mod_buffer(self.mod_dial_modes["lfo2_phase"]))
+          #menv 1
+        self.menv1_mod_buffers = [self.assign_mod_buffer(self.mod_dial_modes["menv1_att"])]
+        self.menv1_mod_buffers.append(self.assign_mod_buffer(self.mod_dial_modes["menv1_rel"]))
+          #menv 2
+        self.menv2_mod_buffers = [self.assign_mod_buffer(self.mod_dial_modes["menv2_att"])]
+        self.menv2_mod_buffers.append(self.assign_mod_buffer(self.mod_dial_modes["menv2_rel"]))
+         #oscillators
+          #1
+        self.osc1_mod_buffers = [self.assign_mod_buffer(self.mod_dial_modes["osc_freq"])]
+        self.osc1_mod_buffers.append(self.no_mod)
+        self.osc1_mod_buffers.append(self.assign_mod_buffer(self.mod_dial_modes["osc_amp"]))
+        self.osc1_mod_buffers.append(self.assign_mod_buffer(self.mod_dial_modes["osc_width"]))
+          #2
+        self.osc2_mod_buffers = [self.assign_mod_buffer(self.mod_dial_modes["osc2_freq"])]
+        self.osc2_mod_buffers.append(self.assign_mod_buffer(self.mod_dial_modes["osc2_det"]))
+        self.osc2_mod_buffers.append(self.assign_mod_buffer(self.mod_dial_modes["osc2_amp"]))
+        self.osc2_mod_buffers.append(self.assign_mod_buffer(self.mod_dial_modes["osc2_width"]))
+          #3
+        self.osc3_mod_buffers = [self.assign_mod_buffer(self.mod_dial_modes["osc3_freq"])]
+        self.osc3_mod_buffers.append(self.assign_mod_buffer(self.mod_dial_modes["osc3_det"]))
+        self.osc3_mod_buffers.append(self.assign_mod_buffer(self.mod_dial_modes["osc3_amp"]))
+        self.osc3_mod_buffers.append(self.assign_mod_buffer(self.mod_dial_modes["osc3_width"]))
+         #filter envelope
+        self.fenv_mod_buffers = [self.assign_mod_buffer(self.mod_dial_modes["fenv_att"])]
+        self.fenv_mod_buffers.append(self.assign_mod_buffer(self.mod_dial_modes["fenv_dec"]))
+        self.fenv_mod_buffers.append(self.assign_mod_buffer(self.mod_dial_modes["fenv_sus"]))
+        self.fenv_mod_buffers.append(self.assign_mod_buffer(self.mod_dial_modes["fenv_rel"]))
+         #filter
+        self.filt_mod_buffers = [self.assign_mod_buffer(self.mod_dial_modes["filt_freq"])]
+        self.filt_mod_buffers.append(self.assign_mod_buffer(self.mod_dial_modes["filt_res"]))
+        self.filt_mod_buffers.append(self.assign_mod_buffer(self.mod_dial_modes["filt_drive"]))
+        self.filt_mod_buffers.append(self.assign_mod_buffer(self.mod_dial_modes["filt_sat"]))
+        self.filt_mod_buffers.append(self.assign_mod_buffer(self.mod_dial_modes["fenv_amt"]))
+         #amp. envelope
+        self.env_mod_buffers = [self.assign_mod_buffer(self.mod_dial_modes["env_att"])]
+        self.env_mod_buffers.append(self.assign_mod_buffer(self.mod_dial_modes["env_dec"]))
+        self.env_mod_buffers.append(self.assign_mod_buffer(self.mod_dial_modes["env_sus"]))
+        self.env_mod_buffers.append(self.assign_mod_buffer(self.mod_dial_modes["env_rel"]))
+        #modules
         self.osc = WrappedOsc(2, 0.5, 55, fs, .5)
         self.osc2 = WrappedOsc(2, 0.5, 55, fs, .5)
         self.osc3 = WrappedOsc(2, 0.5, 55, fs, .5)
         self.filt = HalSVF(0.0, 3520, 10, 1.0)
         self.filt2 = ZDFSVF()
-        self.filt_mode = 0
         self.env = ADSR(.01, 1.0, 0.5, 1.0)
         self.fenv = ADSR(.01, .5, .5, .5)
         self.lfo1 = LFO(fs, 5, 0, 0)
         self.lfo2 = LFO(fs, 5, 0, 1)
         self.menv1 = ModEnv(fs, 0.5, 0.5, 0)
         self.menv2 = ModEnv(fs, 0.5, 0.5, 1)
+        #attributes
+        self.filt_mode = 0
         self.base_note = 0
         self.velocity = 0.0
         self.status = 1
@@ -690,88 +750,55 @@ class Voice():
         if self.status != 0:
             #modulators
             # lfo 1
-            lfo1_mod_buffers = [self.assign_mod_buffer(self.mod_dial_modes["lfo1_freq"])]
-            lfo1_mod_buffers.append(self.assign_mod_buffer(self.mod_dial_modes["lfo1_phase"]))
             lfo1_mod_values = [self.mod_dial_values["lfo1_freq"], self.mod_dial_values["lfo1_phase"]]
-            self.lfo1.process_block(frames, lfo1_mod_buffers, lfo1_mod_values)
+            self.lfo1.process_block(frames, self.lfo1_mod_buffers, lfo1_mod_values)
             # lfo 2
-            lfo2_mod_buffers = [self.assign_mod_buffer(self.mod_dial_modes["lfo2_freq"])]
-            lfo2_mod_buffers.append(self.assign_mod_buffer(self.mod_dial_modes["lfo2_phase"]))
             lfo2_mod_values = [self.mod_dial_values["lfo2_freq"], self.mod_dial_values["lfo2_phase"]]
-            self.lfo2.process_block(frames, lfo2_mod_buffers, lfo2_mod_values)
+            self.lfo2.process_block(frames, self.lfo2_mod_buffers, lfo2_mod_values)
             # menv 1
-            menv1_mod_buffers = [self.assign_mod_buffer(self.mod_dial_modes["menv1_att"])]
-            menv1_mod_buffers.append(self.assign_mod_buffer(self.mod_dial_modes["menv1_rel"]))
             menv1_mod_values = [self.mod_dial_values["menv1_att"], self.mod_dial_values["menv1_rel"]]
-            self.menv1.process_block(frames, menv1_mod_buffers, menv1_mod_values)
+            self.menv1.process_block(frames, self.menv1_mod_buffers, menv1_mod_values)
             # menv 2
-            menv2_mod_buffers = [self.assign_mod_buffer(self.mod_dial_modes["menv2_att"])]
-            menv2_mod_buffers.append(self.assign_mod_buffer(self.mod_dial_modes["menv2_rel"]))
             menv2_mod_values = [self.mod_dial_values["menv2_att"], self.mod_dial_values["menv2_rel"]]
-            self.menv2.process_block(frames, menv2_mod_buffers, menv2_mod_values)
+            self.menv2.process_block(frames, self.menv2_mod_buffers, menv2_mod_values)
 
             #oscillators
             # 1
-            osc1_mod_buffers = [self.assign_mod_buffer(self.mod_dial_modes["osc_freq"])]
-            osc1_mod_buffers.append(self.no_mod)
-            osc1_mod_buffers.append(self.assign_mod_buffer(self.mod_dial_modes["osc_amp"]))
-            osc1_mod_buffers.append(self.assign_mod_buffer(self.mod_dial_modes["osc_width"]))
             osc1_mod_values = [self.mod_dial_values["osc_freq"], 0.0,
                             self.mod_dial_values["osc_amp"], self.mod_dial_values["osc_width"]]
-            self.osc.process_block(self.osc_out[:frames], osc1_mod_buffers, osc1_mod_values)
+            self.osc.process_block(self.osc_out[:frames], self.osc1_mod_buffers, osc1_mod_values)
             self.osc_out *= 0.33
             # 2
-            osc2_mod_buffers = [self.assign_mod_buffer(self.mod_dial_modes["osc2_freq"])]
-            osc2_mod_buffers.append(self.assign_mod_buffer(self.mod_dial_modes["osc2_det"]))
-            osc2_mod_buffers.append(self.assign_mod_buffer(self.mod_dial_modes["osc2_amp"]))
-            osc2_mod_buffers.append(self.assign_mod_buffer(self.mod_dial_modes["osc2_width"]))
             osc2_mod_values = [self.mod_dial_values["osc2_freq"], self.mod_dial_values["osc2_det"],
                             self.mod_dial_values["osc2_amp"], self.mod_dial_values["osc2_width"]]
-            self.osc2.process_block(self.osc2_out[:frames], osc2_mod_buffers, osc2_mod_values)
+            self.osc2.process_block(self.osc2_out[:frames], self.osc2_mod_buffers, osc2_mod_values)
             self.osc2_out *= 0.33
             # 3
-            osc3_mod_buffers = [self.assign_mod_buffer(self.mod_dial_modes["osc3_freq"])]
-            osc3_mod_buffers.append(self.assign_mod_buffer(self.mod_dial_modes["osc3_det"]))
-            osc3_mod_buffers.append(self.assign_mod_buffer(self.mod_dial_modes["osc3_amp"]))
-            osc3_mod_buffers.append(self.assign_mod_buffer(self.mod_dial_modes["osc3_width"]))
             osc3_mod_values = [self.mod_dial_values["osc3_freq"], self.mod_dial_values["osc3_det"],
                             self.mod_dial_values["osc3_amp"], self.mod_dial_values["osc3_width"]]
-            self.osc3.process_block(self.osc3_out[:frames], osc3_mod_buffers, osc3_mod_values)
+            self.osc3.process_block(self.osc3_out[:frames], self.osc3_mod_buffers, osc3_mod_values)
             self.osc3_out *= 0.33
             # sum
             self.osc_out += self.osc2_out
             self.osc_out += self.osc3_out
 
             # filter envelope
-            fenv_mod_buffers = [self.assign_mod_buffer(self.mod_dial_modes["fenv_att"])]
-            fenv_mod_buffers.append(self.assign_mod_buffer(self.mod_dial_modes["fenv_dec"]))
-            fenv_mod_buffers.append(self.assign_mod_buffer(self.mod_dial_modes["fenv_sus"]))
-            fenv_mod_buffers.append(self.assign_mod_buffer(self.mod_dial_modes["fenv_rel"]))
             fenv_mod_values = [self.mod_dial_values["fenv_att"], self.mod_dial_values["fenv_dec"],
                             self.mod_dial_values["fenv_sus"], self.mod_dial_values["fenv_rel"]]
-            self.fenv.process_block(self.fenv_in[:frames], self.fenv_out[:frames], fenv_mod_buffers, fenv_mod_values)
+            self.fenv.process_block(self.fenv_in[:frames], self.fenv_out[:frames], self.fenv_mod_buffers, fenv_mod_values)
 
             # filter
-            filt_mod_buffers = [self.assign_mod_buffer(self.mod_dial_modes["filt_freq"])]
-            filt_mod_buffers.append(self.assign_mod_buffer(self.mod_dial_modes["filt_res"]))
-            filt_mod_buffers.append(self.assign_mod_buffer(self.mod_dial_modes["filt_drive"]))
-            filt_mod_buffers.append(self.assign_mod_buffer(self.mod_dial_modes["filt_sat"]))
-            filt_mod_buffers.append(self.assign_mod_buffer(self.mod_dial_modes["fenv_amt"]))
             filt_mod_values = [self.mod_dial_values["filt_freq"], self.mod_dial_values["filt_res"],
                             self.mod_dial_values["filt_drive"], self.mod_dial_values["filt_sat"], self.mod_dial_values["fenv_amt"]]
             if self.filt_mode == 0:
-                self.filt.process_block(self.osc_out[:frames], self.filt_out[:frames], self.fenv_out[:frames], filt_mod_buffers, filt_mod_values)
+                self.filt.process_block(self.osc_out[:frames], self.filt_out[:frames], self.fenv_out[:frames], self.filt_mod_buffers, filt_mod_values)
             else:
-                self.filt2.process_block(self.osc_out[:frames], self.filt_out[:frames], self.fenv_out[:frames], filt_mod_buffers, filt_mod_values)
+                self.filt2.process_block(self.osc_out[:frames], self.filt_out[:frames], self.fenv_out[:frames], self.filt_mod_buffers, filt_mod_values)
 
             # amplitude envelope
-            env_mod_buffers = [self.assign_mod_buffer(self.mod_dial_modes["env_att"])]
-            env_mod_buffers.append(self.assign_mod_buffer(self.mod_dial_modes["env_dec"]))
-            env_mod_buffers.append(self.assign_mod_buffer(self.mod_dial_modes["env_sus"]))
-            env_mod_buffers.append(self.assign_mod_buffer(self.mod_dial_modes["env_rel"]))
             env_mod_values = [self.mod_dial_values["env_att"], self.mod_dial_values["env_dec"],
                             self.mod_dial_values["env_sus"], self.mod_dial_values["env_rel"]]
-            self.env.process_block(self.filt_out[:frames], output, env_mod_buffers, env_mod_values)
+            self.env.process_block(self.filt_out[:frames], output, self.env_mod_buffers, env_mod_values)
 
             # output
             output *= self.velocity
@@ -779,6 +806,87 @@ class Voice():
             output *= 0.0
         if (self.env.state[0] == 0.0) and (self.status > 0):  
             self.status = 0
+
+    #mod dial helpers
+    def update_mod_mode(self, name, mode):
+        new_buffer = self.assign_mod_buffer(mode)
+        if name.startswith("osc"):
+            if "2" in name:
+                if name.endswith("freq"):
+                    self.osc2_mod_buffers[0] = new_buffer
+                elif name.endswith("det"):
+                    self.osc2_mod_buffers[1] = new_buffer
+                elif name.endswith("amp"):
+                    self.osc2_mod_buffers[2] = new_buffer
+                elif name.endswith("width"):
+                    self.osc2_mod_buffers[3] = new_buffer
+            elif "3" in name:
+                if name.endswith("freq"):
+                    self.osc3_mod_buffers[0] = new_buffer
+                elif name.endswith("det"):
+                    self.osc3_mod_buffers[1] = new_buffer
+                elif name.endswith("amp"):
+                    self.osc3_mod_buffers[2] = new_buffer
+                elif name.endswith("width"):
+                    self.osc3_mod_buffers[3] = new_buffer
+            else:
+                if name.endswith("freq"):
+                    self.osc1_mod_buffers[0] = new_buffer
+                elif name.endswith("amp"):
+                    self.osc1_mod_buffers[2] = new_buffer
+                elif name.endswith("width"):
+                    self.osc1_mod_buffers[3] = new_buffer
+        elif name.startswith("filt"):
+            if name.endswith("freq"):
+                self.filt_mod_buffers[0] = new_buffer
+            elif name.endswith("res"):
+                self.filt_mod_buffers[1] = new_buffer
+            elif name.endswith("drive"):
+                self.filt_mod_buffers[2] = new_buffer
+            elif name.endswith("sat"):
+                self.filt_mod_buffers[3] = new_buffer
+        elif name.startswith("fenv"):
+            if name.endswith("att"):
+                self.fenv_mod_buffers[0] = new_buffer
+            elif name.endswith("dec"):
+                self.fenv_mod_buffers[1] = new_buffer
+            elif name.endswith("sus"):
+                self.fenv_mod_buffers[2] = new_buffer
+            elif name.endswith("rel"):
+                self.fenv_mod_buffers[3] = new_buffer
+            elif name.endswith("amt"):
+                self.filt_mod_buffers[4] = new_buffer
+        elif name.startswith("env"):
+            if name.endswith("att"):
+                self.env_mod_buffers[0] = new_buffer
+            elif name.endswith("dec"):
+                self.env_mod_buffers[1] = new_buffer
+            elif name.endswith("sus"):
+                self.env_mod_buffers[2] = new_buffer
+            elif name.endswith("rel"):
+                self.env_mod_buffers[3] = new_buffer
+        elif name.startswith("lfo"):
+            if "1" in name:
+                if name.endswith("freq"):
+                    self.lfo1_mod_buffers[0] = new_buffer
+                elif name.endswith("phase"):
+                    self.lfo1_mod_buffers[1] = new_buffer
+            elif "2" in name:
+                if name.endswith("freq"):
+                    self.lfo2_mod_buffers[0] = new_buffer
+                elif name.endswith("phase"):
+                    self.lfo2_mod_buffers[1] = new_buffer
+        elif name.startswith("menv"):
+            if "1" in name:
+                if name.endswith("att"):
+                    self.menv1_mod_buffers[0] = new_buffer
+                elif name.endswith("rel"):
+                    self.menv1_mod_buffers[1] = new_buffer
+            elif "2" in name:
+                if name.endswith("att"):
+                    self.menv2_mod_buffers[0] = new_buffer
+                elif name.endswith("rel"):
+                    self.menv2_mod_buffers[1] = new_buffer
     
     def assign_mod_buffer(self, mode):
         if mode == 0:
@@ -791,6 +899,7 @@ class Voice():
             return self.menv1.output
         elif mode == 4:
             return self.menv2.output
+        
 
 @njit(nogil=True, fastmath=True, cache=True)
 def dc_hpf(buffer, hp_state):
