@@ -49,6 +49,8 @@ class AudioEngine():
                                 "del_time": 0, "del_feedback": 0, "del_mix": 0,
                                 "lfo1_freq": 0, "lfo1_phase": 0, "lfo2_freq": 0, "lfo2_phase": 0,
                                 "menv1_att": 0, "menv1_rel": 0, "menv2_att": 0, "menv2_rel": 0}
+        
+        #instance voices & effects
         self.voices = []
         for n in range(0, 16):
             self.voices.append(Voice(self.mod_dial_values, self.mod_dial_modes))
@@ -66,6 +68,7 @@ class AudioEngine():
             voice.detune_offset_3 = .975 + .050*random.random()
             voice_index += 1
 
+        #attributes
         self.recorder_output = np.ascontiguousarray(np.zeros((2048, 2), dtype=np.float32))
         self.delay_output = np.ascontiguousarray(np.zeros((2048, 2), dtype=np.float32))
         self.key_to_note = {}
@@ -96,6 +99,28 @@ class AudioEngine():
         self.run_threads = True
         self.voice_executor = concurrent.futures.ThreadPoolExecutor(max_workers=16)
         self.output_hpf_states = np.zeros((2), dtype=np.float32)
+
+        #mod dial mode buffers (delay & engine modulators)
+        self.lfo1_mod_buffers = [self.assign_mod_buffer(self.mod_dial_modes["lfo1_freq"])]
+        self.lfo1_mod_buffers.append(self.assign_mod_buffer(self.mod_dial_modes["lfo1_phase"]))
+        self.lfo2_mod_buffers = [self.assign_mod_buffer(self.mod_dial_modes["lfo2_freq"])]
+        self.lfo2_mod_buffers.append(self.assign_mod_buffer(self.mod_dial_modes["lfo2_phase"]))
+        self.menv1_mod_buffers = [self.assign_mod_buffer(self.mod_dial_modes["menv1_att"])]
+        self.menv1_mod_buffers.append(self.assign_mod_buffer(self.mod_dial_modes["menv1_rel"]))
+        self.menv2_mod_buffers = [self.assign_mod_buffer(self.mod_dial_modes["menv2_att"])]
+        self.menv2_mod_buffers.append(self.assign_mod_buffer(self.mod_dial_modes["menv2_rel"]))
+        self.del_mod_buffers = [self.assign_mod_buffer(self.mod_dial_modes["del_time"])]
+        self.del_mod_buffers.append(self.assign_mod_buffer(self.mod_dial_modes["del_feedback"]))
+        self.del_mod_buffers.append(self.assign_mod_buffer(self.mod_dial_modes["del_mix"]))
+
+        #mod dial value buffers
+        self.lfo1_mod_values = [self.mod_dial_values["lfo1_freq"], self.mod_dial_values["lfo1_phase"]]
+        self.lfo2_mod_values = [self.mod_dial_values["lfo2_freq"], self.mod_dial_values["lfo2_phase"]]
+        self.menv1_mod_values = [self.mod_dial_values["menv1_att"], self.mod_dial_values["menv1_rel"]]
+        self.menv2_mod_values = [self.mod_dial_values["menv2_att"], self.mod_dial_values["menv2_rel"]]
+        self.del_mod_values = [self.mod_dial_values["del_time"], self.mod_dial_values["del_feedback"],
+                           self.mod_dial_values["del_mix"]]
+
 
     #initialize stream
     def start_audio(self):
@@ -169,34 +194,17 @@ class AudioEngine():
         outdata += self.recorder_output[:frames]
 
         # delay modulators (self/cross modulated)
-        #  lfo 1
-        lfo1_mod_buffers = [self.assign_mod_buffer(self.mod_dial_modes["lfo1_freq"])]
-        lfo1_mod_buffers.append(self.assign_mod_buffer(self.mod_dial_modes["lfo1_phase"]))
-        lfo1_mod_values = [self.mod_dial_values["lfo1_freq"], self.mod_dial_values["lfo1_phase"]]
-        self.delay_modulators[0].process_block(frames, lfo1_mod_buffers, lfo1_mod_values)
+        # lfo 1
+        self.delay_modulators[0].process_block(frames, self.lfo1_mod_buffers, self.lfo1_mod_values)
         # lfo 2
-        lfo2_mod_buffers = [self.assign_mod_buffer(self.mod_dial_modes["lfo2_freq"])]
-        lfo2_mod_buffers.append(self.assign_mod_buffer(self.mod_dial_modes["lfo2_phase"]))
-        lfo2_mod_values = [self.mod_dial_values["lfo2_freq"], self.mod_dial_values["lfo2_phase"]]
-        self.delay_modulators[1].process_block(frames, lfo2_mod_buffers, lfo2_mod_values)
+        self.delay_modulators[1].process_block(frames, self.lfo2_mod_buffers, self.lfo2_mod_values)
         # menv 1
-        menv1_mod_buffers = [self.assign_mod_buffer(self.mod_dial_modes["menv1_att"])]
-        menv1_mod_buffers.append(self.assign_mod_buffer(self.mod_dial_modes["menv1_rel"]))
-        menv1_mod_values = [self.mod_dial_values["menv1_att"], self.mod_dial_values["menv1_rel"]]
-        self.delay_modulators[2].process_block(frames, menv1_mod_buffers, menv1_mod_values)
+        self.delay_modulators[2].process_block(frames, self.menv1_mod_buffers, self.menv1_mod_values)
         # menv 2
-        menv2_mod_buffers = [self.assign_mod_buffer(self.mod_dial_modes["menv2_att"])]
-        menv2_mod_buffers.append(self.assign_mod_buffer(self.mod_dial_modes["menv2_rel"]))
-        menv2_mod_values = [self.mod_dial_values["menv2_att"], self.mod_dial_values["menv2_rel"]]
-        self.delay_modulators[3].process_block(frames, menv2_mod_buffers, menv2_mod_values)
+        self.delay_modulators[3].process_block(frames, self.menv2_mod_buffers, self.menv2_mod_values)
 
         # delay mod buffers
-        del_mod_buffers = [self.assign_mod_buffer(self.mod_dial_modes["del_time"])]
-        del_mod_buffers.append(self.assign_mod_buffer(self.mod_dial_modes["del_feedback"]))
-        del_mod_buffers.append(self.assign_mod_buffer(self.mod_dial_modes["del_mix"]))
-        del_mod_values = [self.mod_dial_values["del_time"], self.mod_dial_values["del_feedback"],
-                           self.mod_dial_values["del_mix"]]
-        self.delay.process_block(outdata, outdata, del_mod_buffers, del_mod_values)
+        self.delay.process_block(outdata, outdata, self.del_mod_buffers, self.del_mod_values)
         outdata *= 0.288675
         outdata = np.tanh(outdata)
 
@@ -646,12 +654,69 @@ class AudioEngine():
 
     #mod dial helpers
     def update_mod_value(self, name, value):
-        self.mod_dial_values.update({name: value})
+        if name.startswith("lfo"):
+            if "1" in name:
+                if name.endswith("freq"):
+                    self.lfo1_mod_values[0] = value
+                elif name.endswith("phase"):
+                    self.lfo1_mod_values[1] = value
+            elif "2" in name:
+                if name.endswith("freq"):
+                    self.lfo2_mod_values[0] = value
+                elif name.endswith("phase"):
+                    self.lfo2_mod_values[1] = value
+        elif name.startswith("menv"):
+            if "1" in name:
+                if name.endswith("att"):
+                    self.menv1_mod_values[0] = value
+                elif name.endswith("rel"):
+                    self.menv1_mod_values[1] = value
+            elif "2" in name:
+                if name.endswith("att"):
+                    self.menv2_mod_values[0] = value
+                elif name.endswith("rel"):
+                    self.menv2_mod_values[1] = value
+        elif name.startswith("del"):
+            if name.endswith("time"):
+                self.del_mod_values[0] = value
+            elif name.endswith("feedback"):
+                self.del_mod_values[1] = value
+            elif name.endswith("mix"):
+                self.del_mod_values[2] = value
         for voice in self.voices:
             voice.update_mod_value(name, value)
 
     def update_mod_mode(self, name, mode):
-        self.mod_dial_modes.update({name: mode})
+        new_buffer = self.assign_mod_buffer(mode)
+        if name.startswith("lfo"):
+            if "1" in name:
+                if name.endswith("freq"):
+                    self.lfo1_mod_buffers[0] = new_buffer
+                elif name.endswith("phase"):
+                    self.lfo1_mod_buffers[1] = new_buffer
+            elif "2" in name:
+                if name.endswith("freq"):
+                    self.lfo2_mod_buffers[0] = new_buffer
+                elif name.endswith("phase"):
+                    self.lfo2_mod_buffers[1] = new_buffer
+        elif name.startswith("menv"):
+            if "1" in name:
+                if name.endswith("att"):
+                    self.menv1_mod_buffers[0] = new_buffer
+                elif name.endswith("rel"):
+                    self.menv1_mod_buffers[1] = new_buffer
+            elif "2" in name:
+                if name.endswith("att"):
+                    self.menv2_mod_buffers[0] = new_buffer
+                elif name.endswith("rel"):
+                    self.menv2_mod_buffers[1] = new_buffer
+        elif name.startswith("del"):
+            if name.endswith("time"):
+                self.del_mod_buffers[0] = new_buffer
+            elif name.endswith("feedback"):
+                self.del_mod_buffers[1] = new_buffer
+            elif name.endswith("mix"):
+                self.del_mod_buffers[2] = new_buffer
         for voice in self.voices:
             voice.update_mod_mode(name, mode)
 
