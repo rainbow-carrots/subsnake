@@ -79,7 +79,8 @@ class ScopeGUI(QGroupBox):
         self.setLayout(layout)
         self.setTitle("scope")
         self.setObjectName("scope_group")
-        #self.scope_timer.start()
+        
+        ScopeGUI.update_display_math(self.base_x_coords, self.scope_flat, self.stable_scope, self.x_coords, self.valid_crossings, self.valid_crossings_count)
 
     def update_display(self):
             np.concatenate((self.scope_buffer[self.scope_head[0]:], self.scope_buffer[:self.scope_head[0]]), axis=0, out=self.scope_flat)

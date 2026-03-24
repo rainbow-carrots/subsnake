@@ -6,21 +6,11 @@ from PySide6.QtGui import QIcon, QPixmap, QFontDatabase
 from PySide6.QtCore import Qt
 from subsnake.gui import MainWindow
 from subsnake.audio import AudioEngine
-from subsnake.gui.scope_gui import ScopeGUI
 from importlib import resources
 
 fs = 44100
 twopi = 2*np.pi
 oneoverpi = 1/np.pi
-
-#init compile (scope)
-test_stable_scope = np.ascontiguousarray(np.zeros((2048, 2), dtype=np.float32))
-test_x_coords = np.ascontiguousarray(np.arange(2048, dtype=np.float32))
-test_base_x_coords = np.ascontiguousarray(np.arange(2048, dtype=np.float32))
-test_scope_flat = np.ascontiguousarray(np.zeros((16384, 2), dtype=np.float32))
-test_valid_crossings = np.ascontiguousarray(np.zeros((2048), dtype=np.int32))
-test_valid_crossings_count = np.zeros((1), dtype=np.int32)
-ScopeGUI.update_display_math(test_base_x_coords, test_scope_flat, test_stable_scope, test_x_coords, test_valid_crossings, test_valid_crossings_count)
 
 #get midi inputs & channels
 input_list = mido.get_input_names()
