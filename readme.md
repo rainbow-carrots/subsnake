@@ -53,11 +53,12 @@ there's also a stereo tape delay effect on the master bus (voice output + record
     * triangle: morphs the waveform from a sawtooth (w≈0.0), through a triangle (w=0.5), to a ramp (w≈1.0)
     * saw: crossfades between a saw & a second (free-running) saw at twice the fundamental (center is full fundamental)
     * pulse: bog-standard through-zero PWM
+* the stereo delay can be made into a psuedo-chorus by modulating the time parameter with a slow-moving LFO
 
 
 
 ### how can i play it?
-* [v0.3.3](https://github.com/rainbow-carrots/subsnake/releases/tag/v0.3.3) is the latest build
+* [v0.3.4](https://github.com/rainbow-carrots/subsnake/releases/tag/v0.3.4) is the latest build
 * click on the version that corresponds to your platform to download the zip, extract, & run! if it doesn't open:
     * __on linux__: right click the file, go to *Properties* -> *Permissions*, and make sure "Allow executing file as program" is checked 
     * __on macos__: you'll need to [authorize the app](https://support.apple.com/guide/mac-help/open-a-mac-app-from-an-unknown-developer-mh40616/mac) when running it for the first time. go to *System Settings* -> *Privacy & Security*, scroll down to the bottom, and choose *Open anyway* (under *Security*)
@@ -80,9 +81,9 @@ there's also a stereo tape delay effect on the master bus (voice output + record
     * shape-dependent secondary control (currently sets phase only)
         * phase for sine, saw & ramp
         * width for square & triangle
-        * jitter for sample & hold
+        * slew for sample & hold
     * third LFO & modulation envelope
-    * make LFOs anti-aliased
+    * make LFOs anti-aliased (for audio-rate mod.)
     * additional LFO modes:
         * reset phase on gate
         * key pitch tracking (w/ ratio)
@@ -90,11 +91,11 @@ there's also a stereo tape delay effect on the master bus (voice output + record
     * add audio oscillators as mod sources
 * effects:
     * stereo delay
-        * ping pong & dampening parameters
+        * add ping pong & dampening parameters
     * stereo chorus
-    * Schroeder reverb
+    * algorithmic reverb
     * combine effects into single stack
-* pattern generator/sequencer
+* isorhythmic pattern generator/sequencer
 * combine oscillators into single stack
 * allow UI theming & saving/loading of themes
 * Lissajous display mode for scope
