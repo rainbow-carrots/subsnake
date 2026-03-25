@@ -234,9 +234,9 @@ def filter_block_zdf(filt_in, filt_out, states, params, fenv, freq_mod, res_mod,
             if mode == 0:
                 filt_out[n, c] = LP_clipped
             elif mode == 1:
-                filt_out[n, c] = BP_clipped
-            elif mode == 2:
                 filt_out[n, c] = HP_clipped
+            elif mode == 2:
+                filt_out[n, c] = BP_clipped
             elif mode == 3:
                 filt_out[n, c] = N_out
 
