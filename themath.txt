@@ -44,9 +44,9 @@ g - frequency coefficient
 res - Q (resonance) control parameter
 
 definitions:
-F1 = tan(pi*(Fc/Fs))
+g = tan(pi*(Fc/Fs))
     pre-warped frequency coefficient (for bilinear transform/trapezoidal rule)
-Q1 = 1/Q (unchanged from canonical form)
+res = 1/Q (unchanged from canonical form)
 
 1-sample delay: modified form
 HP = x - res*BP - LP
