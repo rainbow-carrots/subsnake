@@ -1,0 +1,82 @@
+Chamberlin SVF: solution for a delay-free loop
+
+abbreviations:
+TMAoM - The Musical Applications of Microprocessors, 2nd ed., by Hal Chamberlin (Hayden Book Company, 1985)
+
+variables (canonical):
+I - input sample
+L - lowpass output
+H - highpass output
+B - bandpass output
+N - notch output
+D1 - bandpass delay (prev. bandpass output)
+D2 - lowpass delay (prev. lowpass output)
+F1 - frequency coefficient
+Q1 - Q (resonance) control parameter
+
+definitions:
+F1 = 2*sin(pi*Fc/Fs)
+    Includes the center frequency error correction, as described in TMAoM, page 492
+Q1 = 1/Q
+    Canonically, the "useful range" lies between Q = 0.5 (Q1 = 2) and Q ≈ 0.0 (Q1 ≈  ∞) (self-oscillation)
+
+1-sample delay: canonical form (TMAoM, page 490):
+L = D2 + F1*D1
+H = I - L - Q1*D1
+B = F1*H + D1
+N = H + L
+
+delays (implicit in calculation before assignment):
+D1 = B
+D2 = L
+
+---- re-written for zero-delay feedback
+
+variables (modified):
+x - input sample
+LP - lowpass output
+HP - highpass output
+BP - bandpass output
+N - notch output
+s1 - bandpass delay (prev. bandpass output)
+s2 - lowpass delay (prev. lowpass output)
+g - frequency coefficient
+res - Q (resonance) control parameter
+
+definitions:
+F1 = tan(pi*(Fc/Fs))
+    pre-warped frequency coefficient (for bilinear transform/trapezoidal rule)
+Q1 = 1/Q (unchanged from canonical form)
+
+1-sample delay: modified form
+HP = x - res*BP - LP
+BP = g*HP + s1
+LP = g*BP + s2
+N = HP + LP
+
+delays:
+s1 = BP
+s2 = LP
+
+using substitution to solve for highpass:
+HP = x - res*(g*HP + s1) - g*BP - s2
+HP = x - res*(g*HP + s1) - g*(g*HP + s1) - s2
+HP = x - res*g*HP - res*s1 - g*g*HP - g*s1 - s2
+HP + res*g*HP + g^2*HP = x - res*s1 - g*s1 - s2
+HP(1 + res*g + g^2) = x - res*s1 - g*s1 - s2
+
+explicit form of highpass
+HP = (x - res*s1 - g*s1 - s2)/(1 + res*g + g^2)
+
+explicit form (factored)
+HP = (x - s1*(res + g) - s2)/(1 + res*g + g^2)
+
+applying the trapezoidal rule:
+HP = (x - s1*(res + g) - s2)/(1 + res*g + g^2)
+BP = g*HP + s1
+s1 = BP + g*HP 
+LP = g*BP + s2
+s2 = LP + g*BP
+
+applying the trapezoidal rule enables the transformation of the delay (feedback) elements into predicted next states,
+replacing forward euler with trapezoidal integration & resolving the delay-related instabilities of the Chamberlin SVF.
