@@ -53,12 +53,12 @@ there's also a stereo tape delay effect on the master bus (voice output + record
     * triangle: morphs the waveform from a sawtooth (w≈0.0), through a triangle (w=0.5), to a ramp (w≈1.0)
     * saw: crossfades between a saw & a second (free-running) saw at twice the fundamental (center is full fundamental)
     * pulse: bog-standard through-zero PWM
-* the stereo delay can be made into a psuedo-chorus by modulating the time parameter with a slow-moving LFO
+* the stereo delay can be made into a pitch-shifting delay by modulating the time parameter with an LFO
 
 
 
 ### how can i play it?
-* [v0.3.4](https://github.com/rainbow-carrots/subsnake/releases/tag/v0.3.4) is the latest build
+* [v0.3.5](https://github.com/rainbow-carrots/subsnake/releases/tag/v0.3.5) is the latest build
 * click on the version that corresponds to your platform to download the zip, extract, & run! if it doesn't open:
     * __on linux__: right click the file, go to *Properties* -> *Permissions*, and make sure "Allow executing file as program" is checked 
     * __on macos__: you'll need to [authorize the app](https://support.apple.com/guide/mac-help/open-a-mac-app-from-an-unknown-developer-mh40616/mac) when running it for the first time. go to *System Settings* -> *Privacy & Security*, scroll down to the bottom, and choose *Open anyway* (under *Security*)
