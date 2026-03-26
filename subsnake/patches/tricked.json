@@ -20,7 +20,7 @@
     "fenv_dec": 151,
     "fenv_sus": 1,
     "fenv_rel": 154,
-    "fenv_amt": 62,
+    "fenv_amt": 163,
     "env_att": 1,
     "env_dec": 500,
     "env_sus": 1000,
