@@ -5,6 +5,7 @@ MainWindow#main_window {
         stop: 0 #1c0627,
         stop: 1 #490747
     );
+    max-height:600px;
 }
 
 QLCDNumber {
@@ -24,7 +25,6 @@ QGroupBox {
     font-size: 10px;
     margin-top: 12px;
     background-color: #380f4d;
-    border
 }
 
 QGroupBox QLabel {
@@ -252,9 +252,15 @@ QGroupBox::title#recorder, QGroupBox:title#patch_manager {
     background-color: #380f4d;
 }
 
-QGroupBox#filt_group, QGroupBox#osc_group, QGroupBox#osc2_group, QGroupBox#osc3_group, QGroupBox#env_group, QGroupBox#fenv_group, QGroupBox#del_group, QWidget#mod_group, QGroupBox#midi_group {
+QGroupBox#filt_group, QGroupBox#env_group, QGroupBox#fenv_group, QGroupBox#del_group, QWidget#mod_group, QGroupBox#midi_group {
     min-height: 200px;
     max-height: 200px;
+}
+
+QGroupBox#osc_group, QGroupBox#osc2_group, QGroupBox#osc3_group {
+    min-height: 180px;
+    max-height: 180px;
+    margin-top: 38px;
 }
 
 ModulatorGUI QGroupBox {
@@ -283,9 +289,25 @@ QPushButton#menv2_button {
     background-color: #ce73ff;
 }
 
+QPushButton#osc1_select {
+    background-color: #8abcee;
+}
+
+QPushButton#osc2_select {
+    background-color: #8febe2;
+}
+
+QPushButton#osc3_select {
+    background-color: #86e7c0;
+}
+
 QPushButton#lfo1_button:checked, QPushButton#lfo2_button:checked, QPushButton#menv1_button:checked, QPushButton#menv2_button:checked {
     border-color: black;
     color: black;
+}
+
+QPushButton#osc1_select:checked, QPushButton#osc2_select:checked, QPushButton#osc3_select:checked {
+    border-color: black;
 }
 
 QPushButton#lfo1_button:hover {
@@ -302,6 +324,18 @@ QPushButton#menv1_button:hover {
 
 QPushButton#menv2_button:hover {
     background-color: #c664fb;
+}
+
+QPushButton#osc1_select:hover {
+    background-color: #7ab5f0;
+}
+
+QPushButton#osc2_select:hover {
+    background-color: #77d9cf;
+}
+
+QPushButton#osc3_select:hover {
+    background-color: #77d9b2;
 }
 
 QGroupBox#midi_group, QGroupBox#synth_group {
@@ -322,31 +356,18 @@ QWidget#mod_group {
     max-width: 480px;
 }
 
-QWidget#mod_group QPushButton {
+QWidget#osc_view QGroupBox {
+    max-height: 180px;
+}
+
+QWidget#mod_group QPushButton, QWidget#osc_view QPushButton {
+    color: black;
     width: 48px;
     height: 16px;
-    color: #dfdfef;
     border: 1px solid white;
     border-radius: 6px;
-}
-
-QPushButton#env_gate {
-    color: #dfdfef;
-    border: 1px solid white;
-    border-radius: 6px;
-    height: 24px;
-    text-align: center;
-    font-family: "Dogica Pixel";
     font-size: 9px;
-}
-
-QPushButton#env_gate:hover {
-    background-color: #d19fb4;
-}
-
-QPushButton#env_gate:checked {
-    color: #dfdfef;
-    background-color: #eeb6ce;
+    font-family: "Dogica Pixel";
 }
 
 QPushButton#midi_refresh, QGroupBox#cc_group QPushButton {
