@@ -134,7 +134,55 @@ class MainWindow(QMainWindow):
         self.del_group = DelayGUI(self.display_color)
         self.mod_group = ModulatorGUI(self.display_color)
 
-        #update modulate dictionary
+        #oscillator stack
+        self.osc_view = QWidget()
+        self.osc_view.setAttribute(Qt.WA_StyledBackground, True)
+        self.osc_view.setObjectName("osc_view")
+        self.osc_stack = QWidget()
+        self.osc_stack.setObjectName("osc_stack")
+        self.osc_select = QWidget()
+
+        #oscillator stack layouts
+        self.osc_view_layout = QGridLayout()
+        self.osc_stack_layout = QStackedLayout()
+        self.osc_select_layout = QGridLayout()
+        self.osc_view_layout.setAlignment(Qt.AlignmentFlag.AlignHCenter)
+        self.osc_stack_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.osc_select_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        #oscillator select buttons
+        self.osc_select_1 = QPushButton("osc 1")
+        self.osc_select_2 = QPushButton("osc 2")
+        self.osc_select_3 = QPushButton("osc 3")
+        self.osc_select_1.setCheckable(True)
+        self.osc_select_2.setCheckable(True)
+        self.osc_select_3.setCheckable(True)
+        self.osc_select_1.setChecked(True)
+        self.osc_select_group = QButtonGroup()
+        self.osc_select_group.addButton(self.osc_select_1)
+        self.osc_select_group.addButton(self.osc_select_2)
+        self.osc_select_group.addButton(self.osc_select_3)
+        self.osc_select_1.setObjectName("osc1_select")
+        self.osc_select_2.setObjectName("osc2_select")
+        self.osc_select_3.setObjectName("osc3_select")
+        self.osc_select_layout.addWidget(self.osc_select_1, 0, 0)
+        self.osc_select_layout.addWidget(self.osc_select_2, 0, 1)
+        self.osc_select_layout.addWidget(self.osc_select_3, 0, 2)
+        self.osc_select.setLayout(self.osc_select_layout)
+
+        #configure oscillator stack
+        self.osc_stack_layout.addWidget(self.osc_group)
+        self.osc_stack_layout.addWidget(self.osc2_group)
+        self.osc_stack_layout.addWidget(self.osc3_group)
+        self.osc_stack.setLayout(self.osc_stack_layout)
+        
+        #configure oscillator view
+        self.osc_view_layout.addWidget(self.osc_stack, 0, 0)
+        self.osc_view_layout.addWidget(self.osc_select, 1, 0)
+        self.osc_view.setLayout(self.osc_view_layout)
+
+
+        #update module dictionary
         self.modules_dict.update({"filt_group": self.filt_group})
         self.modules_dict.update({"osc_group": self.osc_group})
         self.modules_dict.update({"osc2_group": self.osc2_group})
@@ -145,9 +193,7 @@ class MainWindow(QMainWindow):
         self.modules_dict.update({"mod_group": self.osc2_group})
 
         #module drop shadows
-        self.osc_group.setGraphicsEffect(self.osc_drop_shadow)
-        self.osc2_group.setGraphicsEffect(self.osc2_drop_shadow)
-        self.osc3_group.setGraphicsEffect(self.osc3_drop_shadow)
+        self.osc_view.setGraphicsEffect(self.osc_drop_shadow)
         self.filt_group.setGraphicsEffect(self.filt_drop_shadow)
         self.env_group.setGraphicsEffect(self.env_drop_shadow)
         self.fenv_group.setGraphicsEffect(self.fenv_drop_shadow)
@@ -190,15 +236,13 @@ class MainWindow(QMainWindow):
         self.window_grid.addWidget(self.patch_manager, 0, 3)
         self.window_grid.addWidget(self.recorder, 0, 5)
 
-        self.window_grid.addWidget(self.osc_group, 1, 1)
+        self.window_grid.addWidget(self.osc_view, 1, 1)
         self.window_grid.addWidget(self.filt_group, 1, 3)
         self.window_grid.addWidget(self.env_group, 1, 5)
 
-        self.window_grid.addWidget(self.osc2_group, 2, 1)
         self.window_grid.addWidget(self.fenv_group, 2, 3)
         self.window_grid.addWidget(self.del_group, 2, 5)
 
-        self.window_grid.addWidget(self.osc3_group, 3, 1)
         self.window_grid.addWidget(self.mod_group, 3, 3)
         self.window_grid.addWidget(self.settings_view, 3, 5)
 
@@ -238,6 +282,8 @@ class MainWindow(QMainWindow):
         self.filt_group.mode_changed.connect(self.update_filt_mode)
 
         # oscillators
+        #  select
+        self.osc_select_group.buttonClicked.connect(self.update_osc_select)
         #  1
         self.osc_group.pitch_changed.connect(self.update_osc_freq)
         self.osc_group.level_changed.connect(self.update_osc_amp)
@@ -258,6 +304,7 @@ class MainWindow(QMainWindow):
         self.osc3_group.width_changed.connect(self.update_osc3_width)
         self.osc3_group.alg_changed.connect(self.update_osc3_alg)
         self.osc3_group.type_changed.connect(self.update_osc_type)
+
         # envelope
         self.env_group.attack_changed.connect(self.update_env_attack)
         self.env_group.decay_changed.connect(self.update_env_decay)
@@ -887,6 +934,16 @@ class MainWindow(QMainWindow):
 
     def update_filt_mode(self, newMode):
         self.engine.update_mode(newMode)
+
+    # oscillator select
+    def update_osc_select(self, button):
+        button_text = button.text()
+        if button_text == "osc 1":
+            self.osc_stack_layout.setCurrentIndex(0)
+        elif button_text == "osc 2":
+            self.osc_stack_layout.setCurrentIndex(1)
+        elif button_text == "osc 3":
+            self.osc_stack_layout.setCurrentIndex(2)
 
     # oscillator drift
     def update_osc_drift(self, value):
