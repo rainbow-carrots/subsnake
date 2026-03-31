@@ -16,3 +16,4 @@ from .record import RecorderGUI
 from .settings import SynthSettings
 from .mod_gui import ModulatorGUI, CoolDial
 from .scope_gui import ScopeGUI
+from .mixer_gui import MixerGUI
