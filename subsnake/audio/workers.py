@@ -54,7 +54,7 @@ class KeyEventWorker(QRunnable):
         note, velocity, sample_offset = press_event
         new_voice = self.assign_voice(note)
         if new_voice is not None:
-            new_pitch = 440.0 * 2**((float(note))/12.0 + self.engine.pitch_offset_1)
+            new_pitch = 440.0 * 2**((float(note))/12.0 + self.engine.pitch_offset_1) + self.engine.detune_1*new_voice.detune_offset_1
             new_pitch2 = 440.0 * 2**((float(note))/12.0 + self.engine.pitch_offset_2) + self.engine.detune_2*new_voice.detune_offset_2
             new_pitch3 = 440.0 * 2**((float(note))/12.0 + self.engine.pitch_offset_3) + self.engine.detune_3*new_voice.detune_offset_3
             new_voice.base_note = note
