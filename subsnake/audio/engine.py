@@ -30,7 +30,7 @@ class AudioEngine():
         dc_hpf(np.zeros((16, 2), dtype=np.float32), self.test_hpf_states)
 
         #mod dial value states (float)
-        self.mod_dial_values = {"osc_freq": 0.0, "osc_amp": 0.0, "osc_width": 0.0,
+        self.mod_dial_values = {"osc_freq": 0.0, "osc_det": 0.0, "osc_amp": 0.0, "osc_width": 0.0,
                                 "osc2_freq": 0.0, "osc2_det": 0.0, "osc2_amp": 0.0, "osc2_width": 0.0,
                                 "osc3_freq": 0.0, "osc3_det": 0.0, "osc3_amp": 0.0, "osc3_width": 0.0,
                                 "filt_freq": 0.0, "filt_res": 0.0, "filt_drive": 0.0, "filt_sat": 0.0,
@@ -40,7 +40,7 @@ class AudioEngine():
                                 "lfo1_freq": 0.0, "lfo1_phase": 0.0, "lfo2_freq": 0.0, "lfo2_phase": 0.0,
                                 "menv1_att": 0.0, "menv1_rel": 0.0, "menv2_att": 0.0, "menv2_rel": 0.0}
         #mod dial mode states (int)
-        self.mod_dial_modes =  {"osc_freq": 0, "osc_amp": 0, "osc_width": 0,
+        self.mod_dial_modes =  {"osc_freq": 0, "osc_det": 0, "osc_amp": 0, "osc_width": 0,
                                 "osc2_freq": 0, "osc2_det": 0, "osc2_amp": 0, "osc2_width": 0,
                                 "osc3_freq": 0, "osc3_det": 0, "osc3_amp": 0, "osc3_width": 0,
                                 "filt_freq": 0, "filt_res": 0, "filt_drive": 0, "filt_sat": 0,
@@ -64,6 +64,7 @@ class AudioEngine():
         for voice in self.voices:
             voice.index = voice_index
             self.stopped_voice_indeces.append(voice_index)
+            voice.detune_offset_1 = .975 + .050*random.random()
             voice.detune_offset_2 = .975 + .050*random.random()
             voice.detune_offset_3 = .975 + .050*random.random()
             voice_index += 1
@@ -78,6 +79,7 @@ class AudioEngine():
         self.pitch_offset_1 = 0
         self.pitch_offset_2 = 0
         self.pitch_offset_3 = 0
+        self.detune_1 = 0.0
         self.detune_2 = 0.0
         self.detune_3 = 0.0
         self.midi_in_queue = queue.SimpleQueue()
@@ -282,7 +284,7 @@ class AudioEngine():
     # oscillators
     def update_pitch_1(self, offset):
         for voice in self.voices:
-            new_pitch = 440.0 * 2**(float(voice.base_note)/12.0 + offset)
+            new_pitch = 440.0 * 2**(float(voice.base_note)/12.0 + offset) + self.detune_1*voice.detune_offset_1
             voice.osc.update_pitch(new_pitch)
             self.pitch_offset_1 = offset
 
@@ -297,6 +299,12 @@ class AudioEngine():
             new_pitch = 440.0 * 2**(float(voice.base_note)/12.0 + offset) + self.detune_3*voice.detune_offset_3
             voice.osc3.update_pitch(new_pitch)
             self.pitch_offset_3 = offset
+
+    def update_detune_1(self, detune):
+        for voice in self.voices:
+            new_pitch = 440.0 * 2**(float(voice.base_note)/12.0 + self.pitch_offset_1) + detune*voice.detune_offset_1
+            voice.osc.update_pitch(new_pitch)
+        self.detune_1 = detune
 
     def update_detune_2(self, detune):
         for voice in self.voices:
