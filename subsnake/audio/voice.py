@@ -40,7 +40,7 @@ class Voice():
          #oscillators
           #1
         self.osc1_mod_buffers = [self.assign_mod_buffer(self.mod_dial_modes["osc_freq"])]
-        self.osc1_mod_buffers.append(self.no_mod)
+        self.osc1_mod_buffers.append(self.assign_mod_buffer(self.mod_dial_modes["osc_det"]))
         self.osc1_mod_buffers.append(self.assign_mod_buffer(self.mod_dial_modes["osc_amp"]))
         self.osc1_mod_buffers.append(self.assign_mod_buffer(self.mod_dial_modes["osc_width"]))
           #2
@@ -77,7 +77,7 @@ class Voice():
         self.menv1_mod_values = [self.mod_dial_values["menv1_att"], self.mod_dial_values["menv1_rel"]]
         self.menv2_mod_values = [self.mod_dial_values["menv2_att"], self.mod_dial_values["menv2_rel"]]
          #oscillators
-        self.osc1_mod_values = [self.mod_dial_values["osc_freq"], 0.0,
+        self.osc1_mod_values = [self.mod_dial_values["osc_freq"], self.mod_dial_values["osc_det"],
                             self.mod_dial_values["osc_amp"], self.mod_dial_values["osc_width"]]
         self.osc2_mod_values = [self.mod_dial_values["osc2_freq"], self.mod_dial_values["osc2_det"],
                             self.mod_dial_values["osc2_amp"], self.mod_dial_values["osc2_width"]]
@@ -112,6 +112,7 @@ class Voice():
         self.velocity = 0.0
         self.status = 1
         self.index = 0
+        self.detune_offset_1 = 0.0
         self.detune_offset_2 = 0.0
         self.detune_offset_3 = 0.0
 
@@ -185,6 +186,8 @@ class Voice():
             else:
                 if name.endswith("freq"):
                     self.osc1_mod_buffers[0] = new_buffer
+                elif name.endswith("det"):
+                    self.osc1_mod_buffers[1] = new_buffer
                 elif name.endswith("amp"):
                     self.osc1_mod_buffers[2] = new_buffer
                 elif name.endswith("width"):
@@ -264,6 +267,8 @@ class Voice():
             else:
                 if name.endswith("freq"):
                     self.osc1_mod_values[0] = value
+                elif name.endswith("det"):
+                    self.osc1_mod_values[1] = value
                 elif name.endswith("amp"):
                     self.osc1_mod_values[2] = value
                 elif name.endswith("width"):
