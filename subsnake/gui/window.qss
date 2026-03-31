@@ -173,6 +173,18 @@ QGroupBox#synth_group QSlider::sub-page {
     background-color: #ff8d8d;
 }
 
+QSlider::sub-page#osc1_amp_slider {
+    background-color: #7ab5f0;
+}
+
+QSlider::sub-page#osc2_amp_slider {
+    background-color: #77d9cf;
+}
+
+QSlider::sub-page#osc3_amp_slider {
+    background-color: #77d9b2;
+}
+
 QWidget#mod_group QGroupBox#lfo1_group QSlider::sub-page {
     background-color: #88b7f9;
 }
@@ -219,6 +231,18 @@ QGroupBox#del_group QSlider::handle {
 
 QGroupBox#synth_group QSlider::handle {
     background-color: #f66767;
+}
+
+QSlider::handle#osc1_amp_slider {
+    background-color: #56a6f6;
+}
+
+QSlider::handle#osc2_amp_slider {
+    background-color: #2bd6c5;
+}
+
+QSlider::handle#osc3_amp_slider {
+    background-color: #2bd6ae;
 }
 
 QWidget#mod_group QGroupBox#lfo1_group QSlider::handle {
