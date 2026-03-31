@@ -2,6 +2,7 @@ from subsnake.gui.keys import Keys
 from subsnake.gui.osc_gui import OscillatorGUI
 from subsnake.gui.osc2_gui import Oscillator2GUI
 from subsnake.gui.osc3_gui import Oscillator3GUI
+from subsnake.gui.mixer_gui import MixerGUI
 from subsnake.gui.filt_gui import FilterGUI
 from subsnake.gui.env_gui import EnvelopeGUI
 from subsnake.gui.fenv_gui import FilterEnvGUI
@@ -44,8 +45,8 @@ class MainWindow(QMainWindow):
         self.display_color = QColor("black")
         self.key_to_note = {}
         self.osc_drop_shadow = self.configure_drop_shadow(QGraphicsDropShadowEffect(), QColor("#1c0627"))
-        self.osc2_drop_shadow = self.configure_drop_shadow(QGraphicsDropShadowEffect(), QColor("#1c0627"))
-        self.osc3_drop_shadow = self.configure_drop_shadow(QGraphicsDropShadowEffect(), QColor("#1c0627"))
+        self.mix_drop_shadow = self.configure_drop_shadow(QGraphicsDropShadowEffect(), QColor("#1c0627"))
+        self.seq_drop_shadow = self.configure_drop_shadow(QGraphicsDropShadowEffect(), QColor("#1c0627"))
         self.filt_drop_shadow = self.configure_drop_shadow(QGraphicsDropShadowEffect(), QColor("#1c0627"))
         self.fenv_drop_shadow = self.configure_drop_shadow(QGraphicsDropShadowEffect(), QColor("#1c0627"))
         self.env_drop_shadow = self.configure_drop_shadow(QGraphicsDropShadowEffect(), QColor("#1c0627"))
@@ -129,10 +130,12 @@ class MainWindow(QMainWindow):
         self.osc_group = OscillatorGUI(self.display_color)
         self.osc2_group = Oscillator2GUI(self.display_color)
         self.osc3_group = Oscillator3GUI(self.display_color)
+        self.mix_group = MixerGUI(self.display_color)
         self.env_group = EnvelopeGUI(self.display_color)
         self.fenv_group = FilterEnvGUI(self.display_color)
         self.del_group = DelayGUI(self.display_color)
         self.mod_group = ModulatorGUI(self.display_color)
+        
 
         #oscillator stack
         self.osc_view = QWidget()
@@ -184,6 +187,7 @@ class MainWindow(QMainWindow):
 
         #update module dictionary
         self.modules_dict.update({"filt_group": self.filt_group})
+        self.modules_dict.update({"mix_group": self.mix_group})
         self.modules_dict.update({"osc_group": self.osc_group})
         self.modules_dict.update({"osc2_group": self.osc2_group})
         self.modules_dict.update({"osc3_group": self.osc3_group})
@@ -194,6 +198,7 @@ class MainWindow(QMainWindow):
 
         #module drop shadows
         self.osc_view.setGraphicsEffect(self.osc_drop_shadow)
+        self.mix_group.setGraphicsEffect(self.mix_drop_shadow)
         self.filt_group.setGraphicsEffect(self.filt_drop_shadow)
         self.env_group.setGraphicsEffect(self.env_drop_shadow)
         self.fenv_group.setGraphicsEffect(self.fenv_drop_shadow)
@@ -240,6 +245,7 @@ class MainWindow(QMainWindow):
         self.window_grid.addWidget(self.filt_group, 1, 3)
         self.window_grid.addWidget(self.env_group, 1, 5)
 
+        self.window_grid.addWidget(self.mix_group, 2, 1)
         self.window_grid.addWidget(self.fenv_group, 2, 3)
         self.window_grid.addWidget(self.del_group, 2, 5)
 
@@ -286,24 +292,26 @@ class MainWindow(QMainWindow):
         self.osc_select_group.buttonClicked.connect(self.update_osc_select)
         #  1
         self.osc_group.pitch_changed.connect(self.update_osc_freq)
-        self.osc_group.level_changed.connect(self.update_osc_amp)
+        self.osc_group.detune_changed.connect(self.update_osc_det)
         self.osc_group.width_changed.connect(self.update_osc_width)
         self.osc_group.alg_changed.connect(self.update_osc_alg)
         self.osc_group.type_changed.connect(self.update_osc_type)
         #  2
         self.osc2_group.pitch_changed.connect(self.update_osc2_freq)
         self.osc2_group.detune_changed.connect(self.update_osc2_det)
-        self.osc2_group.level_changed.connect(self.update_osc2_amp)
         self.osc2_group.width_changed.connect(self.update_osc2_width)
         self.osc2_group.alg_changed.connect(self.update_osc2_alg)
         self.osc2_group.type_changed.connect(self.update_osc_type)
         #  3
         self.osc3_group.pitch_changed.connect(self.update_osc3_freq)
         self.osc3_group.detune_changed.connect(self.update_osc3_det)
-        self.osc3_group.level_changed.connect(self.update_osc3_amp)
         self.osc3_group.width_changed.connect(self.update_osc3_width)
         self.osc3_group.alg_changed.connect(self.update_osc3_alg)
         self.osc3_group.type_changed.connect(self.update_osc_type)
+        #  mix
+        self.mix_group.level_1_changed.connect(self.update_osc_amp)
+        self.mix_group.level_2_changed.connect(self.update_osc2_amp)
+        self.mix_group.level_3_changed.connect(self.update_osc3_amp)
 
         # envelope
         self.env_group.attack_changed.connect(self.update_env_attack)
@@ -327,18 +335,20 @@ class MainWindow(QMainWindow):
         #  values
         #   oscillator 1
         self.osc_group.osc_freq_mod_dial.value_changed.connect(self.update_mod_dial_value)
-        self.osc_group.osc_amp_mod_dial.value_changed.connect(self.update_mod_dial_value)
+        self.osc_group.osc_det_mod_dial.value_changed.connect(self.update_mod_dial_value)
         self.osc_group.osc_width_mod_dial.value_changed.connect(self.update_mod_dial_value)
         #   oscillator 2
         self.osc2_group.osc2_freq_mod_dial.value_changed.connect(self.update_mod_dial_value)
         self.osc2_group.osc2_det_mod_dial.value_changed.connect(self.update_mod_dial_value)
-        self.osc2_group.osc2_amp_mod_dial.value_changed.connect(self.update_mod_dial_value)
         self.osc2_group.osc2_width_mod_dial.value_changed.connect(self.update_mod_dial_value)
         #   oscillator 3
         self.osc3_group.osc3_freq_mod_dial.value_changed.connect(self.update_mod_dial_value)
         self.osc3_group.osc3_det_mod_dial.value_changed.connect(self.update_mod_dial_value)
-        self.osc3_group.osc3_amp_mod_dial.value_changed.connect(self.update_mod_dial_value)
         self.osc3_group.osc3_width_mod_dial.value_changed.connect(self.update_mod_dial_value)
+        #   mixer
+        self.mix_group.osc1_amp_mod_dial.value_changed.connect(self.update_mod_dial_value)
+        self.mix_group.osc2_amp_mod_dial.value_changed.connect(self.update_mod_dial_value)
+        self.mix_group.osc3_amp_mod_dial.value_changed.connect(self.update_mod_dial_value)
         #   filter
         self.filt_group.filt_freq_mod_dial.value_changed.connect(self.update_mod_dial_value)
         self.filt_group.filt_res_mod_dial.value_changed.connect(self.update_mod_dial_value)
@@ -375,18 +385,20 @@ class MainWindow(QMainWindow):
         #  modes
         #   oscillator 1
         self.osc_group.osc_freq_mod_dial.mode_changed.connect(self.update_mod_dial_mode)
-        self.osc_group.osc_amp_mod_dial.mode_changed.connect(self.update_mod_dial_mode)
+        self.osc_group.osc_det_mod_dial.mode_changed.connect(self.update_mod_dial_mode)
         self.osc_group.osc_width_mod_dial.mode_changed.connect(self.update_mod_dial_mode)
         #   oscillator 2
         self.osc2_group.osc2_freq_mod_dial.mode_changed.connect(self.update_mod_dial_mode)
         self.osc2_group.osc2_det_mod_dial.mode_changed.connect(self.update_mod_dial_mode)
-        self.osc2_group.osc2_amp_mod_dial.mode_changed.connect(self.update_mod_dial_mode)
         self.osc2_group.osc2_width_mod_dial.mode_changed.connect(self.update_mod_dial_mode)
         #   oscillator 3
         self.osc3_group.osc3_freq_mod_dial.mode_changed.connect(self.update_mod_dial_mode)
         self.osc3_group.osc3_det_mod_dial.mode_changed.connect(self.update_mod_dial_mode)
-        self.osc3_group.osc3_amp_mod_dial.mode_changed.connect(self.update_mod_dial_mode)
         self.osc3_group.osc3_width_mod_dial.mode_changed.connect(self.update_mod_dial_mode)
+        #   mixer
+        self.mix_group.osc1_amp_mod_dial.mode_changed.connect(self.update_mod_dial_mode)
+        self.mix_group.osc2_amp_mod_dial.mode_changed.connect(self.update_mod_dial_mode)
+        self.mix_group.osc3_amp_mod_dial.mode_changed.connect(self.update_mod_dial_mode)
         #   filter
         self.filt_group.filt_freq_mod_dial.mode_changed.connect(self.update_mod_dial_mode)
         self.filt_group.filt_res_mod_dial.mode_changed.connect(self.update_mod_dial_mode)
@@ -481,8 +493,8 @@ class MainWindow(QMainWindow):
     
     def update_drop_shadow_colors(self, color):
         self.osc_drop_shadow.setColor(color)
-        self.osc2_drop_shadow.setColor(color)
-        self.osc3_drop_shadow.setColor(color)
+        self.mix_drop_shadow.setColor(color)
+        self.seq_drop_shadow.setColor(color)
         self.filt_drop_shadow.setColor(color)
         self.fenv_drop_shadow.setColor(color)
         self.env_drop_shadow.setColor(color)
@@ -496,19 +508,22 @@ class MainWindow(QMainWindow):
     
     def init_sliders_dict(self):
         self.param_sliders.update({"osc_drift": self.synth_group.drift_slider})
+
         self.param_sliders.update({"osc_freq": self.osc_group.osc_freq_slider})
-        self.param_sliders.update({"osc_amp": self.osc_group.osc_amp_slider})
+        self.param_sliders.update({"osc_det": self.osc_group.osc_det_slider})
         self.param_sliders.update({"osc_width": self.osc_group.osc_width_slider})
 
         self.param_sliders.update({"osc2_freq": self.osc2_group.osc2_freq_slider})
         self.param_sliders.update({"osc2_det": self.osc2_group.osc2_det_slider})
-        self.param_sliders.update({"osc2_amp": self.osc2_group.osc2_amp_slider})
         self.param_sliders.update({"osc2_width": self.osc2_group.osc2_width_slider})
 
         self.param_sliders.update({"osc3_freq": self.osc3_group.osc3_freq_slider})
         self.param_sliders.update({"osc3_det": self.osc3_group.osc3_det_slider})
-        self.param_sliders.update({"osc3_amp": self.osc3_group.osc3_amp_slider})
         self.param_sliders.update({"osc3_width": self.osc3_group.osc3_width_slider})
+
+        self.param_sliders.update({"osc_amp": self.mix_group.osc1_amp_slider})
+        self.param_sliders.update({"osc2_amp": self.mix_group.osc2_amp_slider})
+        self.param_sliders.update({"osc3_amp": self.mix_group.osc3_amp_slider})
 
         self.param_sliders.update({"filt_freq": self.filt_group.filt_freq_slider})
         self.param_sliders.update({"filt_res": self.filt_group.filt_res_slider})
@@ -557,18 +572,20 @@ class MainWindow(QMainWindow):
 
     def init_mod_dials_dict(self):
         self.mod_dials.update({"osc_freq": self.osc_group.osc_freq_mod_dial})
-        self.mod_dials.update({"osc_amp": self.osc_group.osc_amp_mod_dial})
+        self.mod_dials.update({"osc_det": self.osc_group.osc_det_mod_dial})
         self.mod_dials.update({"osc_width": self.osc_group.osc_width_mod_dial})
 
         self.mod_dials.update({"osc2_freq": self.osc2_group.osc2_freq_mod_dial})
         self.mod_dials.update({"osc2_det": self.osc2_group.osc2_det_mod_dial})
-        self.mod_dials.update({"osc2_amp": self.osc2_group.osc2_amp_mod_dial})
         self.mod_dials.update({"osc2_width": self.osc2_group.osc2_width_mod_dial})
 
         self.mod_dials.update({"osc3_freq": self.osc3_group.osc3_freq_mod_dial})
         self.mod_dials.update({"osc3_det": self.osc3_group.osc3_det_mod_dial})
-        self.mod_dials.update({"osc3_amp": self.osc3_group.osc3_amp_mod_dial})
         self.mod_dials.update({"osc3_width": self.osc3_group.osc3_width_mod_dial})
+
+        self.mod_dials.update({"osc_amp": self.mix_group.osc1_amp_mod_dial})
+        self.mod_dials.update({"osc2_amp": self.mix_group.osc2_amp_mod_dial})
+        self.mod_dials.update({"osc3_amp": self.mix_group.osc3_amp_mod_dial})
 
         self.mod_dials.update({"filt_freq": self.filt_group.filt_freq_mod_dial})
         self.mod_dials.update({"filt_res": self.filt_group.filt_res_mod_dial})
@@ -735,18 +752,20 @@ class MainWindow(QMainWindow):
     def set_display_colors(self):
         #osc 1
         self.set_palette(self.osc_group.osc_freq_display)
-        self.set_palette(self.osc_group.osc_amp_display)
+        self.set_palette(self.osc_group.osc_det_display)
         self.set_palette(self.osc_group.osc_width_display)
         #osc 2
         self.set_palette(self.osc2_group.osc2_freq_display)
         self.set_palette(self.osc2_group.osc2_det_display)
-        self.set_palette(self.osc2_group.osc2_amp_display)
         self.set_palette(self.osc2_group.osc2_width_display)
         #osc 3
         self.set_palette(self.osc3_group.osc3_freq_display)
         self.set_palette(self.osc3_group.osc3_det_display)
-        self.set_palette(self.osc3_group.osc3_amp_display)
         self.set_palette(self.osc3_group.osc3_width_display)
+        #mixer
+        self.set_palette(self.mix_group.osc1_amp_display)
+        self.set_palette(self.mix_group.osc2_amp_display)
+        self.set_palette(self.mix_group.osc3_amp_display)
         #filter
         self.set_palette(self.filt_group.filt_freq_display)
         self.set_palette(self.filt_group.filt_fback_display)
@@ -956,6 +975,9 @@ class MainWindow(QMainWindow):
     # oscillator 1
     def update_osc_freq(self, value):
         self.engine.update_pitch_1(value)
+
+    def update_osc_det(self, value):
+        self.engine.update_detune_1(value)
 
     def update_osc_amp(self, value):
         self.engine.update_amplitude_1(value)
