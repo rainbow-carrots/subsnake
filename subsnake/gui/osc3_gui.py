@@ -12,7 +12,6 @@ class Oscillator3GUI(QGroupBox):
     #signals
     pitch_changed = Signal(float)
     detune_changed = Signal(float)
-    level_changed = Signal(float)
     width_changed = Signal(float)
     alg_changed = Signal(str)
     type_changed = Signal(int, int)
@@ -32,13 +31,11 @@ class Oscillator3GUI(QGroupBox):
         #dials
         self.osc3_freq_mod_dial = CoolDial(1, -500, 500, "osc3_freq")
         self.osc3_det_mod_dial = CoolDial(1, -500, 500, "osc3_det")
-        self.osc3_amp_mod_dial = CoolDial(1, -500, 500, "osc3_amp")
         self.osc3_width_mod_dial = CoolDial(1, -500, 500, "osc3_width")
 
         #labels
         osc3_freq_label = QLabel("pitch:")
         osc3_det_label = QLabel("detune:")
-        osc3_amp_label = QLabel("level:")
         osc3_width_label = QLabel("width:")
         osc3_alg_label = QLabel("shape:")
 
@@ -53,10 +50,6 @@ class Oscillator3GUI(QGroupBox):
         self.osc3_det_slider.setRange(-200, 200)
         self.osc3_det_slider.setValue(1)
 
-        self.osc3_amp_slider = QSlider(Qt.Horizontal)
-        self.osc3_amp_slider.setSingleStep(1)
-        self.osc3_amp_slider.setRange(0, 500)
-
         self.osc3_width_slider = QSlider(Qt.Horizontal)
         self.osc3_width_slider.setSingleStep(1)
         self.osc3_width_slider.setRange(0, 500)
@@ -64,13 +57,11 @@ class Oscillator3GUI(QGroupBox):
         #displays
         self.osc3_freq_display = self.configure_display(ClickLCD(), 3, QLCDNumber.Dec, QLCDNumber.Flat, True)
         self.osc3_det_display = self.configure_display(ClickLCD(), 3, QLCDNumber.Dec, QLCDNumber.Flat, True)
-        self.osc3_amp_display = self.configure_display(ClickLCD(), 3, QLCDNumber.Dec, QLCDNumber.Flat, True)
         self.osc3_width_display = self.configure_display(ClickLCD(), 3, QLCDNumber.Dec, QLCDNumber.Flat, True)
 
         #set display palettes
         self.set_palette(self.osc3_freq_display)
         self.set_palette(self.osc3_det_display)
-        self.set_palette(self.osc3_amp_display)
         self.set_palette(self.osc3_width_display)
 
         #radio buttons
@@ -90,26 +81,22 @@ class Oscillator3GUI(QGroupBox):
         #add dials
         osc3_layout.addWidget(self.osc3_freq_mod_dial, 0, 0)
         osc3_layout.addWidget(self.osc3_det_mod_dial, 1, 0)
-        osc3_layout.addWidget(self.osc3_amp_mod_dial, 2, 0)
         osc3_layout.addWidget(self.osc3_width_mod_dial, 3, 0)
 
         #add labels
         osc3_layout.addWidget(osc3_freq_label, 0, 1)
         osc3_layout.addWidget(osc3_det_label, 1, 1)
-        osc3_layout.addWidget(osc3_amp_label, 2, 1)
         osc3_layout.addWidget(osc3_width_label, 3, 1)
         osc3_layout.addWidget(osc3_alg_label, 4, 1)
 
         #add sliders
         osc3_layout.addWidget(self.osc3_freq_slider, 0, 2)
         osc3_layout.addWidget(self.osc3_det_slider, 1, 2)
-        osc3_layout.addWidget(self.osc3_amp_slider, 2, 2)
         osc3_layout.addWidget(self.osc3_width_slider, 3, 2)
 
         #add displays
         osc3_layout.addWidget(self.osc3_freq_display, 0, 3)
         osc3_layout.addWidget(self.osc3_det_display, 1, 3)
-        osc3_layout.addWidget(self.osc3_amp_display, 2, 3)
         osc3_layout.addWidget(self.osc3_width_display, 3, 3)
 
         #add radio buttons
@@ -127,13 +114,11 @@ class Oscillator3GUI(QGroupBox):
         #connect signals
         self.osc3_freq_slider.valueChanged.connect(self.change_pitch)
         self.osc3_det_slider.valueChanged.connect(self.change_detune)
-        self.osc3_amp_slider.valueChanged.connect(self.change_level)
         self.osc3_width_slider.valueChanged.connect(self.change_width)
         self.osc3_alg_group.buttonClicked.connect(self.change_alg)
 
         self.osc3_freq_display.double_clicked.connect(self.reset_pitch)
         self.osc3_det_display.double_clicked.connect(self.reset_detune)
-        self.osc3_amp_display.double_clicked.connect(self.reset_level)
         self.osc3_width_display.double_clicked.connect(self.reset_width)
 
         #set object name
@@ -183,11 +168,6 @@ class Oscillator3GUI(QGroupBox):
         self.osc3_det_display.display(f"{detune:.2f}")
         self.detune_changed.emit(detune)
 
-    def change_level(self, value):
-        newAmp = float(value)/500.0
-        self.osc3_amp_display.display(f"{newAmp:.2f}")
-        self.level_changed.emit(newAmp)
-
     def change_width(self, value):
         newWidth = float(value)/500.0
         self.osc3_width_display.display(f"{newWidth:.2f}")
@@ -201,9 +181,6 @@ class Oscillator3GUI(QGroupBox):
 
     def reset_detune(self):
         self.osc3_det_slider.setValue(0)
-
-    def reset_level(self):
-        self.osc3_amp_slider.setValue(250)
 
     def reset_width(self):
         self.osc3_width_slider.setValue(250)
