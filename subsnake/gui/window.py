@@ -662,8 +662,8 @@ class MainWindow(QMainWindow):
         if (module == "oscillator 1"):
             if (param == "pitch"):
                 cc_function = self.engine.cc_change_pitch_1
-            elif (param == "level"):
-                cc_function = self.engine.cc_change_level_1
+            elif (param == "detune"):
+                cc_function = self.engine.cc_change_detune_1
             elif (param == "width"):
                 cc_function = self.engine.cc_change_width_1
         elif (module == "oscillator 2"):
@@ -671,8 +671,6 @@ class MainWindow(QMainWindow):
                 cc_function = self.engine.cc_change_pitch_2
             elif (param == "detune"):
                 cc_function = self.engine.cc_change_detune_2
-            elif (param == "level"):
-                cc_function = self.engine.cc_change_level_2
             elif (param == "width"):
                 cc_function = self.engine.cc_change_width_2
         elif (module == "oscillator 3"):
@@ -680,10 +678,15 @@ class MainWindow(QMainWindow):
                 cc_function = self.engine.cc_change_pitch_3
             elif (param == "detune"):
                 cc_function = self.engine.cc_change_detune_3
-            elif (param == "level"):
-                cc_function = self.engine.cc_change_level_3
             elif (param == "width"):
                 cc_function = self.engine.cc_change_width_3
+        elif (module == "mixer"):
+            if (param == "osc 1"):
+                cc_function = self.engine.cc_change_level_1
+            elif (param == "osc 2"):
+                cc_function = self.engine.cc_change_level_2
+            elif (param == "osc 3"):
+                cc_function = self.engine.cc_change_level_3
         elif (module == "filter"):
             if (param == "cutoff"):
                 cc_function = self.engine.cc_change_cutoff
