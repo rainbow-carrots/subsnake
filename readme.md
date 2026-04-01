@@ -6,7 +6,7 @@ subsnake is a polyphonic virtual analog subtractive synthesizer, written in pyth
 
 
 ### what's it do?
-well, i'm very glad you asked.
+well, i'm glad you asked.
 * it has 16 voices of polyphony
 * it supports midi (input)
 * it can save & load patches
@@ -14,7 +14,7 @@ well, i'm very glad you asked.
 
 
 ### what's in a voice?
-* 3 sine, triangle, sawtooth, or pulse oscillators with pitch, detune, level & width controls | 2 algorithms (BLIT, polyBLEP)
+* 3 sine, triangle, sawtooth, or pulse oscillators with pitch, detune, level & width controls | 2 algorithms ([BLIT](https://ccrma.stanford.edu/~stilti/papers/blit.pdf), [polyBLEP](https://mac.kaist.ac.kr/pubs/ValimakiPeknenNam-jasa2012.pdf))
 * 1 state-variable filter with resonance, saturation & drive | 2 types (recursive Chamberlin, ZDF-solved Chamberlin)
 * 2 ADSR envelopes - one for amplitude, one for filter frequency (with bipolar depth control) | .004-4s per stage
 * 4 modulators - 2 LFOs, 2 AR envelopes, with dedicated assignable attenuverters for every parameter
@@ -53,30 +53,33 @@ there's also a stereo tape delay effect on the master bus (voice output + record
     * triangle: morphs the waveform from a sawtooth (w≈0.0), through a triangle (w=0.5), to a ramp (w≈1.0)
     * saw: crossfades between a saw & a second (free-running) saw at twice the fundamental (center is full fundamental)
     * pulse: bog-standard through-zero PWM
-* the stereo delay can be made into a pitch-shifting delay by modulating the time parameter with an LFO
+* the stereo delay can be made into a pitch-shifting delay (or pseudo-chorus) by modulating the time parameter with an LFO
 
 
 
 ### how can i play it?
-* [v0.3.5](https://github.com/rainbow-carrots/subsnake/releases/tag/v0.3.5) is the latest build
+* [v0.3.6](https://github.com/rainbow-carrots/subsnake/releases/tag/v0.3.6) is the latest build
 * click on the version that corresponds to your platform to download the zip, extract, & run! if it doesn't open:
     * __on linux__: right click the file, go to *Properties* -> *Permissions*, and make sure "Allow executing file as program" is checked 
     * __on macos__: you'll need to [authorize the app](https://support.apple.com/guide/mac-help/open-a-mac-app-from-an-unknown-developer-mh40616/mac) when running it for the first time. go to *System Settings* -> *Privacy & Security*, scroll down to the bottom, and choose *Open anyway* (under *Security*)
     * __on windows__: click *More info* on the smartscreen popup and choose *Run anyway* 
 * **note**: on first load, it may take 1-2 minutes for the initial numba compilation step to complete.
 * **note**: this project is in active development. though i test every build prior to release, you may still encounter bugs.
-    * if you do spot something, [let me know](https://github.com/rainbow-carrots/subsnake/issues)
 
 
-### what's on the docket?
+### what else is planned?
 * save & auto-restore midi settings (channel, cc's, parameter mappings)
 * recorder settings panel:
-    * controls for adjusting loop start/end points
-    * control to change input level (currently fixed)
+    * adjustable loop start/end points
+    * input level control (currently fixed)
     * playback speed control
 * synth settings panel:
     * pc keyboard velocity control
     * voice stacking & spread settings
+* oscillators:
+    * [LP-BLIT](https://www.dafx.de/paper-archive/2017/papers/DAFx17_paper_59.pdf) implementation
+    * VOSIM implementation
+    * anti-aliased wavetable oscillator
 * modulators:
     * shape-dependent secondary control (currently sets phase only)
         * phase for sine, saw & ramp
@@ -95,8 +98,8 @@ there's also a stereo tape delay effect on the master bus (voice output + record
     * stereo chorus
     * algorithmic reverb
     * combine effects into single stack
+* mixer:
+    * oscillator panning sub-module
 * isorhythmic pattern generator/sequencer
-* combine oscillators into single stack
-* allow UI theming & saving/loading of themes
 * Lissajous display mode for scope
-* more "factory" patches
+* more patches :3
