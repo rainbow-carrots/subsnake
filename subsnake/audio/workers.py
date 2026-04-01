@@ -41,7 +41,6 @@ class KeyEventWorker(QRunnable):
                     elif (message.type == "control_change") and (message.channel == self.engine.midi_channel):
                         if (message.control in self.engine.midi_cc_functions):
                             self.engine.midi_cc_values.update({message.control: message.value})
-                            print(f"DEBUG: control change #{message.control}, value:{self.engine.midi_cc_values[message.control]}")
                             cc_update_function = self.engine.midi_cc_functions[message.control]
                             cc_update_function(message.value)
                     self.pending_event = None
