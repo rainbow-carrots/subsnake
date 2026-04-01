@@ -23,6 +23,7 @@ engine = AudioEngine()
 app = QApplication(sys.argv)
 window = MainWindow(engine)
 window.setObjectName("main_window")
+window.setMaximumWidth(1600)
 
 #add midi inputs
 if input_list is not None:
