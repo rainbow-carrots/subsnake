@@ -511,9 +511,9 @@ class AudioEngine():
         new_pitch = (float(value)/127.0)*4.0 - 2
         self.update_pitch_1(new_pitch)
 
-    def cc_change_level_1(self, value):
-        new_level = float(value)/127.0
-        self.update_amplitude_1(new_level)
+    def cc_change_detune_1(self, value):
+        new_detune = (float(value)/127.0)*20.0 - 10
+        self.update_detune_1(new_detune)
 
     def cc_change_width_1(self, value):
         new_width = float(value)/127.0
@@ -524,34 +524,39 @@ class AudioEngine():
         new_pitch = (float(value)/127.0)*4.0 - 2
         self.update_pitch_2(new_pitch)
 
-    def cc_change_level_2(self, value):
-        new_level = float(value)/127.0
-        self.update_amplitude_2(new_level)
+    def cc_change_detune_2(self, value):
+        new_detune = (float(value)/127.0)*20.0 - 10
+        self.update_detune_2(new_detune)
 
     def cc_change_width_2(self, value):
         new_width = float(value)/127.0
         self.update_width_2(new_width)
-
-    def cc_change_detune_2(self, value):
-        new_detune = (float(value)/127.0)*20.0 - 10
-        self.update_detune_2(new_detune)
 
     #osc 3
     def cc_change_pitch_3(self, value):
         new_pitch = (float(value)/127.0)*4.0 - 2
         self.update_pitch_3(new_pitch)
 
-    def cc_change_level_3(self, value):
-        new_level = float(value)/127.0
-        self.update_amplitude_3(new_level)
+    def cc_change_detune_3(self, value):
+        new_detune = (float(value)/127.0)*20.0 - 10
+        self.update_detune_3(new_detune)
 
     def cc_change_width_3(self, value):
         new_width = float(value)/127.0
         self.update_width_3(new_width)
 
-    def cc_change_detune_3(self, value):
-        new_detune = (float(value)/127.0)*20.0 - 10
-        self.update_detune_3(new_detune)
+    #mixer
+    def cc_change_level_1(self, value):
+        new_level = float(value)/127.0
+        self.update_amplitude_1(new_level)
+
+    def cc_change_level_2(self, value):
+        new_level = float(value)/127.0
+        self.update_amplitude_2(new_level)
+
+    def cc_change_level_3(self, value):
+        new_level = float(value)/127.0
+        self.update_amplitude_3(new_level)
 
     #filt
     def cc_change_cutoff(self, value):
