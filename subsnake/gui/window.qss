@@ -5,7 +5,7 @@ MainWindow#main_window {
         stop: 0 #b2b2e4,
         stop: 1 #c2b2e0
     );
-    max-height:600px;
+    max-height:540px;
 }
 
 QLCDNumber {
@@ -23,7 +23,6 @@ CoolDial {
 QGroupBox {
     font-family: "Dogica Pixel";
     font-size: 10px;
-    margin-top: 12px;
     background-color: #c1c1e3;
 }
 
@@ -282,9 +281,7 @@ QGroupBox#filt_group, QGroupBox#env_group, QGroupBox#fenv_group, QGroupBox#del_g
 }
 
 QGroupBox#osc_group, QGroupBox#osc2_group, QGroupBox#osc3_group {
-    min-height: 180px;
-    max-height: 180px;
-    margin-top: 38px;
+    max-height: 200px;
 }
 
 ModulatorGUI QGroupBox {
@@ -380,7 +377,8 @@ QWidget#mod_group {
 }
 
 QWidget#osc_view QGroupBox {
-    max-height: 180px;
+    min-width: 380px;
+    max-width: 480px;
 }
 
 QWidget#mod_group QPushButton, QWidget#osc_view QPushButton {
