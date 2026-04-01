@@ -53,8 +53,8 @@ class UpdateGUI(QTimer):
         if (module == "oscillator 1"):
             if (param == "pitch"):
                 cc_slider = self.window.osc_group.osc_freq_slider
-            elif (param == "level"):
-                cc_slider = self.window.osc_group.osc_amp_slider
+            elif (param == "detune"):
+                cc_slider = self.window.osc_group.osc_det_slider
             elif (param == "width"):
                 cc_slider = self.window.osc_group.osc_width_slider
         elif (module == "oscillator 2"):
@@ -62,8 +62,6 @@ class UpdateGUI(QTimer):
                 cc_slider = self.window.osc2_group.osc2_freq_slider
             elif (param == "detune"):
                 cc_slider = self.window.osc2_group.osc2_det_slider
-            elif (param == "level"):
-                cc_slider = self.window.osc2_group.osc2_amp_slider
             elif (param == "width"):
                 cc_slider = self.window.osc2_group.osc2_width_slider
         elif (module == "oscillator 3"):
@@ -71,10 +69,15 @@ class UpdateGUI(QTimer):
                 cc_slider = self.window.osc3_group.osc3_freq_slider
             elif (param == "detune"):
                 cc_slider = self.window.osc3_group.osc3_det_slider
-            elif (param == "level"):
-                cc_slider = self.window.osc3_group.osc3_amp_slider
             elif (param == "width"):
                 cc_slider = self.window.osc3_group.osc3_width_slider
+        elif (module == "mixer"):
+            if (param == "osc 1"):
+                cc_slider = self.window.mix_group.osc1_amp_slider
+            elif (param == "osc 2"):
+                cc_slider = self.window.mix_group.osc2_amp_slider
+            elif (param == "osc 3"):
+                cc_slider = self.window.mix_group.osc3_amp_slider
         elif (module == "filter"):
             if (param == "cutoff"):
                 cc_slider = self.window.filt_group.filt_freq_slider
@@ -138,8 +141,8 @@ class UpdateGUI(QTimer):
         if (module == "oscillator 1"):
             if (param == "pitch"):
                 cc_display = self.window.osc_group.osc_freq_display
-            elif (param == "level"):
-                cc_display = self.window.osc_group.osc_amp_display
+            elif (param == "detune"):
+                cc_display = self.window.osc_group.osc_det_display
             elif (param == "width"):
                 cc_display = self.window.osc_group.osc_width_display
         elif (module == "oscillator 2"):
@@ -147,8 +150,6 @@ class UpdateGUI(QTimer):
                 cc_display = self.window.osc2_group.osc2_freq_display
             elif (param == "detune"):
                 cc_display = self.window.osc2_group.osc2_det_display
-            elif (param == "level"):
-                cc_display = self.window.osc2_group.osc2_amp_display
             elif (param == "width"):
                 cc_display = self.window.osc2_group.osc2_width_display
         elif (module == "oscillator 3"):
@@ -156,10 +157,15 @@ class UpdateGUI(QTimer):
                 cc_display = self.window.osc3_group.osc3_freq_display
             elif (param == "detune"):
                 cc_display = self.window.osc3_group.osc3_det_display
-            elif (param == "level"):
-                cc_display = self.window.osc3_group.osc3_amp_display
             elif (param == "width"):
                 cc_display = self.window.osc3_group.osc3_width_display
+        elif (module == "mixer"):
+            if (param == "osc 1"):
+                cc_display = self.window.mix_group.osc1_amp_display
+            elif (param == "osc 2"):
+                cc_display = self.window.mix_group.osc2_amp_display
+            elif (param == "osc 3"):
+                cc_display = self.window.mix_group.osc3_amp_display
         elif (module == "filter"):
             if (param == "cutoff"):
                 cc_display = self.window.filt_group.filt_freq_display
@@ -222,8 +228,8 @@ class UpdateGUI(QTimer):
         if (module == "oscillator 1"):
             if (param == "pitch"):
                 display_val = float(value)/250.0
-            elif (param == "level"):
-                display_val = float(value)/500.0
+            elif (param == "detune"):
+                display_val = value/20.0
             elif (param == "width"):
                 display_val = float(value)/500.0
             display.display(f"{display_val:.2f}")
@@ -232,8 +238,6 @@ class UpdateGUI(QTimer):
                 display_val = float(value)/100.0
             elif (param == "detune"):
                 display_val = value/20.0
-            elif (param == "level"):
-                display_val = float(value)/500.0
             elif (param == "width"):
                 display_val = float(value)/500.0
             display.display(f"{display_val:.2f}")
@@ -242,10 +246,11 @@ class UpdateGUI(QTimer):
                 display_val = float(value)/100.0
             elif (param == "detune"):
                 display_val = value/20.0
-            elif (param == "level"):
-                display_val = float(value)/500.0
             elif (param == "width"):
                 display_val = float(value)/500.0
+            display.display(f"{display_val:.2f}")
+        elif (module == "mixer"):
+            display_val = float(value)/500.0
             display.display(f"{display_val:.2f}")
         elif (module == "filter"):
             if (param == "cutoff"):
