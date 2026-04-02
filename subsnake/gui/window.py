@@ -62,6 +62,7 @@ class MainWindow(QMainWindow):
         self.recorder = RecorderGUI()
         settings_layout = QHBoxLayout()
         self.settings_group = QGroupBox("settings")
+        self.settings_group.setObjectName("settings_toolbar")
         self.settings_group.setAttribute(Qt.WA_StyledBackground, True)
 
         self.toggle_dark = QPushButton("dark")
@@ -149,9 +150,10 @@ class MainWindow(QMainWindow):
         self.osc_view_layout = QGridLayout()
         self.osc_stack_layout = QStackedLayout()
         self.osc_select_layout = QGridLayout()
-        self.osc_view_layout.setAlignment(Qt.AlignmentFlag.AlignHCenter)
+        self.osc_view_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.osc_stack_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.osc_select_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.osc_view.setAttribute(Qt.WA_StyledBackground, True)
 
         #oscillator select buttons
         self.osc_select_1 = QPushButton("osc 1")
