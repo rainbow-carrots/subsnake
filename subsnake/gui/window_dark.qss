@@ -1,3 +1,6 @@
+/* dark mode UI */
+
+/* main window */
 MainWindow#main_window {
     background-color: #1c0627;
     background: qlineargradient(
@@ -5,43 +8,13 @@ MainWindow#main_window {
         stop: 0 #1c0627,
         stop: 1 #490747
     );
-    max-height:540px;
 }
 
-QLCDNumber {
-    border: none;
-    text-align: right;
-    height: 24px;
-}
-
-CoolDial {
-    max-width: 20px;
-    max-height: 20px;
-    background-color: #bbbbbb;
-}
-
+/* group boxes */
 QGroupBox {
     font-family: "Dogica Pixel";
     font-size: 10px;
     background-color: #380f4d;
-}
-
-QGroupBox QLabel {
-    color: #dfdfef;
-    font-family: "Dogica Pixel";
-    font-size: 9px;
-}
-
-QWidget QLabel {
-    color: #dfdfef;
-}
-
-QGroupBox#recorder QLabel {
-    margin-top: 0px;
-    font-size: 12px;
-}
-
-MainWindow QGroupBox {
     margin-top: 18px;
     margin-bottom: 18px;
     border: 1px solid white;
@@ -50,10 +23,15 @@ MainWindow QGroupBox {
     max-width: 480px;
 }
 
-QScrollArea {
-    background-color: transparent;
-    border-radius: 6px;
-    border: 1px solid white;
+QGroupBox::title {
+    subcontrol-origin: padding;
+    subcontrol-position: top center;
+    color: #dfdfef;
+    top: -9px;
+    min-height: 16px;
+    border-radius: 4px;
+    border: .5px solid white;
+    background-color: #380f4d;
 }
 
 QGroupBox#cc_group {
@@ -63,20 +41,65 @@ QGroupBox#cc_group {
     border: 0px;
 }
 
+QGroupBox#filt_group, QGroupBox#env_group, QGroupBox#fenv_group, QGroupBox#del_group, QWidget#mod_group, QGroupBox#midi_group {
+    min-height: 200px;
+    max-height: 200px;
+}
+
+QGroupBox#osc_group, QGroupBox#osc2_group, QGroupBox#osc3_group {
+    max-height: 180px;
+}
+
+QGroupBox#midi_group, QGroupBox#synth_group {
+    min-height: 200px;
+    max-height: 280px;
+}
+
+QGroupBox#midi_group {
+    min-width:360px;
+}
+
+ModulatorGUI QGroupBox {
+    max-height: 180px;
+}
+
+/* QWidgets */
+QWidget#mod_group, QWidget#settings_group {
+    min-width: 380px;
+    max-width: 480px;
+}
+
+QWidget#settings_group {
+    max-height: 40px;
+}
+
+QWidget#toolbar_widget {
+    max-height: 60px;
+}
+
+QWidget#osc_view {
+    min-height: 240px;
+    max-height: 240px;
+}
+
+/* labels */
+QLabel {
+    color: #dfdfef;
+    font-family: "Dogica Pixel";
+    font-size: 9px;
+}
+
+QGroupBox#recorder QLabel {
+    font-size: 12px;
+}
+
+/* radio buttons */
 QRadioButton {
     color: #dfdfef;
     font-size: 12px;
     spacing: 6px;
     font-family: "Dogica Pixel";
     font-size: 7px;
-}
-
-QGroupBox QSlider {
-    min-height: 18px;
-}
-
-QFrame#grid_space {
-    min-width: 24px;
 }
 
 QRadioButton::indicator {
@@ -117,6 +140,11 @@ QWidget#mod_group QGroupBox#menv1_group QRadioButton::indicator:checked {
 
 QWidget#mod_group QGroupBox#menv2_group QRadioButton::indicator:checked {
     background-color: #ce73ff;
+}
+
+/* sliders */
+QGroupBox QSlider {
+    min-height: 18px;
 }
 
 QGroupBox QSlider::handle {
@@ -260,35 +288,7 @@ QWidget#mod_group QGroupBox#menv2_group QSlider::handle {
     background-color: #ce73ff;
 }
 
-QGroupBox::title {
-    subcontrol-origin: padding;
-    subcontrol-position: top center;
-    color: #dfdfef;
-    top: -9px;
-    min-height: 16px;
-    border-radius: 4px;
-    border: .5px solid white;
-    background-color: #380f4d;
-}
-
-QGroupBox::title#recorder, QGroupBox:title#patch_manager {
-    background-color: #380f4d;
-}
-
-QGroupBox#filt_group, QGroupBox#env_group, QGroupBox#fenv_group, QGroupBox#del_group, QWidget#mod_group, QGroupBox#midi_group {
-    min-height: 200px;
-    max-height: 200px;
-}
-
-QGroupBox#osc_group, QGroupBox#osc2_group, QGroupBox#osc3_group {
-    max-height: 200px;
-}
-
-ModulatorGUI QGroupBox {
-    max-height: 180px;
-    min-width: 360px;
-}
-
+/* push buttons */
 ModulatorGUI QPushButton {
     font-family: "Dogica Pixel";
     font-size: 9px;
@@ -359,29 +359,6 @@ QPushButton#osc3_select:hover {
     background-color: #77d9b2;
 }
 
-QGroupBox#midi_group, QGroupBox#synth_group {
-    min-height: 200px;
-    max-height: 280px;
-}
-
-QGroupBox#midi_group {
-    min-width:360px;
-}
-
-QGroupBox#midi_group QComboBox {
-    max-width: 120px;
-}
-
-QWidget#mod_group {
-    min-width: 380px;
-    max-width: 480px;
-}
-
-QWidget#osc_view QGroupBox {
-    min-width: 380px;
-    max-width: 480px;
-}
-
 QWidget#mod_group QPushButton, QWidget#osc_view QPushButton {
     color: black;
     width: 48px;
@@ -406,15 +383,7 @@ QPushButton#midi_refresh:hover, QGroupBox#cc_group QPushButton:hover {
     color: black;
 }
 
-QPushButton#midi_refresh {
-    background-color: transparent;
-}
-
-QPushButton#cc_add {
-    background-color: transparent;
-}
-
-QPushButton#cc_delete {
+QPushButton#midi_refresh, QPushButton#cc_add, QPushButton#cc_delete {
     background-color: transparent;
 }
 
@@ -430,7 +399,7 @@ QPushButton#cc_delete:hover {
     background-color: #c77581;
 }
 
-QPushButton#toggle_midi, QPushButton#toggle_synth, QPushButton#toggle_record, QPushButton#toggle_dark, QPushButton#toggle_scope {
+QGroupBox#settings_toolbar QPushButton {
     max-height: 36px;
     color: #dfdfef;
     border: 1px solid white;
@@ -510,14 +479,6 @@ QPushButton#toggle_dark:hover {
     color: black;
 }
 
-PatchManager#patch_manager {
-    border: 1px solid white;
-    border-radius: 6px;
-    max-height: 40px;
-    min-width: 380px;
-    max-width: 480px;
-}
-
 PatchManager QPushButton {
     background-color: none;
     width: 60px;
@@ -549,14 +510,6 @@ QPushButton#save_patch:pressed {
     color: black;
 }
 
-RecorderGUI#recorder {
-    border: 1px solid white;
-    border-radius: 6px;
-    min-width: 380px;
-    max-width: 480px;
-    max-height: 40px;
-}
-
 RecorderGUI QPushButton {
     max-width: 30px;
     min-width: 30px;
@@ -564,21 +517,6 @@ RecorderGUI QPushButton {
     color: #dfdfef;
     border: 1px solid white;
     border-radius: 6px;
-}
-
-QWidget#settings_group {
-    min-width: 380px;
-    max-width: 480px;
-    max-height: 40px;
-}
-
-QWidget#toolbar_widget {
-    max-height: 60px;
-}
-
-QFrame#record_spacer {
-    min-width:12px;
-    max-width:12px;
 }
 
 QPushButton#record_button, QPushButton#play_button, QPushButton#stop_button, QPushButton#delete_button {
@@ -625,8 +563,63 @@ QGroupBox#record_group QPushButton:hover {
     background-color: #82eaaa;
 }
 
+/* graphics view (scope) */
 QGraphicsView {
     background-color: none;
     background: transparent;
     border: none;
+}
+
+/* recorder */
+RecorderGUI#recorder {
+    border: 1px solid white;
+    border-radius: 6px;
+    min-width: 380px;
+    max-width: 480px;
+    max-height: 40px;
+}
+
+/* patch manager */
+PatchManager#patch_manager {
+    border: 1px solid white;
+    border-radius: 6px;
+    max-height: 40px;
+    min-width: 380px;
+    max-width: 480px;
+}
+
+/* combo boxes */
+QGroupBox#midi_group QComboBox {
+    max-width: 120px;
+}
+
+/* displays */
+QLCDNumber {
+    border: none;
+    text-align: right;
+    height: 24px;
+}
+
+/* mod dials */
+CoolDial {
+    max-width: 20px;
+    max-height: 20px;
+    background-color: #bbbbbb;
+}
+
+/* scroll area (midi) */
+QScrollArea {
+    background-color: transparent;
+    border-radius: 6px;
+    border: 1px solid white;
+}
+
+/* QFrame (spacers) */
+QFrame#grid_space {
+    min-width: 24px;
+}
+
+QFrame#record_spacer {
+    min-width:12px;
+    max-width:12px;
 }
