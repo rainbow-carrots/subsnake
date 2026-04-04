@@ -135,6 +135,21 @@ class AudioRecorder():
             self.put_stop[0] = False
             self.event_queue.put_nowait("stop")
 
+class Panner():
+    def __init__(self):
+        self.position = 0.0
+        test_data = np.zeros((16, 2), dtype=np.float32)
+        mod_test = np.zeros((16), dtype=np.float32)
+        mod_test_val = np.float32(0.0)
+        pan_samples(test_data, test_data, self.position, mod_test, mod_test_val)
+
+    def process_block(self, indata, outdata, pan_mod, pm_amt):
+        pan_samples(indata, outdata, self.position, pan_mod, pm_amt)
+
+    def update_position(self, new_pos):
+        self.position = new_pos
+
+
 #numba DSP
 # delay
 @njit(nogil=True, fastmath=True, cache=True, inline="always")
@@ -212,4 +227,15 @@ def process_samples(rec_buffer, indata, outdata, frames, paused, stopped, record
                         stopped[0] = True
                         record[0] = False
                 outdata[n, c] = read_sample*output_level_smooth[0, c]
+
+# stereo panner
+@njit(nogil=True, fastmath=True, cache=True)
+def pan_samples(indata, outdata, position, pan_mod, pm_amt):
+    frames = len(indata)
+    for n in range(0, frames):
+        mod_pos = max(-1.0, min(1.0, position + pan_mod[n]*pm_amt))
+        L_pos = 1.0 - mod_pos
+        R_pos = 1.0 + mod_pos
+        outdata[n, 0] = indata[n, 0]*L_pos
+        outdata[n, 1] = indata[n, 1]*R_pos
 
