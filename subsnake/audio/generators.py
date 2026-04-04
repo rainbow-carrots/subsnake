@@ -284,7 +284,7 @@ def polyblep_triangle(state, integrator, smoothed_width, hpf, outdata, state2, w
 
 #-BLIT
 #--anti-aliased sawtooth
-@njit(nogil=True, fastmath=True, cache=True)
+@njit(nogil=True, fastmath=True, cache=True, inline="always")
 def blit_saw(outdata, states, integrators, width,
                 walk_mod, walk_amt, pitch_mod, det_mod, amp_mod, width_mod, pm_amt, dm_amt, am_amt, wm_amt, amp=1.0, freq=440.0):
     frames = len(outdata)
@@ -327,7 +327,7 @@ def blit_saw(outdata, states, integrators, width,
             outdata[n, c] = output_sample*mod_amp
 
 #--anti-aliased pulse
-@njit(nogil=True, fastmath=True, cache=True)
+@njit(nogil=True, fastmath=True, cache=True, inline="always")
 def blit_pulse(outdata, states, integrators, smoothed_widths,
                 walk_mod, walk_amt, pitch_mod, det_mod, amp_mod, width_mod, pm_amt, dm_amt, am_amt, wm_amt, amp=1.0, freq=440.0, width=0.5):
     frames = len(outdata)
@@ -367,7 +367,7 @@ def blit_pulse(outdata, states, integrators, smoothed_widths,
 
 #--anti-aliased trisaw (BLIT)
 #---(width=0.5: triangle, width≈0.0: sawtooth, width≈1.0: ramp)
-@njit(nogil=True, fastmath=True, cache=True)
+@njit(nogil=True, fastmath=True, cache=True, inline="always")
 def blit_triangle(outdata, states, integrators, smoothed_widths, followers,
                 walk_mod, walk_amt, pitch_mod, det_mod, amp_mod, width_mod, pm_amt, dm_amt, am_amt, wm_amt, amp=1.0, freq=440.0, width=0.5):
     frames = len(outdata)
