@@ -77,7 +77,7 @@ QWidget#toolbar_widget {
     max-height: 60px;
 }
 
-QWidget#osc_view {
+QWidget#osc_view, QWidget#mixer_group {
     min-height: 240px;
     max-height: 240px;
 }
@@ -200,15 +200,15 @@ QGroupBox#synth_group QSlider::sub-page {
     background-color: #ff8d8d;
 }
 
-QSlider::sub-page#osc1_amp_slider {
+QSlider::sub-page#osc1_amp_slider, QSlider::sub-page#osc1_pan_slider {
     background-color: #7ab5f0;
 }
 
-QSlider::sub-page#osc2_amp_slider {
+QSlider::sub-page#osc2_amp_slider, QSlider::sub-page#osc2_pan_slider {
     background-color: #77d9cf;
 }
 
-QSlider::sub-page#osc3_amp_slider {
+QSlider::sub-page#osc3_amp_slider, QSlider::sub-page#osc3_pan_slider {
     background-color: #77d9b2;
 }
 
@@ -260,15 +260,15 @@ QGroupBox#synth_group QSlider::handle {
     background-color: #f66767;
 }
 
-QSlider::handle#osc1_amp_slider {
+QSlider::handle#osc1_amp_slider, QSlider::handle#osc1_pan_slider {
     background-color: #56a6f6;
 }
 
-QSlider::handle#osc2_amp_slider {
+QSlider::handle#osc2_amp_slider, QSlider::handle#osc2_pan_slider {
     background-color: #2bd6c5;
 }
 
-QSlider::handle#osc3_amp_slider {
+QSlider::handle#osc3_amp_slider, QSlider::handle#osc3_pan_slider {
     background-color: #2bd6ae;
 }
 
@@ -322,12 +322,24 @@ QPushButton#osc3_select {
     background-color: #86e7c0;
 }
 
+QPushButton#mix_select {
+    background-color: #e070ff;
+}
+
+QPushButton#pan_select {
+    background-color: #f370ff;
+}
+
 QPushButton#lfo1_button:checked, QPushButton#lfo2_button:checked, QPushButton#menv1_button:checked, QPushButton#menv2_button:checked {
     border-color: black;
     color: black;
 }
 
 QPushButton#osc1_select:checked, QPushButton#osc2_select:checked, QPushButton#osc3_select:checked {
+    border-color: black;
+}
+
+QPushButton#mix_select:checked, QPushButton#pan_select:checked {
     border-color: black;
 }
 
@@ -359,9 +371,18 @@ QPushButton#osc3_select:hover {
     background-color: #77d9b2;
 }
 
-QWidget#mod_group QPushButton, QWidget#osc_view QPushButton {
+QPushButton#mix_select:hover {
+    background-color: #db5efe;
+}
+
+QPushButton#pan_select:hover {
+    background-color: #e958f6;
+}
+
+QWidget#mod_group QPushButton, QWidget#osc_view QPushButton, QWidget#mixer_group QPushButton {
     color: black;
     width: 48px;
+    max-width: 48px;
     height: 16px;
     border: 1px solid white;
     border-radius: 6px;
