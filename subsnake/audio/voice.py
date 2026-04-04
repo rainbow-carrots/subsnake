@@ -3,6 +3,7 @@ from .generators import WrappedOsc
 from .filters import HalSVF, ZDFSVF
 from .envelopes import ADSR
 from .modulators import LFO, ModEnv
+from .effects import Panner
 
 fs = 44100
 
@@ -53,6 +54,10 @@ class Voice():
         self.osc3_mod_buffers.append(self.assign_mod_buffer(self.mod_dial_modes["osc3_det"]))
         self.osc3_mod_buffers.append(self.assign_mod_buffer(self.mod_dial_modes["osc3_amp"]))
         self.osc3_mod_buffers.append(self.assign_mod_buffer(self.mod_dial_modes["osc3_width"]))
+         #panners
+        self.osc1_pan_buffer = [self.assign_mod_buffer(self.mod_dial_modes["osc_pan"])]
+        self.osc2_pan_buffer = [self.assign_mod_buffer(self.mod_dial_modes["osc2_pan"])]
+        self.osc3_pan_buffer = [self.assign_mod_buffer(self.mod_dial_modes["osc3_pan"])]
          #filter envelope
         self.fenv_mod_buffers = [self.assign_mod_buffer(self.mod_dial_modes["fenv_att"])]
         self.fenv_mod_buffers.append(self.assign_mod_buffer(self.mod_dial_modes["fenv_dec"]))
@@ -83,6 +88,10 @@ class Voice():
                             self.mod_dial_values["osc2_amp"], self.mod_dial_values["osc2_width"]]
         self.osc3_mod_values = [self.mod_dial_values["osc3_freq"], self.mod_dial_values["osc3_det"],
                             self.mod_dial_values["osc3_amp"], self.mod_dial_values["osc3_width"]]
+         #panners
+        self.osc1_pan_value = [self.mod_dial_values["osc_pan"]]
+        self.osc2_pan_value = [self.mod_dial_values["osc2_pan"]]
+        self.osc3_pan_value = [self.mod_dial_values["osc3_pan"]]
          #filter env
         self.fenv_mod_values = [self.mod_dial_values["fenv_att"], self.mod_dial_values["fenv_dec"],
                             self.mod_dial_values["fenv_sus"], self.mod_dial_values["fenv_rel"]]
@@ -97,6 +106,9 @@ class Voice():
         self.osc = WrappedOsc(2, 0.5, 55, fs, .5)
         self.osc2 = WrappedOsc(2, 0.5, 55, fs, .5)
         self.osc3 = WrappedOsc(2, 0.5, 55, fs, .5)
+        self.pan1 = Panner()
+        self.pan2 = Panner()
+        self.pan3 = Panner()
         self.filt = HalSVF(0.0, 3520, 10, 1.0)
         self.filt2 = ZDFSVF()
         self.env = ADSR(.01, 1.0, 0.5, 1.0)
@@ -131,12 +143,15 @@ class Voice():
             #oscillators
             # 1
             self.osc.process_block(self.osc_out[:frames], self.osc1_mod_buffers, self.osc1_mod_values)
+            self.pan1.process_block(self.osc_out[:frames], self.osc_out[:frames], self.osc1_pan_buffer[0], self.osc1_pan_value[0])
             self.osc_out *= 0.33
             # 2
             self.osc2.process_block(self.osc2_out[:frames], self.osc2_mod_buffers, self.osc2_mod_values)
+            self.pan2.process_block(self.osc2_out[:frames], self.osc2_out[:frames], self.osc2_pan_buffer[0], self.osc2_pan_value[0])
             self.osc2_out *= 0.33
             # 3
             self.osc3.process_block(self.osc3_out[:frames], self.osc3_mod_buffers, self.osc3_mod_values)
+            self.pan3.process_block(self.osc3_out[:frames], self.osc3_out[:frames], self.osc3_pan_buffer[0], self.osc3_pan_value[0])
             self.osc3_out *= 0.33
             # sum
             self.osc_out += self.osc2_out
@@ -174,6 +189,8 @@ class Voice():
                     self.osc2_mod_buffers[2] = new_buffer
                 elif name.endswith("width"):
                     self.osc2_mod_buffers[3] = new_buffer
+                elif name.endswith("pan"):
+                    self.osc2_pan_buffer[0] = new_buffer
             elif "3" in name:
                 if name.endswith("freq"):
                     self.osc3_mod_buffers[0] = new_buffer
@@ -183,6 +200,8 @@ class Voice():
                     self.osc3_mod_buffers[2] = new_buffer
                 elif name.endswith("width"):
                     self.osc3_mod_buffers[3] = new_buffer
+                elif name.endswith("pan"):
+                    self.osc3_pan_buffer[0] = new_buffer
             else:
                 if name.endswith("freq"):
                     self.osc1_mod_buffers[0] = new_buffer
@@ -192,6 +211,8 @@ class Voice():
                     self.osc1_mod_buffers[2] = new_buffer
                 elif name.endswith("width"):
                     self.osc1_mod_buffers[3] = new_buffer
+                elif name.endswith("pan"):
+                    self.osc1_pan_buffer[0] = new_buffer
         elif name.startswith("filt"):
             if name.endswith("freq"):
                 self.filt_mod_buffers[0] = new_buffer
@@ -255,6 +276,8 @@ class Voice():
                     self.osc2_mod_values[2] = value
                 elif name.endswith("width"):
                     self.osc2_mod_values[3] = value
+                elif name.endswith("pan"):
+                    self.osc2_pan_value[0] = value
             elif "3" in name:
                 if name.endswith("freq"):
                     self.osc3_mod_values[0] = value
@@ -264,6 +287,8 @@ class Voice():
                     self.osc3_mod_values[2] = value
                 elif name.endswith("width"):
                     self.osc3_mod_values[3] = value
+                elif name.endswith("pan"):
+                    self.osc3_pan_value[0] = value
             else:
                 if name.endswith("freq"):
                     self.osc1_mod_values[0] = value
@@ -273,6 +298,8 @@ class Voice():
                     self.osc1_mod_values[2] = value
                 elif name.endswith("width"):
                     self.osc1_mod_values[3] = value
+                elif name.endswith("pan"):
+                    self.osc1_pan_value[0] = value
         elif name.startswith("filt"):
             if name.endswith("freq"):
                 self.filt_mod_values[0] = value
