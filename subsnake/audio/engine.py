@@ -33,6 +33,7 @@ class AudioEngine():
         self.mod_dial_values = {"osc_freq": 0.0, "osc_det": 0.0, "osc_amp": 0.0, "osc_width": 0.0,
                                 "osc2_freq": 0.0, "osc2_det": 0.0, "osc2_amp": 0.0, "osc2_width": 0.0,
                                 "osc3_freq": 0.0, "osc3_det": 0.0, "osc3_amp": 0.0, "osc3_width": 0.0,
+                                "osc_pan": 0.0, "osc2_pan": 0.0, "osc3_pan": 0.0,
                                 "filt_freq": 0.0, "filt_res": 0.0, "filt_drive": 0.0, "filt_sat": 0.0,
                                 "fenv_att": 0.0, "fenv_dec": 0.0, "fenv_sus": 0.0, "fenv_rel": 0.0, "fenv_amt": 0.0,
                                 "env_att": 0.0, "env_dec": 0.0, "env_sus": 0.0, "env_rel": 0.0,
@@ -43,6 +44,7 @@ class AudioEngine():
         self.mod_dial_modes =  {"osc_freq": 0, "osc_det": 0, "osc_amp": 0, "osc_width": 0,
                                 "osc2_freq": 0, "osc2_det": 0, "osc2_amp": 0, "osc2_width": 0,
                                 "osc3_freq": 0, "osc3_det": 0, "osc3_amp": 0, "osc3_width": 0,
+                                "osc_pan": 0, "osc2_pan": 0, "osc3_pan": 0,
                                 "filt_freq": 0, "filt_res": 0, "filt_drive": 0, "filt_sat": 0,
                                 "fenv_att": 0, "fenv_dec": 0, "fenv_sus": 0, "fenv_rel": 0, "fenv_amt": 0,
                                 "env_att": 0, "env_dec": 0, "env_sus": 0, "env_rel": 0,
@@ -207,6 +209,7 @@ class AudioEngine():
 
         # delay mod buffers
         self.delay.process_block(outdata, outdata, self.del_mod_buffers, self.del_mod_values)
+        # limit output
         outdata *= 0.288675
         outdata = np.tanh(outdata)
 
@@ -318,18 +321,6 @@ class AudioEngine():
             voice.osc3.update_pitch(new_pitch)
         self.detune_3 = detune
 
-    def update_amplitude_1(self, newAmp):
-        for voice in self.voices:
-            voice.osc.update_amplitude(newAmp)
-
-    def update_amplitude_2(self, newAmp):
-        for voice in self.voices:
-            voice.osc2.update_amplitude(newAmp)
-
-    def update_amplitude_3(self, newAmp):
-        for voice in self.voices:
-            voice.osc3.update_amplitude(newAmp)
-
     def update_width_1(self, newWidth):
         for voice in self.voices:
             voice.osc.update_width(newWidth)
@@ -350,6 +341,32 @@ class AudioEngine():
                 voice.osc2.update_algorithm(newAlg)
             elif (osc == 3):
                 voice.osc3.update_algorithm(newAlg)
+
+    # mix
+    def update_amplitude_1(self, newAmp):
+        for voice in self.voices:
+            voice.osc.update_amplitude(newAmp)
+
+    def update_amplitude_2(self, newAmp):
+        for voice in self.voices:
+            voice.osc2.update_amplitude(newAmp)
+
+    def update_amplitude_3(self, newAmp):
+        for voice in self.voices:
+            voice.osc3.update_amplitude(newAmp)
+
+    # pan
+    def update_pan_1(self, newPan):
+        for voice in self.voices:
+            voice.pan1.update_position(newPan)
+
+    def update_pan_2(self, newPan):
+        for voice in self.voices:
+            voice.pan2.update_position(newPan)
+
+    def update_pan_3(self, newPan):
+        for voice in self.voices:
+            voice.pan3.update_position(newPan)
     
     # filter
     def update_cutoff(self, newFreq):
