@@ -21,7 +21,6 @@ class MIDIControl(QWidget):
 
         while self.prev_cc in self.row_ccs.values():
             self.prev_cc += 1
-            print(f"new cc: {self.prev_cc}")
 
         #layout
         layout = QGridLayout()
@@ -43,7 +42,8 @@ class MIDIControl(QWidget):
         self.param_select.installEventFilter(self)
 
         #param name LUT
-        self.param_names = [["pitch", "detune", "width"], ["pitch", "detune", "width"], ["pitch", "detune", "width"], ["osc 1", "osc 2", "osc 3"],
+        self.param_names = [["pitch", "detune", "width"], ["pitch", "detune", "width"], ["pitch", "detune", "width"],
+                            ["osc 1", "osc 2", "osc 3"], ["pan 1", "pan 2", "pan 3"],
                             ["cutoff", "feedback", "drive", "saturate"], ["attack", "decay", "sustain", "release", "depth"],
                             ["attack", "decay", "sustain", "release"], ["time", "feedback", "mix"],
                             ["speed", "phase"], ["speed", "phase"], ["attack", "release"], ["attack", "release"]]
@@ -51,7 +51,7 @@ class MIDIControl(QWidget):
         #init widgets
         self.cc_select.setRange(0, 127)
         self.cc_select.setValue(self.prev_cc)
-        self.module_select.addItems(["oscillator 1", "oscillator 2", "oscillator 3", "mixer", "filter", "filter env", "envelope", "delay",
+        self.module_select.addItems(["oscillator 1", "oscillator 2", "oscillator 3", "mixer", "panner", "filter", "filter env", "envelope", "delay",
                                      "lfo 1", "lfo 2", "menv 1", "menv 2"])
         self.module_select.setCurrentIndex(0)
         self.param_select.addItems(self.param_names[0])
