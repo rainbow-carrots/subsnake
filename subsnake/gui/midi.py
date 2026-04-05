@@ -125,7 +125,6 @@ class MIDISettings(QGroupBox):
         self.cc_rows += 1
         new_cc.row = self.cc_rows
         self.row_ccs.update({new_cc.row: cc_val})
-        print(self.row_ccs)
         self.cc_stack.addWidget(new_cc, self.cc_rows, 0)
         new_cc.cc_changed.connect(self.update_cc)
         new_cc.param_changed.connect(self.update_param)
@@ -134,7 +133,6 @@ class MIDISettings(QGroupBox):
 
     def update_cc(self, new_cc, old_cc, param, module, row):
         self.row_ccs.update({row: new_cc})
-        print(self.row_ccs)
         self.cc_changed.emit(new_cc, old_cc, param, module)
 
     def update_param(self, cc, new_param, module):
