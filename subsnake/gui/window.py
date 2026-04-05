@@ -711,6 +711,13 @@ class MainWindow(QMainWindow):
                 cc_function = self.engine.cc_change_level_2
             elif (param == "osc 3"):
                 cc_function = self.engine.cc_change_level_3
+        elif (module == "panner"):
+            if (param == "pan 1"):
+                cc_function = self.engine.cc_change_pan_1
+            elif (param == "pan 2"):
+                cc_function = self.engine.cc_change_pan_2
+            elif (param == "pan 3"):
+                cc_function = self.engine.cc_change_pan_3
         elif (module == "filter"):
             if (param == "cutoff"):
                 cc_function = self.engine.cc_change_cutoff
