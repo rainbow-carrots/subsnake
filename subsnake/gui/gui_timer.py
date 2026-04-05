@@ -78,6 +78,13 @@ class UpdateGUI(QTimer):
                 cc_slider = self.window.mix_group.osc2_amp_slider
             elif (param == "osc 3"):
                 cc_slider = self.window.mix_group.osc3_amp_slider
+        elif (module == "panner"):
+            if (param == "pan 1"):
+                cc_slider = self.window.mix_group.osc1_pan_slider
+            elif (param == "pan 2"):
+                cc_slider = self.window.mix_group.osc2_pan_slider
+            elif (param == "pan 3"):
+                cc_slider = self.window.mix_group.osc3_pan_slider
         elif (module == "filter"):
             if (param == "cutoff"):
                 cc_slider = self.window.filt_group.filt_freq_slider
@@ -166,6 +173,13 @@ class UpdateGUI(QTimer):
                 cc_display = self.window.mix_group.osc2_amp_display
             elif (param == "osc 3"):
                 cc_display = self.window.mix_group.osc3_amp_display
+        elif (module == "panner"):
+            if (param == "pan 1"):
+                cc_display = self.window.mix_group.osc1_pan_display
+            elif (param == "pan 2"):
+                cc_display = self.window.mix_group.osc2_pan_display
+            elif (param == "pan 3"):
+                cc_display = self.window.mix_group.osc3_pan_display
         elif (module == "filter"):
             if (param == "cutoff"):
                 cc_display = self.window.filt_group.filt_freq_display
@@ -251,6 +265,9 @@ class UpdateGUI(QTimer):
             display.display(f"{display_val:.2f}")
         elif (module == "mixer"):
             display_val = float(value)/500.0
+            display.display(f"{display_val:.2f}")
+        elif (module == "panner"):
+            display_val = float(value)/250.0
             display.display(f"{display_val:.2f}")
         elif (module == "filter"):
             if (param == "cutoff"):
