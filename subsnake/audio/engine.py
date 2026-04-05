@@ -563,6 +563,7 @@ class AudioEngine():
         self.update_width_3(new_width)
 
     #mixer
+    # mix
     def cc_change_level_1(self, value):
         new_level = float(value)/127.0
         self.update_amplitude_1(new_level)
@@ -574,6 +575,19 @@ class AudioEngine():
     def cc_change_level_3(self, value):
         new_level = float(value)/127.0
         self.update_amplitude_3(new_level)
+
+    # pan
+    def cc_change_pan_1(self, value):
+        new_pan = float(value)/64.0 - 1.0
+        self.update_pan_1(new_pan)
+
+    def cc_change_pan_2(self, value):
+        new_pan = float(value)/64.0 - 1.0
+        self.update_pan_2(new_pan)
+
+    def cc_change_pan_3(self, value):
+        new_pan = float(value)/64.0 - 1.0
+        self.update_pan_3(new_pan)
 
     #filt
     def cc_change_cutoff(self, value):
@@ -595,7 +609,6 @@ class AudioEngine():
     #filter env
     def cc_change_fenv_attack(self, value):
         new_attack = (float(value)/32.0) + oott
-        print(new_attack)
         self.update_fenv_attack(new_attack)
 
     def cc_change_fenv_decay(self, value):
