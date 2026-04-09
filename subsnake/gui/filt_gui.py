@@ -169,11 +169,15 @@ class FilterGUI(QGroupBox):
 
     def update_mode(self, newMode):
         self.mode = newMode
+        self.change_freq(self.filt_freq_slider.value())
         self.mode_changed.emit(newMode)
 
     #slots
     def change_freq(self, value):
-        newFreq = 27.5 * 2**(float(value)/100.0)
+        if self.mode == 0:
+            newFreq = 27.5 * 2**(float(value)/100.0)
+        else:
+            newFreq = 27.5 * 2**(float(value)/95.0)
         self.filt_freq_display.display(f"{newFreq:.1f}")
         self.freq_changed.emit(newFreq)
 
@@ -226,6 +230,7 @@ class FilterGUI(QGroupBox):
                     type_text = "Chamberlin"
                 elif self.mode == 1:
                     type_text = "ZDF"
+                self.change_freq(self.filt_freq_slider.value())
                 self.mode_changed.emit(self.mode)
                 QToolTip.showText(event.globalPos(), type_text)
                 event.accept()
