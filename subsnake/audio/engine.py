@@ -84,6 +84,7 @@ class AudioEngine():
         self.detune_1 = 0.0
         self.detune_2 = 0.0
         self.detune_3 = 0.0
+        self.filt_mode = 0
         self.midi_in_queue = queue.SimpleQueue()
         self.frame_times = queue.SimpleQueue()
         self.pending_event = None
@@ -400,6 +401,7 @@ class AudioEngine():
             voice.filt2.update_key_tracking(newTrack)
 
     def update_mode(self, newMode):
+        self.filt_mode = newMode
         for voice in self.voices:
             voice.filt_mode = newMode
 
@@ -591,7 +593,10 @@ class AudioEngine():
 
     #filt
     def cc_change_cutoff(self, value):
-        new_freq = 27.5 * 2**((float(value)/127.0)*8.0)
+        if self.filt_mode == 0:
+            new_freq = 27.5 * 2**((float(value)/127.0)*9.0)
+        else:
+            new_freq = 27.5 * 2**((float(value)/120.65)*9.0)
         self.update_cutoff(new_freq)
 
     def cc_change_resonance(self, value):
