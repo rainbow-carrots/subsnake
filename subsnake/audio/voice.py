@@ -17,6 +17,7 @@ class Voice():
         self.osc_out = np.ascontiguousarray(np.zeros((2048, 2), dtype=np.float32))
         self.osc2_out = np.ascontiguousarray(np.zeros((2048, 2), dtype=np.float32))
         self.osc3_out = np.ascontiguousarray(np.zeros((2048, 2), dtype=np.float32))
+        self.osc_sum = np.ascontiguousarray(np.zeros((2048, 2), dtype=np.float32))
         self.filt_out = np.ascontiguousarray(np.zeros((2048, 2), dtype=np.float32))
         self.voice_output = np.ascontiguousarray(np.zeros((2048, 2), dtype=np.float32))
 
@@ -144,27 +145,26 @@ class Voice():
             # 1
             self.osc.process_block(self.osc_out[:frames], self.osc1_mod_buffers, self.osc1_mod_values)
             self.pan1.process_block(self.osc_out[:frames], self.osc_out[:frames], self.osc1_pan_buffer[0], self.osc1_pan_value[0])
-            self.osc_out *= 0.33
             # 2
             self.osc2.process_block(self.osc2_out[:frames], self.osc2_mod_buffers, self.osc2_mod_values)
             self.pan2.process_block(self.osc2_out[:frames], self.osc2_out[:frames], self.osc2_pan_buffer[0], self.osc2_pan_value[0])
-            self.osc2_out *= 0.33
             # 3
             self.osc3.process_block(self.osc3_out[:frames], self.osc3_mod_buffers, self.osc3_mod_values)
             self.pan3.process_block(self.osc3_out[:frames], self.osc3_out[:frames], self.osc3_pan_buffer[0], self.osc3_pan_value[0])
-            self.osc3_out *= 0.33
-            # sum
-            self.osc_out += self.osc2_out
-            self.osc_out += self.osc3_out
+            # sum & scale
+            self.osc_sum = self.osc_out
+            self.osc_sum += self.osc2_out
+            self.osc_sum += self.osc3_out
+            self.osc_sum *= 0.33
 
             # filter envelope
             self.fenv.process_block(self.fenv_in[:frames], self.fenv_out[:frames], self.fenv_mod_buffers, self.fenv_mod_values)
 
             # filter
             if self.filt_mode == 0:
-                self.filt.process_block(self.osc_out[:frames], self.filt_out[:frames], self.fenv_out[:frames], self.filt_mod_buffers, self.filt_mod_values)
+                self.filt.process_block(self.osc_sum[:frames], self.filt_out[:frames], self.fenv_out[:frames], self.filt_mod_buffers, self.filt_mod_values)
             else:
-                self.filt2.process_block(self.osc_out[:frames], self.filt_out[:frames], self.fenv_out[:frames], self.filt_mod_buffers, self.filt_mod_values)
+                self.filt2.process_block(self.osc_sum[:frames], self.filt_out[:frames], self.fenv_out[:frames], self.filt_mod_buffers, self.filt_mod_values)
 
             # amplitude envelope
             self.env.process_block(self.filt_out[:frames], output, self.env_mod_buffers, self.env_mod_values)
