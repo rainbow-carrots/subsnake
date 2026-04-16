@@ -60,6 +60,7 @@ jobs:
         fi
 
     - name: Upload Binaries to Release
+      id: gh_release
       uses: softprops/action-gh-release@v2
       if: startsWith(github.ref, 'refs/tags/')
       with:
@@ -73,3 +74,4 @@ jobs:
         vt_api_key: ${{ secrets.VT_API_KEY }}
         file_globs: dist/${{ matrix.artifact_name }}
         update_release: true
+        release_id: ${{ steps.gh_release.outputs.id }}
