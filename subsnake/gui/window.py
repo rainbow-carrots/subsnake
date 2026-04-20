@@ -44,6 +44,7 @@ class MainWindow(QMainWindow):
         self.engine = engine
         self.display_color = QColor("black")
         self.key_to_note = {}
+        self.key_velocity = 127
         self.osc_drop_shadow = self.configure_drop_shadow(QGraphicsDropShadowEffect(), QColor("#1c0627"))
         self.mix_drop_shadow = self.configure_drop_shadow(QGraphicsDropShadowEffect(), QColor("#1c0627"))
         self.seq_drop_shadow = self.configure_drop_shadow(QGraphicsDropShadowEffect(), QColor("#1c0627"))
@@ -472,6 +473,7 @@ class MainWindow(QMainWindow):
         # synth settings
         self.synth_group.drift_changed.connect(self.update_osc_drift)
         self.synth_group.key_tracking_changed.connect(self.update_key_tracking)
+        self.synth_group.key_velocity_changed.connect(self.update_key_velocity)
 
         self.setCentralWidget(window_widget)
 
@@ -523,8 +525,6 @@ class MainWindow(QMainWindow):
         self.scope_group.scope_glow.setColor(color)
     
     def init_sliders_dict(self):
-        self.param_sliders.update({"osc_drift": self.synth_group.drift_slider})
-
         self.param_sliders.update({"osc_freq": self.osc_group.osc_freq_slider})
         self.param_sliders.update({"osc_det": self.osc_group.osc_det_slider})
         self.param_sliders.update({"osc_width": self.osc_group.osc_width_slider})
@@ -578,7 +578,9 @@ class MainWindow(QMainWindow):
         self.param_sliders.update({"menv2_att": self.mod_group.menv_att_slider_2})
         self.param_sliders.update({"menv2_rel": self.mod_group.menv_rel_slider_2})
 
+        self.param_sliders.update({"osc_drift": self.synth_group.drift_slider})
         self.param_sliders.update({"kt_amt": self.synth_group.key_tracking_slider})
+        self.param_sliders.update({"kv_amt": self.synth_group.key_velocity_slider})
     
     def init_buttons_dict(self):
         self.param_button_groups.append(self.osc_group.osc_alg_group)
@@ -836,6 +838,7 @@ class MainWindow(QMainWindow):
         #synth settings
         self.set_palette(self.synth_group.drift_display)
         self.set_palette(self.synth_group.key_tracking_display)
+        self.set_palette(self.synth_group.key_velocity_display)
 
     #slots
     # toggle dark mode
@@ -985,9 +988,6 @@ class MainWindow(QMainWindow):
             newAlg = 3.0
         self.engine.update_type(newAlg)
 
-    def update_key_tracking(self, value):
-        self.engine.update_key_tracking(value)
-
     def update_filt_mode(self, newMode):
         self.engine.update_mode(newMode)
 
@@ -1000,10 +1000,6 @@ class MainWindow(QMainWindow):
             self.osc_stack_layout.setCurrentIndex(1)
         elif button_text == "osc 3":
             self.osc_stack_layout.setCurrentIndex(2)
-
-    # oscillator drift
-    def update_osc_drift(self, value):
-        self.engine.update_osc_drift(value)
 
     # oscillator type (algorithm)
     def update_osc_type(self, osc, new_type):
@@ -1176,6 +1172,16 @@ class MainWindow(QMainWindow):
     def update_menv2_mode(self, value):
         self.engine.update_menv2_mode(value)
 
+    # synth settings
+    def update_osc_drift(self, value):
+        self.engine.update_osc_drift(value)
+
+    def update_key_tracking(self, value):
+        self.engine.update_key_tracking(value)
+
+    def update_key_velocity(self, value):
+        self.key_velocity = value
+
     # process pc keyboard press events (chromatic)
     def keyPressEvent(self, event):
         if (event.isAutoRepeat()):
@@ -1186,7 +1192,7 @@ class MainWindow(QMainWindow):
                 if (offset < 18):
                     note = min(127, 12*self.engine.octave + offset + 60)
                     self.key_to_note.update({offset: note})
-                    self.engine.key_pressed(self.key_to_note[offset], 127)
+                    self.engine.key_pressed(self.key_to_note[offset], self.key_velocity)
                 else:
                     if (offset == 18):
                         if (self.engine.octave < 5):
