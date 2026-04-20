@@ -12,6 +12,7 @@ from pathlib import Path
 class SynthSettings(QGroupBox):
     drift_changed = Signal(float)
     key_tracking_changed = Signal(float)
+    key_velocity_changed = Signal(int)
 
     def __init__(self, display_color=QColor("black")):
         super().__init__()
@@ -20,6 +21,7 @@ class SynthSettings(QGroupBox):
 
         drift_label = QLabel("osc drift:")
         key_tracking_label = QLabel("key tracking:")
+        key_velocity_label = QLabel("key velocity:")
 
         self.drift_slider = QSlider(Qt.Horizontal)
         self.drift_slider.setRange(0, 1000)
@@ -30,12 +32,20 @@ class SynthSettings(QGroupBox):
         self.key_tracking_slider.setRange(0, 1000)
         self.key_tracking_slider.setSingleStep(1)
         self.key_tracking_slider.setValue(0)
+
+        self.key_velocity_slider = QSlider(Qt.Horizontal)
+        self.key_velocity_slider.setRange(0, 127)
+        self.key_velocity_slider.setSingleStep(1)
+        self.key_velocity_slider.setValue(127)
      
         self.drift_display = self.configure_display(ClickLCD(), 3, QLCDNumber.Dec, QLCDNumber.Flat, True)
         self.set_palette(self.drift_display)
 
         self.key_tracking_display = self.configure_display(ClickLCD(), 3, QLCDNumber.Dec, QLCDNumber.Flat, True)
         self.set_palette(self.key_tracking_display)
+
+        self.key_velocity_display = self.configure_display(ClickLCD(), 3, QLCDNumber.Dec, QLCDNumber.Flat, True)
+        self.set_palette(self.key_velocity_display)
 
         layout = QGridLayout()
 
@@ -46,6 +56,10 @@ class SynthSettings(QGroupBox):
         layout.addWidget(key_tracking_label, 1, 0)
         layout.addWidget(self.key_tracking_slider, 1, 1)
         layout.addWidget(self.key_tracking_display, 1, 2)
+
+        layout.addWidget(key_velocity_label, 2, 0)
+        layout.addWidget(self.key_velocity_slider, 2, 1)
+        layout.addWidget(self.key_velocity_display, 2, 2)
         
         self.setLayout(layout)
         self.setObjectName("synth_group")
@@ -56,6 +70,9 @@ class SynthSettings(QGroupBox):
 
         self.key_tracking_slider.valueChanged.connect(self.change_key_tracking)
         self.key_tracking_display.double_clicked.connect(self.reset_key_tracking)
+
+        self.key_velocity_slider.valueChanged.connect(self.change_key_velocity)
+        self.key_velocity_display.double_clicked.connect(self.reset_key_velocity)
 
     def change_drift(self, value):
         norm_value = float(value)/100.0
@@ -72,6 +89,13 @@ class SynthSettings(QGroupBox):
 
     def reset_key_tracking(self):
         self.key_tracking_slider.setValue(0)
+
+    def change_key_velocity(self, value):
+        self.key_velocity_display.display(f"{value}")
+        self.key_velocity_changed.emit(value)
+
+    def reset_key_velocity(self):
+        self.key_velocity_slider.setValue(127)
 
     #helpers
     def configure_display(self, display, num_digits, num_mode, dig_style, small_dec):
