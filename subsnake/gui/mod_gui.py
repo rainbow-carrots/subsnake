@@ -54,9 +54,9 @@ class ModulatorGUI(QWidget):
         self.lfo_phase_mod_dial_1 = CoolDial(1, -500, 500, "lfo1_phase")
 
         #   labels
-        freq_label_1 = QLabel("speed:")
-        phase_label_1 = QLabel("phase:")
-        shape_label_1 = QLabel("shape:")
+        self.freq_label_1 = QLabel("speed:")
+        self.phase_label_1 = QLabel("phase:")
+        self.shape_label_1 = QLabel("shape:")
 
         #   sliders
         self.lfo_freq_slider_1 = QSlider(Qt.Horizontal)
@@ -108,9 +108,9 @@ class ModulatorGUI(QWidget):
         lfo_layout_1.addWidget(self.lfo_freq_mod_dial_1, 0, 0)
         lfo_layout_1.addWidget(self.lfo_phase_mod_dial_1, 1, 0)
 
-        lfo_layout_1.addWidget(freq_label_1, 0, 1)
-        lfo_layout_1.addWidget(phase_label_1, 1, 1)
-        lfo_layout_1.addWidget(shape_label_1, 2, 1)
+        lfo_layout_1.addWidget(self.freq_label_1, 0, 1)
+        lfo_layout_1.addWidget(self.phase_label_1, 1, 1)
+        lfo_layout_1.addWidget(self.shape_label_1, 2, 1)
 
         lfo_layout_1.addWidget(self.lfo_freq_slider_1, 0, 2)
         lfo_layout_1.addWidget(self.lfo_phase_slider_1, 1, 2)
@@ -127,9 +127,9 @@ class ModulatorGUI(QWidget):
         self.lfo_phase_mod_dial_2 = CoolDial(1, -500, 500, "lfo2_phase")
 
         #   labels
-        freq_label_2 = QLabel("speed:")
-        phase_label_2 = QLabel("phase:")
-        shape_label_2 = QLabel("shape:")
+        self.freq_label_2 = QLabel("speed:")
+        self.phase_label_2 = QLabel("phase:")
+        self.shape_label_2 = QLabel("shape:")
 
         #   sliders
         self.lfo_freq_slider_2 = QSlider(Qt.Horizontal)
@@ -181,9 +181,9 @@ class ModulatorGUI(QWidget):
         lfo_layout_2.addWidget(self.lfo_freq_mod_dial_2, 0, 0)
         lfo_layout_2.addWidget(self.lfo_phase_mod_dial_2, 1, 0)
 
-        lfo_layout_2.addWidget(freq_label_2, 0, 1)
-        lfo_layout_2.addWidget(phase_label_2, 1, 1)
-        lfo_layout_2.addWidget(shape_label_2, 2, 1)
+        lfo_layout_2.addWidget(self.freq_label_2, 0, 1)
+        lfo_layout_2.addWidget(self.phase_label_2, 1, 1)
+        lfo_layout_2.addWidget(self.shape_label_2, 2, 1)
 
         lfo_layout_2.addWidget(self.lfo_freq_slider_2, 0, 2)
         lfo_layout_2.addWidget(self.lfo_phase_slider_2, 1, 2)
@@ -426,6 +426,11 @@ class ModulatorGUI(QWidget):
 
     def change_lfo1_shape(self, button):
         shape_text = button.text()
+        if shape_text == "square":
+            self.phase_label_1.setText("width:")
+        else:
+            self.phase_label_1.setText("phase:")
+
         if shape_text == "sine":
             new_shape = 0
         elif shape_text == "tri":
@@ -460,6 +465,11 @@ class ModulatorGUI(QWidget):
 
     def change_lfo2_shape(self, button):
         shape_text = button.text()
+        if shape_text == "square":
+            self.phase_label_2.setText("width:")
+        else:
+            self.phase_label_2.setText("phase:")
+
         if shape_text == "sine":
             new_shape = 0
         elif shape_text == "tri":
@@ -536,6 +546,11 @@ class ModulatorGUI(QWidget):
 
     #patch helpers
     def set_lfo1_shape(self, shape):
+        if shape == "square":
+            self.phase_label_1.setText("width:")
+        else:
+            self.phase_label_1.setText("phase:")
+
         if shape == "sine":
             new_shape = 0
             self.lfo_sin_button_1.setChecked(True)
@@ -557,6 +572,11 @@ class ModulatorGUI(QWidget):
         self.lfo1_shape_changed.emit(new_shape)
     
     def set_lfo2_shape(self, shape):
+        if shape == "square":
+            self.phase_label_2.setText("width:")
+        else:
+            self.phase_label_2.setText("phase:")
+            
         if shape == "sine":
             new_shape = 0
             self.lfo_sin_button_2.setChecked(True)
