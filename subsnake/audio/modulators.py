@@ -34,7 +34,7 @@ class LFO():
         generate_triangle(phase_test, f32_increment, f32_offset, test_out, mod_test, mod_test, 0.0, 0.0)
         generate_ramp(phase_test, f32_increment, f32_offset, test_out, mod_test, mod_test, 0.0, 0.0)
         generate_sawtooth(phase_test, f32_increment, f32_offset, test_out, mod_test, mod_test, 0.0, 0.0)
-        generate_square(phase_test, f32_increment, f32_offset, test_out, 0.5, mod_test, mod_test, 0.0, 0.0)
+        generate_square(phase_test, f32_increment, f32_offset, test_out, mod_test, mod_test, 0.0, 0.0)
         sample_and_hold(phase_test, f32_increment, test_out, np.zeros((1), dtype=np.float32), mod_test, 0.0)
 
     def process_block(self, frames, mod_buffers, mod_values):
@@ -47,7 +47,7 @@ class LFO():
         elif self.shape == 3:
             generate_sawtooth(self.current_phase, self.phase_offset, self.phase_increment, self.output[:frames], mod_buffers[0], mod_buffers[1], mod_values[0], mod_values[1])
         elif self.shape == 4:
-            generate_square(self.current_phase, self.phase_offset, self.phase_increment, self.output[:frames], 0.5, mod_buffers[0], mod_buffers[1], mod_values[0], mod_values[1])
+            generate_square(self.current_phase, self.phase_offset, self.phase_increment, self.output[:frames], mod_buffers[0], mod_buffers[1], mod_values[0], mod_values[1])
         elif self.shape == 5:
             sample_and_hold(self.current_phase, self.phase_increment, self.output, self.held_value,  mod_buffers[0], mod_values[0])
 
@@ -177,15 +177,15 @@ def generate_sawtooth(phase, offset, increment, output, freq_mod, phase_mod, fm_
 
 #--square (+pwm)
 @njit(nogil=True, fastmath=True, cache=True)
-def generate_square(phase, offset, increment, output, width, freq_mod, phase_mod, fm_amt, pm_amt):
+def generate_square(phase, offset, increment, output, freq_mod, width_mod, fm_amt, wm_amt):
     frames = len(output)
+    width = offset*oneovertwopi
     for n in range(0, frames):
         mod_increment = max(0.0, min(max_increment, increment + max_increment*freq_mod[n]*fm_amt))
-        mod_offset = max(0.0, min(twopi, offset + twopi*phase_mod[n]*pm_amt))
-        new_phase = phase[0] + mod_offset
-        norm_phase = new_phase*oneovertwopi
+        mod_width = max(0.0, min(1.0, width + width_mod[n]*wm_amt))
+        norm_phase = phase[0]*oneovertwopi
         norm_phase = norm_phase - np.floor(norm_phase)
-        output[n] = 2*(norm_phase < width) - 1.0
+        output[n] = 2*(norm_phase < mod_width) - 1.0
         phase[0] += mod_increment
         if phase[0] >= twopi:
             phase[0] -= twopi
