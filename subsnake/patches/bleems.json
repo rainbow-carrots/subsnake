@@ -1,5 +1,4 @@
 {
-    "osc_drift": 0,
     "osc_freq": 0,
     "osc_det": 0,
     "osc_width": 355,
@@ -40,7 +39,9 @@
     "menv1_rel": 500,
     "menv2_att": 250,
     "menv2_rel": 250,
+    "osc_drift": 0,
     "kt_amt": 198,
+    "kv_amt": 127,
     "osc_freq_mod": 0,
     "osc_freq_ass": 0,
     "osc_det_mod": 0,
