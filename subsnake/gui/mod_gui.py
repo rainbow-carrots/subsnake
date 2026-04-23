@@ -428,6 +428,8 @@ class ModulatorGUI(QWidget):
         shape_text = button.text()
         if shape_text == "square":
             self.phase_label_1.setText("width:")
+        elif shape_text == "s+h":
+            self.phase_label_1.setText("slew:")
         else:
             self.phase_label_1.setText("phase:")
 
@@ -467,6 +469,8 @@ class ModulatorGUI(QWidget):
         shape_text = button.text()
         if shape_text == "square":
             self.phase_label_2.setText("width:")
+        elif shape_text == "s+h":
+            self.phase_label_2.setText("slew:")
         else:
             self.phase_label_2.setText("phase:")
 
@@ -548,6 +552,8 @@ class ModulatorGUI(QWidget):
     def set_lfo1_shape(self, shape):
         if shape == "square":
             self.phase_label_1.setText("width:")
+        elif shape == "s+h":
+            self.phase_label_1.setText("slew:")
         else:
             self.phase_label_1.setText("phase:")
 
@@ -574,9 +580,11 @@ class ModulatorGUI(QWidget):
     def set_lfo2_shape(self, shape):
         if shape == "square":
             self.phase_label_2.setText("width:")
+        elif shape == "s+h":
+            self.phase_label_2.setText("slew:")
         else:
             self.phase_label_2.setText("phase:")
-            
+
         if shape == "sine":
             new_shape = 0
             self.lfo_sin_button_2.setChecked(True)
