@@ -44,7 +44,8 @@ there's also a stereo tape delay effect on the master bus (voice output + record
 ### is there anything else?
 * to reset a parameter, *double click* the parameter display (to the right of each slider)
 * the keys A-' are mapped chromatically and can trigger note events (fixed velocity)
-    * you can shift the pc keyboard octave range up/down using the +/- keys
+    * to shift the pc keyboard octave range up/down, use the +/- keys, respectively
+    * you can set the pc keyboard velocity (0-127) from the synth settings panel
 * to switch between oscillator types (BLIT/polyBLEP), *right click* the oscillator title box
 * to switch between filter types (Chamberlin/ZDF), *right click* the filter title box
 * the filter & oscillator type selections are saved with the patch (& restored on load)
@@ -60,7 +61,7 @@ there's also a stereo tape delay effect on the master bus (voice output + record
 
 
 ### how can i play it?
-* [v0.4.0](https://github.com/rainbow-carrots/subsnake/releases/tag/v0.4.0) is the latest build
+* [v0.4.1](https://github.com/rainbow-carrots/subsnake/releases/tag/v0.4.1) is the latest build
 * click on the version that corresponds to your platform to download the zip, extract, & run! if it doesn't open:
     * __on linux__: right click the file, go to *Properties* -> *Permissions*, and make sure "Allow executing file as program" is checked 
     * __on macos__: you'll need to [authorize the app](https://support.apple.com/guide/mac-help/open-a-mac-app-from-an-unknown-developer-mh40616/mac) when running it for the first time. go to *System Settings* -> *Privacy & Security*, scroll down to the bottom, and choose *Open anyway* (under *Security*)
@@ -76,32 +77,25 @@ there's also a stereo tape delay effect on the master bus (voice output + record
     * input level control (currently fixed)
     * playback speed control
 * synth settings panel:
-    * pc keyboard velocity control
-    * voice stacking & spread settings
+    * voice stacking & spread
 * oscillators:
-    * [LP-BLIT](https://www.dafx.de/paper-archive/2017/papers/DAFx17_paper_59.pdf) implementation
-    * VOSIM implementation
-    * anti-aliased wavetable oscillator
+    * noise module
+    * more algorithms
+        * [LP-BLIT](https://www.dafx.de/paper-archive/2017/papers/DAFx17_paper_59.pdf) implementation
+        * VOSIM implementation
+        * anti-aliased wavetable oscillator
 * modulators:
-    * shape-dependent secondary control (currently sets phase only)
-        * phase for sine, saw & ramp
-        * width for square & triangle
-        * slew for sample & hold
-    * third LFO & modulation envelope
     * make LFOs anti-aliased (for audio-rate mod.)
+    * increase max. LFO rate to audio range
     * additional LFO modes:
         * reset phase on gate
         * key pitch tracking (w/ ratio)
-    * increase max. LFO rate to audio range
-    * add audio oscillators as mod sources
 * effects:
     * stereo delay
         * add ping pong & dampening parameters
     * stereo chorus
     * algorithmic reverb
     * combine effects into single stack
-* mixer:
-    * noise submodule
 * isorhythmic pattern generator/sequencer
 * Lissajous display mode for scope
 * more patches :3
