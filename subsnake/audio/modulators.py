@@ -23,6 +23,7 @@ class LFO():
         self.shape = shape
         self.held_value = np.zeros((1), dtype=np.float32)
         self.held_value[0] = 2*np.random.random() - 1.0
+        self.slew_buffer = np.zeros((1), dtype=np.float32)
 
         #init numba compile calls
         test_out = np.zeros((16), dtype=np.float32)
@@ -30,12 +31,12 @@ class LFO():
         phase_test = np.zeros((1), dtype=np.float32)
         f32_increment = np.float32(0.1)
         f32_offset = np.float32(0.0)
-        generate_sine(phase_test, f32_increment, f32_offset, test_out, mod_test, mod_test, 0.0, 0.0)
-        generate_triangle(phase_test, f32_increment, f32_offset, test_out, mod_test, mod_test, 0.0, 0.0)
-        generate_ramp(phase_test, f32_increment, f32_offset, test_out, mod_test, mod_test, 0.0, 0.0)
-        generate_sawtooth(phase_test, f32_increment, f32_offset, test_out, mod_test, mod_test, 0.0, 0.0)
-        generate_square(phase_test, f32_increment, f32_offset, test_out, mod_test, mod_test, 0.0, 0.0)
-        sample_and_hold(phase_test, f32_increment, test_out, np.zeros((1), dtype=np.float32), mod_test, 0.0)
+        generate_sine(phase_test, f32_offset, f32_increment, test_out, mod_test, mod_test, 0.0, 0.0)
+        generate_triangle(phase_test, f32_offset, f32_increment, test_out, mod_test, mod_test, 0.0, 0.0)
+        generate_ramp(phase_test, f32_offset, f32_increment, test_out, mod_test, mod_test, 0.0, 0.0)
+        generate_sawtooth(phase_test, f32_offset, f32_increment, test_out, mod_test, mod_test, 0.0, 0.0)
+        generate_square(phase_test, f32_offset, f32_increment, test_out, mod_test, mod_test, 0.0, 0.0)
+        sample_and_hold(phase_test, f32_offset, f32_increment, test_out, np.zeros((1), dtype=np.float32), np.zeros((1), dtype=np.float32), mod_test, mod_test, 0.0, 0.0)
 
     def process_block(self, frames, mod_buffers, mod_values):
         if self.shape == 0:
@@ -49,7 +50,7 @@ class LFO():
         elif self.shape == 4:
             generate_square(self.current_phase, self.phase_offset, self.phase_increment, self.output[:frames], mod_buffers[0], mod_buffers[1], mod_values[0], mod_values[1])
         elif self.shape == 5:
-            sample_and_hold(self.current_phase, self.phase_increment, self.output, self.held_value,  mod_buffers[0], mod_values[0])
+            sample_and_hold(self.current_phase, self.phase_offset, self.phase_increment, self.output, self.held_value, self.slew_buffer, mod_buffers[0], mod_buffers[1], mod_values[0], mod_values[1])
 
     def set_frequency(self, new_freq):
         self.frequency = np.float32(new_freq)
@@ -190,13 +191,18 @@ def generate_square(phase, offset, increment, output, freq_mod, width_mod, fm_am
         if phase[0] >= twopi:
             phase[0] -= twopi
 
-#--sample & hold (no slew)
+#--sample & hold (+slew)
 @njit(nogil=True, fastmath=True, cache=True)
-def sample_and_hold(phase, increment, output, held_value, freq_mod, fm_amt):
+def sample_and_hold(phase, offset, increment, output, held_value, slew_buffer, freq_mod, slew_mod, fm_amt, sm_amt):
     frames = len(output)
+    norm_offset = offset*oneovertwopi
+    cutoff = 25.0*norm_offset
     for n in range(0, frames):
         mod_increment = max(0.0, min(max_increment, increment + max_increment*freq_mod[n]*fm_amt))
-        output[n] = held_value[0]
+        mod_cutoff = max(0.01, min(25.0, cutoff + 25.0*slew_mod[n]*sm_amt))
+        scaled_cutoff = mod_cutoff*oneoverfs
+        slew_buffer[0] = slew_buffer[0] + (held_value[0] - slew_buffer[0])*scaled_cutoff
+        output[n] = slew_buffer[0]
         phase[0] += mod_increment
         if phase[0] >= twopi:
             phase[0] -= twopi
