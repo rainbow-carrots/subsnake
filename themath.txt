@@ -77,6 +77,3 @@ BP = g*HP + s1
 s1 = BP + g*HP 
 LP = g*BP + s2
 s2 = LP + g*BP
-
-applying the trapezoidal rule enables the transformation of the delay (feedback) elements into predicted next states,
-replacing forward euler with trapezoidal integration & resolving the delay-related instabilities of the Chamberlin SVF.
